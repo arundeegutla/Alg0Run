@@ -1,7 +1,7 @@
 'use client';
 
-import ListGroup from '@/components/ListGroup';
-import NavBar from '@/components/NavBar';
+import ListGroup from '../components/ListGroup';
+import NavBar from '../components/NavBar';
 import { auth } from '../../firebase/clientApp'
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from 'next/navigation';
