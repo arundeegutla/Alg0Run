@@ -1,6 +1,6 @@
 'use client'; // This is a client component 👈🏽
 
-import NavBar from '@/components/NavBar';
+import NavBar from '../../components/NavBar';
 import { auth } from '../../../firebase/clientApp';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
