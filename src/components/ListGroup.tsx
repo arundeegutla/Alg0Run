@@ -55,11 +55,11 @@ const people = [
 
 export default function ListGroup() {
     return (
-        <ul role="list" className="divide-y divide-gray-100 green">
+        <ul role="list" className="divide-y divide-gray-100 bg-white p-[20px]">
             {people.map((person) => (
                 <li
                     key={person.email}
-                    className="flex justify-between gap-x-6 py-5 bg-purple-200">
+                    className="flex justify-between gap-x-6 py-5">
 
                     <div className="flex min-w-0 gap-x-4">
                         <img
@@ -72,7 +72,7 @@ export default function ListGroup() {
                                 {person.name}
                             </p>
                             <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                                {person.email + "fafasdfsd"}
+                                {person.email}
                             </p>
                         </div>
                     </div>

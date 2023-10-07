@@ -1,12 +1,26 @@
+'use client';
+
 import ListGroup from '@/components/ListGroup';
-import Image from 'next/image';
+import NavBar from '@/components/NavBar';
+import { auth } from '../../firebase/clientApp'
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useRouter } from 'next/navigation';
+
 
 export default function Home() {
+    const [user, loading, error] = useAuthState(auth);
+
+    const router = useRouter();
+    if(user) {
+        console.log(user.displayName);
+    } else if(!loading) {
+        router.push('/auth');
+        return;
+    }
+
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24 text-gray-50">
-            <div className="flex flex-col bg-green-100 w-[50%]">
-                <ListGroup />
-            </div>
+        <main className="default ">
+            <NavBar current='Home'></NavBar>
         </main>
     );
 }
