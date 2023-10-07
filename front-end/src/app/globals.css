@@ -25,3 +25,7 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.default {
+  @apply flex h-screen items-center text-gray-50 bg-sky-800
+}
