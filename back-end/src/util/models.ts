@@ -27,7 +27,7 @@ export type Algo = {
   }
   time_complexity: string,
   description: string,
-  usage: string
+  link: string
 }
 
 export type Play = {
