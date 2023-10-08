@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { firestore } from "firebase-admin";
 
 export type Language = "python" | "cpp" | "java";
 
@@ -49,13 +50,13 @@ export type PlayDetails = {
   accuracy: number,
   wpm: number,
   time: number,
-  date_completed: EpochTimeStamp
+  date_completed: firestore.Timestamp
 }
 
 export const LANGUAGE_MULTIPLIER = new Map<Language, number>([
   ["python", 0.8],
-  ["java", 1],
-  ["cpp", 1.3]
+  ["java", 1.3],
+  ["cpp", 1]
 ]);
 
 export function routeWrapper(f: Function) {
