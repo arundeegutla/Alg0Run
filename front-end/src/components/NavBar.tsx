@@ -3,15 +3,20 @@
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { FaLaptopCode } from 'react-icons/fa';
-import { HiFastForward, HiBell, HiX } from 'react-icons/hi';
+
+// Icons
+import { AiFillHome } from 'react-icons/ai';
+import {MdLeaderboard} from 'react-icons/md'
 import { FaUser } from 'react-icons/fa';
+
+// Auth
 import { auth } from '../../firebase/clientApp';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
+
 const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Type', href: '/type' },
-    { name: 'Leaderboard', href: '/leaderboard' },
+    { name: 'Home', href: '/'},
+    { name: 'Leaderboard', href: '/leaderboard' }
 ];
 
 function classNames(...classes: string[]) {
@@ -31,7 +36,7 @@ export default function NavBar({ current }: { current: string }) {
             });
     };
 
-    const getDroppy = () => {
+    const getDroppedDown = () => {
         if (!user) return '';
         return (
             <Transition
@@ -43,38 +48,10 @@ export default function NavBar({ current }: { current: string }) {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute left-10 top-[-16px] z-10 mt-2 w-48 origin-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <Menu.Item>
                         {({ active }) => (
-                            <a
-                                href="#"
-                                className={classNames(
-                                    active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm text-gray-700'
-                                )}
-                            >
-                                Your Profile
-                            </a>
-                        )}
-                    </Menu.Item>
-                    <Menu.Item>
-                        {({ active }) => (
-                            <a
-                                href="#"
-                                className={classNames(
-                                    active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm text-gray-700'
-                                )}
-                            >
-                                Settings
-                            </a>
-                        )}
-                    </Menu.Item>
-                    <Menu.Item>
-                        {({ active }) => (
-                            <a
-                                onClick={signOut}
-                                href="#"
+                            <a onClick={signOut} href="#"
                                 className={classNames(
                                     active ? 'bg-gray-100' : '',
                                     'block px-4 py-2 text-sm text-gray-700'
@@ -91,48 +68,37 @@ export default function NavBar({ current }: { current: string }) {
 
     const getProfilePic = () => {
         if(!user) {
-            return <FaUser className="h-8 w-8 rounded-full" />
+            return <FaUser className="h-8 w-auto rounded-full" />
         }
         const url: string = user.photoURL !== null ? user.photoURL : '';
-        return <img src={url} className='h-8 w-8 rounded-full'/>
+        return <img src={url} className='h-8 w-auto rounded-full'/>
+    }
+
+    const getIcon = (value: string) => {
+        if(value == 'Home') {
+            return <AiFillHome className="h-8 w-auto text-white cursor-pointer hover:text-red-300"/>
+        }
+        return <MdLeaderboard className="h-8 w-auto text-white cursor-pointer hover:text-red-300"/>
     }
 
     return (
-        <div className="top-0 w-screen left-0 absolute">
-            <Disclosure as="nav" className="bg-gray-800">
+        <div className="top-0 left-0 absolute w-16">
+            <Disclosure as="nav" className="my-blur transparent-dark">
                 {({ open }) => (
                     <>
-                        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-                            <div className="relative flex h-16 items-center justify-between">
-                                <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                                    {/* Mobile menu button*/}
-                                    <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                                        <span className="absolute -inset-0.5" />
-                                        <span className="sr-only">
-                                            Open main menu
-                                        </span>
-                                        {open ? (
-                                            <HiX
-                                                className="block h-6 w-6"
-                                                aria-hidden="true"
-                                            />
-                                        ) : (
-                                            <HiFastForward
-                                                className="block h-6 w-6"
-                                                aria-hidden="true"
-                                            />
-                                        )}
-                                    </Disclosure.Button>
-                                </div>
-                                <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                                    <div className="flex flex-shrink-0 items-center">
+                        <div className="my-auto max-w-7xl pb-6 pt-4 h-screen ">
+                            <div className="relative flex flex-col justify-between h-[100%] items-center">
+                                <div>
+                                    {/* LOGO */}
+                                    <div className="flex items-center justify-center">
                                         <FaLaptopCode
-                                            className="h-8 w-auto text-red-400 cursor-pointer hover:text-red-300"
+                                            className="h-8 w-auto text-red-400 cursor-pointer hover:text-red-300 mb-4"
                                             alt="AlgoRun"
                                         />
                                     </div>
-                                    <div className="hidden sm:ml-6 sm:block">
-                                        <div className="flex space-x-4">
+
+                                    <div className="block">
+                                        <div className="flex flex-col">
                                             {navigation.map((item) => (
                                                 <a
                                                     key={item.name}
@@ -141,7 +107,7 @@ export default function NavBar({ current }: { current: string }) {
                                                         item.name == current
                                                             ? 'bg-gray-900 text-white'
                                                             : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                        'rounded-md px-3 py-2 text-sm font-medium'
+                                                        'rounded-md px-3 py-2 text-sm font-medium mb-2'
                                                     )}
                                                     aria-current={
                                                         item.name == current
@@ -149,53 +115,23 @@ export default function NavBar({ current }: { current: string }) {
                                                             : undefined
                                                     }
                                                 >
-                                                    {item.name}
+                                                    {getIcon(item.name)}
                                                 </a>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                                    <Menu as="div" className="relative ml-3">
-                                        <div>
-                                            <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm ring-2 ring-white ring-offset-2 ring-offset-gray-800">
-                                                <span className="absolute -inset-1.5" />
-                                                <span className="sr-only">
-                                                    Open user menu
-                                                </span>
-                                                {getProfilePic()}
-                                            </Menu.Button>
-                                        </div>
-                                        {getDroppy()}
-                                    </Menu>
-                                </div>
+                                <Menu as="div" className="relative focus:outline-0">
+                                    <div>
+                                        <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm ring-2 ring-white ring-offset-2 ring-offset-gray-800 focus:outline-0">
+                                            {getProfilePic()}
+                                        </Menu.Button>
+                                    </div>
+                                    {getDroppedDown()}
+                                </Menu>
                             </div>
                         </div>
 
-                        <Disclosure.Panel className="sm:hidden">
-                            <div className="space-y-1 px-2 pb-3 pt-2">
-                                {navigation.map((item) => (
-                                    <Disclosure.Button
-                                        key={item.name}
-                                        as="a"
-                                        href={item.href}
-                                        className={classNames(
-                                            item.name == current
-                                                ? 'bg-gray-900 text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                            'block rounded-md px-3 py-2 text-base font-medium'
-                                        )}
-                                        aria-current={
-                                            item.name == current
-                                                ? 'page'
-                                                : undefined
-                                        }
-                                    >
-                                        {item.name}
-                                    </Disclosure.Button>
-                                ))}
-                            </div>
-                        </Disclosure.Panel>
                     </>
                 )}
             </Disclosure>

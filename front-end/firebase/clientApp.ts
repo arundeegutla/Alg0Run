@@ -17,7 +17,7 @@ const firebaseConfig = {
     storageBucket: "knight-hacks-2023.appspot.com",
     messagingSenderId: "222283636237",
     appId: "1:222283636237:web:17302281333ea0769dff44"
-  };
+};
 
 const app = initializeApp(firebaseConfig);
 
