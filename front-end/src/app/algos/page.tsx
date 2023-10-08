@@ -34,6 +34,16 @@ export default function Home() {
         algos.push(DATA.algos[i].name);
     }
 
+    
+    const goType = ({name}: {name:string}) => {
+        for (let i = 0; i < 20; i++) {
+            if(name == DATA.algos[i].name) {
+                useRouter().push('/type');
+                return;
+            }
+        }
+    }
+
     return (
         <main className="default flex-row items-center justify-center flex-wrap">
             <div className="flex flex-col items-center  w-[60%] h-[100%] rounded-2xl bg-white/[0.6] text-black p-8">

@@ -45,7 +45,7 @@ export default function Profile({
                             <div className="flex flex-row justify-center items-center ">
                                 <div className='flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium mb-2'>
                                     <GiTrophyCup className="h-8 w-auto "/>
-                                    <h2 className='m-1'>20002</h2>
+                                    <h2 className='m-1'>{Math.floor(Math.random() * 1000) + 1}</h2>
                                 </div>
                             </div>
                         </div>

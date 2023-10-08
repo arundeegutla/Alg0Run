@@ -65,9 +65,8 @@ export default function Profile({
         <div className={className}>
             <div className="flex flex-col w-[100%] h-[100%] rounded-2xl bg-white/[0.6] text-black p-4">
                 <h2 className='font-semibold'>Friends</h2>
-                <SearchComponent onChange={(event: any) => {
-                    setSearchTerm(event.target.value);
-                }}/>
+                <SearchComponent onChange={(event: any) => {setSearchTerm(event.target.value);}}/>
+                
                 <ul className="max-w-md divide-gray-200 dark:divide-gray-700">
                     {people.filter((person) => {
                         if (searchTerm == '' || person.name.toLowerCase().includes(searchTerm.toLowerCase())) {
