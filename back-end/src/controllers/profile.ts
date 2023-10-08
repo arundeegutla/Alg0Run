@@ -88,3 +88,55 @@ export async function getProfile(id: string) {
     error: ""
   }
 }
+
+export async function addFriend(profileId: string, friendId: string) {
+  if (!user.getProfile(profileId)) {
+    return {
+      error: "Profile does not exist"
+    }
+  }
+
+  if (!user.getProfile(friendId)) {
+    return {
+      error: "Friend does not exist"
+    }
+  }
+
+  const res = user.removeFriend(profileId, friendId);
+
+  if (res === undefined) {
+    return {
+      error: "Failed to remove friend"
+    }
+  }
+
+  return {
+    error: ""
+  }
+}
+
+export async function removeFriend(profileId: string, friendId: string) {
+  if (!user.getProfile(profileId)) {
+    return {
+      error: "Profile does not exist"
+    }
+  }
+
+  if (!user.getProfile(friendId)) {
+    return {
+      error: "Friend does not exist"
+    }
+  }
+
+  const res = user.addFriend(profileId, friendId);
+
+  if (res === undefined) {
+    return {
+      error: "Failed to add friend"
+    }
+  }
+
+  return {
+    error: ""
+  }
+}
