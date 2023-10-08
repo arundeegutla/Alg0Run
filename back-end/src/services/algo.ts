@@ -11,15 +11,21 @@ export async function getAlgo(id: string) {
       if (!doc.exists) {
         return undefined;
       }
-
-      return doc.data() as Algo
+      
+      let res = doc.data() || {};
+      res.id = doc.id;
+      return res as Algo
     });
 }
 
 export async function getAllAlgos() {
   return db.collection("Algos")
     .get()
-    .then(querySnapshot => querySnapshot.docs.map(doc => doc.data() as Algo));
+    .then(querySnapshot => querySnapshot.docs.map(doc => {
+      let res = doc.data();
+      res.id = doc.id;
+      return res as Algo
+    }));
 }
 
 export async function createPlay(algoId: string, profileId: string, username: string, playDetails: PlayDetails) {
