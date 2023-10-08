@@ -8,6 +8,7 @@ import {
     createUserWithEmailAndPassword,
     getAuth,
     signInWithEmailAndPassword,
+    updateProfile,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -33,18 +34,18 @@ function AuthScreen() {
 const LogIn = ({ toggle }: MyFunctions) => {
     const googleAuth = new GoogleAuthProvider();
     const router = useRouter();
-    const [username, setUserName] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setUserName] = useState('');
+    const [password, setPassword] = useState('');
 
     const getUserName = (e: ChangeEvent<HTMLInputElement>) => {
-      // 👇 Store the input value to local state
-      setUserName(e.target.value);
+        // 👇 Store the input value to local state
+        setUserName(e.target.value);
     };
     const getPassword = (e: ChangeEvent<HTMLInputElement>) => {
         // 👇 Store the input value to local state
         setPassword(e.target.value);
-      };
-    
+    };
+
     const loginGoogle = async () => {
         try {
             const result = await signInWithPopup(auth, googleAuth);
@@ -58,11 +59,10 @@ const LogIn = ({ toggle }: MyFunctions) => {
         router.push('/auth');
     };
     const loginManually = async () => {
-        if(!username || !password) return;
+        if (!email || !password) return;
 
         const loginAuth = getAuth();
-        alert(username + " " + password)
-        signInWithEmailAndPassword(loginAuth, username, password)
+        signInWithEmailAndPassword(loginAuth, email, password)
             .then((userCredential) => {
                 router.push('/auth');
             })
@@ -140,10 +140,11 @@ const LogIn = ({ toggle }: MyFunctions) => {
                         </div>
                         <div>
                             <label className="text-sm font-medium leading-none text-gray-800">
-                                Username
+                                Email
                             </label>
                             <input
-                                onChange={getUserName} value={username}
+                                onChange={getUserName}
+                                value={email}
                                 aria-label="enter email adress"
                                 role="input"
                                 type="email"
@@ -156,7 +157,8 @@ const LogIn = ({ toggle }: MyFunctions) => {
                             </label>
                             <div className="relative flex items-center justify-center">
                                 <input
-                                    onChange={getPassword} value={password}
+                                    onChange={getPassword}
+                                    value={password}
                                     aria-label="enter Password"
                                     role="input"
                                     type="password"
@@ -198,6 +200,22 @@ const LogIn = ({ toggle }: MyFunctions) => {
 const SignUp = ({ toggle }: MyFunctions) => {
     const googleAuth = new GoogleAuthProvider();
     const router = useRouter();
+    const [email, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+
+    const getUserName = (e: ChangeEvent<HTMLInputElement>) => {
+        // 👇 Store the input value to local state
+        setUserName(e.target.value);
+    };
+    const getPassword = (e: ChangeEvent<HTMLInputElement>) => {
+        // 👇 Store the input value to local state
+        setPassword(e.target.value);
+    };
+    const getName = (e: ChangeEvent<HTMLInputElement>) => {
+        // 👇 Store the input value to local state
+        setName(e.target.value);
+    };
 
     const sign_up = async () => {
         try {
@@ -210,6 +228,25 @@ const SignUp = ({ toggle }: MyFunctions) => {
         } catch (error) {}
 
         router.push('/auth');
+    };
+
+    const sign_up_manually = async () => {
+        if (!email || !password) return;
+        const loginAuth = getAuth();
+        createUserWithEmailAndPassword(loginAuth, email, password)
+            .then(async function (result) {
+                console.log("Madeit");
+                await updateProfile(result.user, {
+                    displayName: name,
+                    photoURL: 'https://cdn-icons-png.flaticon.com/512/147/147142.png',
+                });
+                router.push('/');
+            })
+            .catch(function (error) {
+                console.log(error);
+                router.push('/auth');
+                return;
+            });
     };
     return (
         <main className="default">
@@ -281,31 +318,24 @@ const SignUp = ({ toggle }: MyFunctions) => {
                         </div>
                         <div className="mt-6  w-full">
                             <label className="text-sm font-medium leading-none text-gray-800">
-                                First Name
+                                Name
                             </label>
                             <input
+                                onChange={getName}
+                                value={name}
                                 aria-label="enter email adress"
                                 role="input"
-                                type="fname"
+                                type="name"
                                 className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
                             />
                         </div>
                         <div className="mt-6  w-full">
                             <label className="text-sm font-medium leading-none text-gray-800">
-                                Last Name
+                                Email
                             </label>
                             <input
-                                aria-label="enter email adress"
-                                role="input"
-                                type="lname"
-                                className="bg-gray-200 border rounded focus:outline-none text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
-                            />
-                        </div>
-                        <div className="mt-6  w-full">
-                            <label className="text-sm font-medium leading-none text-gray-800">
-                                Username
-                            </label>
-                            <input
+                                onChange={getUserName}
+                                value={email}
                                 aria-label="enter email adress"
                                 role="input"
                                 type="email"
@@ -318,6 +348,8 @@ const SignUp = ({ toggle }: MyFunctions) => {
                             </label>
                             <div className="relative flex items-center justify-center">
                                 <input
+                                    onChange={getPassword}
+                                    value={password}
                                     aria-label="enter Password"
                                     role="input"
                                     type="password"
@@ -341,6 +373,7 @@ const SignUp = ({ toggle }: MyFunctions) => {
                         </div>
                         <div className="mt-8">
                             <button
+                                onClick={sign_up_manually}
                                 role="button"
                                 aria-label="Sign Up"
                                 className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 w-full"

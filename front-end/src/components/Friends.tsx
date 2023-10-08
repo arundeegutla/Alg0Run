@@ -2,6 +2,7 @@
 import { User } from 'firebase/auth';
 import { FaUser } from 'react-icons/fa';
 import { GiTrophyCup } from 'react-icons/gi';
+import SearchComponent from './SearchBar';
 
 const people = [
     {
@@ -61,6 +62,7 @@ export default function Profile({
         <div className={className}>
             <div className="flex flex-col w-[100%] h-[100%] rounded-2xl bg-white/[0.6] text-black p-4">
                 <h2 className='font-semibold'>Friends</h2>
+                <SearchComponent />
                 <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
                     {people.map((person) => (
                         <li className='py-3'>

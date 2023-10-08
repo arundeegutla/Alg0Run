@@ -7,7 +7,7 @@ export default function Home() {
         <main className="default">
             <NavBar current='Type'></NavBar>
             <div className="flex flex-col bg-green-100 w-[50%]">
-
+                
             </div>
         </main>
     );
