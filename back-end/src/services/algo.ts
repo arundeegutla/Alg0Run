@@ -7,7 +7,13 @@ export async function getAlgo(id: string) {
   return await db.collection("Algos")
     .doc(id)
     .get()
-    .then(doc => doc.data() as Algo);
+    .then(doc => {
+      if (!doc.exists) {
+        return undefined;
+      }
+
+      return doc.data() as Algo
+    });
 }
 
 export async function getAllAlgos() {

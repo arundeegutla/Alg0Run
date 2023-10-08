@@ -17,11 +17,13 @@ export async function getProfileByUserId(userId: string) {
     .where("userId", "==", userId)
     .get()
     .then(querySnapshot => {
-      if (!querySnapshot.empty) {
-        let res = querySnapshot.docs[0].data();
-        res.id = querySnapshot.docs[0].id;
-        return res as Profile;
+      if (querySnapshot.empty) {
+        return undefined;
       }
+
+      let res = querySnapshot.docs[0].data();
+      res.id = querySnapshot.docs[0].id;
+      return res as Profile;
     });
 }
 
@@ -30,12 +32,12 @@ export async function getProfile(profileId: string) {
     .doc(profileId)
     .get()
     .then(doc => {
-      let res = doc.data();
-
-      if (res === undefined) return undefined;
-
-      res.id = profileId;
-
+      if (!doc.exists) {
+        return undefined;
+      }
+      
+      let res = doc.data() || {};
+      res.id = doc.id;
       return res as Profile;
     });
 }

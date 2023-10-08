@@ -8,12 +8,12 @@ export async function getUsers() {
     .select("username", "totalScore")
     .get()
     .then(querySnapshot => querySnapshot.docs.map(doc => {
-      let res = doc.data();
+      if (!doc.exists) {
+        return undefined;
+      }
 
-      if (res === undefined) return undefined;
-      
+      let res = doc.data() || {};      
       res.id = doc.id;
-
       return res as ProfileBasic
     }));
 }
