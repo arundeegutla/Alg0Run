@@ -1,5 +1,5 @@
 import { firestore } from "firebase-admin";
-import { db } from "../util/db";
+import { fb, db } from "../util/db";
 
 import { PlayDetails, Algo } from "../util/models";
 

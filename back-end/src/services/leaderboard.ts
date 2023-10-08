@@ -7,15 +7,7 @@ export async function getUsers() {
   return db.collection("Users")
     .select("username", "totalScore")
     .get()
-    .then(querySnapshot => querySnapshot.docs.map(doc => {
-      if (!doc.exists) {
-        return undefined;
-      }
-
-      let res = doc.data() || {};      
-      res.id = doc.id;
-      return res as ProfileBasic
-    }));
+    .then(querySnapshot => querySnapshot.docs.map(doc => doc.data() as ProfileBasic));
 }
 
 export async function getAlgo(algoId: string) {
