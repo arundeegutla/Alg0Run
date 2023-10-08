@@ -27,17 +27,16 @@ export default function Home() {
         return;
     }
 
-
+    
     return (
         <main className="default flex-row items-stretch flex-wrap">
             <div className='flex flex-col items-stretch flex-wrap'>
                 <Profile className='profile my-blur my-hover rounded-2xl' profile={{metadata: user, score: 10}}></Profile>
-                <Friends className='profile my-blur my-hover rounded-2xl' friends={[]}></Friends>
+                <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={[]}></RecentPlays>
             </div>
             <div>
                 <Friends className='profile my-blur my-hover rounded-2xl' friends={[]}></Friends>
             </div>
-            {/* <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={[]}></RecentPlays> */}
             <NavBar current='Home'></NavBar>
         </main>
     );

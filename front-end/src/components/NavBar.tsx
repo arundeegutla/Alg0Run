@@ -6,17 +6,20 @@ import { FaLaptopCode } from 'react-icons/fa';
 
 // Icons
 import { AiFillHome } from 'react-icons/ai';
-import {MdLeaderboard} from 'react-icons/md'
+import { MdLeaderboard } from 'react-icons/md';
 import { FaUser } from 'react-icons/fa';
+import { PiTreeStructureFill } from 'react-icons/pi';
 
 // Auth
 import { auth } from '../../firebase/clientApp';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+
 const navigation = [
-    { name: 'Home', href: '/'},
-    { name: 'Leaderboard', href: '/leaderboard' }
+    { name: 'Home', href: '/' },
+    { name: 'Algo', href: '/algos' },
+    { name: 'Leaderboard', href: '/leaderboard' },
 ];
 
 function classNames(...classes: string[]) {
@@ -51,7 +54,9 @@ export default function NavBar({ current }: { current: string }) {
                 <Menu.Items className="absolute left-10 top-[-16px] z-10 mt-2 w-48 origin-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <Menu.Item>
                         {({ active }) => (
-                            <a onClick={signOut} href="#"
+                            <a
+                                onClick={signOut}
+                                href="#"
                                 className={classNames(
                                     active ? 'bg-gray-100' : '',
                                     'block px-4 py-2 text-sm text-gray-700'
@@ -67,26 +72,33 @@ export default function NavBar({ current }: { current: string }) {
     };
 
     const getProfilePic = () => {
-        if(!user) {
-            return <FaUser className="h-8 w-auto rounded-full" />
+        if (!user) {
+            return <FaUser className="h-8 w-auto rounded-full" />;
         }
         const url: string = user.photoURL !== null ? user.photoURL : '';
-        return <img src={url} className='h-8 w-auto rounded-full'/>
-    }
+        return <img src={url} className="h-8 w-auto rounded-full" />;
+    };
 
     const getIcon = (value: string) => {
-        if(value == 'Home') {
-            return <AiFillHome className="h-8 w-auto text-white cursor-pointer hover:text-red-300"/>
-        }
-        return <MdLeaderboard className="h-8 w-auto text-white cursor-pointer hover:text-red-300"/>
-    }
+        if (value == 'Home')
+            return (
+                <AiFillHome className="h-8 w-auto text-white cursor-pointer hover:text-red-300" />
+            );
+        if (value == 'Leaderboard')
+            return (
+                <MdLeaderboard className="h-8 w-auto text-white cursor-pointer hover:text-red-300" />
+            );
+        return (
+            <PiTreeStructureFill className="h-8 w-auto text-white cursor-pointer hover:text-red-300" />
+        );
+    };
 
     return (
         <div className="top-0 left-0 absolute w-16">
             <Disclosure as="nav" className="my-blur transparent-dark">
                 {({ open }) => (
                     <>
-                        <div className="my-auto max-w-7xl pb-6 pt-4 h-screen ">
+                        <div className="my-auto max-w-7xl pb-12 pt-4 h-screen ">
                             <div className="relative flex flex-col justify-between h-[100%] items-center">
                                 <div>
                                     {/* LOGO */}
@@ -121,7 +133,10 @@ export default function NavBar({ current }: { current: string }) {
                                         </div>
                                     </div>
                                 </div>
-                                <Menu as="div" className="relative focus:outline-0">
+                                <Menu
+                                    as="div"
+                                    className="relative focus:outline-0"
+                                >
                                     <div>
                                         <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm ring-2 ring-white ring-offset-2 ring-offset-gray-800 focus:outline-0">
                                             {getProfilePic()}
@@ -131,7 +146,6 @@ export default function NavBar({ current }: { current: string }) {
                                 </Menu>
                             </div>
                         </div>
-
                     </>
                 )}
             </Disclosure>
