@@ -20,7 +20,7 @@ export async function getAlgo(algoId: string) {
 
 export async function getAllAlgos() {
   return {
-    algo: await algo.getAllAlgos(),
+    results: await algo.getAllAlgos(),
     error: ""
   };
 }
