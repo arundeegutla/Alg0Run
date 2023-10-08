@@ -5,7 +5,7 @@ import { PlayBasic } from "../util/models";
 
 export async function getUserLeaderboard() {
   return {
-    results: await leaderboard.getUsers(),
+    results: await leaderboard.getProfiles(),
     error: ""
   }
 }
