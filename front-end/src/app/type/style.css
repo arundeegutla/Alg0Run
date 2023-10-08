@@ -1,0 +1,12 @@
+.typing-test {
+  font-size: 25px;
+  font-family: 'Courier New', Courier, monospace;
+  outline: none;
+}
+
+.curr-letter {
+  text-decoration: underline;
+}
+span {
+  white-space:pre;
+}
