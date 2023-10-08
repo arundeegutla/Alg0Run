@@ -3,8 +3,8 @@ import { fb, db } from "../util/db";
 
 import { PlayBasic, ProfileBasic } from "../util/models";
 
-export async function getUsers() {
-  return db.collection("Users")
+export async function getProfiles() {
+  return db.collection("Profiles")
     .select("username", "totalScore")
     .get()
     .then(querySnapshot => querySnapshot.docs.map(doc => doc.data() as ProfileBasic));

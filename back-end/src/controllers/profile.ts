@@ -64,10 +64,11 @@ export async function getProfileByToken(idToken: string) {
     }
   }
 
-  profile.plays = await user.getPlays(profile.id);
+  const plays = await user.getPlays(profile.id);
 
   return {
     profile: profile,
+    plays: plays,
     error: ""
   }
 }

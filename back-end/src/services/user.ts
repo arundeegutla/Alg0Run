@@ -79,3 +79,9 @@ export async function removeFriend(profileId: string, friendId: string) {
     friends: firestore.FieldValue.arrayRemove(friendId)
   });
 }
+
+export async function setScore(profileId: string, newTotalScore: number) {
+  return db.collection("Profiles").doc(profileId).update({
+    totalScore: newTotalScore
+  });
+}
