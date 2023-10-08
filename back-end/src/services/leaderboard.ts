@@ -5,9 +5,17 @@ import { PlayBasic, ProfileBasic } from "../util/models";
 
 export async function getUsers() {
   return db.collection("Users")
-    .select("profileId", "username", "totalScore", )
+    .select("username", "totalScore")
     .get()
-    .then(querySnapshot => querySnapshot.docs.map(doc => doc.data() as ProfileBasic));
+    .then(querySnapshot => querySnapshot.docs.map(doc => {
+      let res = doc.data();
+
+      if (res === undefined) return undefined;
+      
+      res.id = doc.id;
+
+      return res as ProfileBasic
+    }));
 }
 
 export async function getAlgo(algoId: string) {
