@@ -82,10 +82,11 @@ export async function getProfile(profileId: string) {
     }
   }
 
-  const plays = user.getPlays(profileId);
+  const plays = await user.getPlays(profileId);
 
   return {
     profile: p,
+    plays: plays,
     error: ""
   }
 }
@@ -103,7 +104,7 @@ export async function addFriend(profileId: string, friendId: string) {
     }
   }
 
-  const res = user.removeFriend(profileId, friendId);
+  const res = user.addFriend(profileId, friendId);
 
   if (res === undefined) {
     return {
@@ -129,7 +130,7 @@ export async function removeFriend(profileId: string, friendId: string) {
     }
   }
 
-  const res = user.addFriend(profileId, friendId);
+  const res = user.removeFriend(profileId, friendId);
 
   if (res === undefined) {
     return {
