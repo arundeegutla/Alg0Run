@@ -1,5 +1,6 @@
 
-export default function SearchComponent() {
+
+export default function SearchComponent({onChange}: {onChange: any}) {
     return (
         <form className="mt-1">
             <div className="relative">
@@ -18,9 +19,10 @@ export default function SearchComponent() {
                     />
                 </svg>
                 <input
+                    onChange={onChange}
                     type="text"
                     placeholder="Search"
-                    className="w-64 py-1 pl-12 text-gray-500 border rounded-md outline-none bg-white/[0.6] focus:bg-white/[0.7]"
+                    className="w-full py-1 pl-12 text-gray-500 border rounded-md outline-none bg-white/[0.6] focus:bg-white/[0.7]"
                 />
             </div>
         </form>
