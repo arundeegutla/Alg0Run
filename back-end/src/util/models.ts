@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 
 export type Language = "python" | "cpp" | "java";
 
@@ -55,3 +56,9 @@ export const LANGUAGE_MULTIPLIER = new Map<Language, number>([
   ["java", 1],
   ["cpp", 1.3]
 ]);
+
+export function routeWrapper(f: Function) {
+  return async (req: Request, res: Response) => {
+    res.send(await f(req.body));
+  }
+}

@@ -72,8 +72,8 @@ export async function getProfileByToken(idToken: string) {
   }
 }
 
-export async function getProfile(id: string) {
-  const p = await user.getProfile(id);
+export async function getProfile(profileId: string) {
+  const p = await user.getProfile(profileId);
 
   if (p === undefined) {
     return {
@@ -81,7 +81,7 @@ export async function getProfile(id: string) {
     }
   }
 
-  const plays = user.getPlays(id);
+  const plays = user.getPlays(profileId);
 
   return {
     profile: p,

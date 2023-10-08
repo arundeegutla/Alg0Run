@@ -1,7 +1,7 @@
 import * as algo from "../services/algo";
 import * as leaderboard from "../services/leaderboard";
 
-import { Play } from "../util/models";
+import { PlayBasic } from "../util/models";
 
 export async function getUserLeaderboard() {
   return {
@@ -17,7 +17,7 @@ export async function getAlgoLeaderboard(algoId: string) {
     }
   }
 
-  const topScores = new Map<string,Play>();
+  const topScores = new Map<string,PlayBasic>();
 
   const plays = await leaderboard.getAlgo(algoId);
 
