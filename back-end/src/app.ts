@@ -17,6 +17,10 @@ app.post("/", async (req, res) => {
   res.send(r);
 });
 
+app.use('/api/algo', require('./routes/algo'))
+app.use('/api/leaderboard', require('./routes/leaderboard'))
+app.use('/api/profile', require('./routes/profile'))
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
