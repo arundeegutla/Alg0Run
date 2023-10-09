@@ -38,7 +38,6 @@ export default function Page() {
             api.userLeaderboard().then((res) => {
               if (res.data.error === "") {
                 const allProfiles = res.data.results as ProfileBasic[];
-                console.log(allProfiles);
                 setFriends(allProfiles.filter(pb => friendIds.includes(pb.id)));
               }
             })

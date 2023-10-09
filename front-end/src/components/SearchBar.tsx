@@ -1,6 +1,6 @@
 
 
-export default function SearchComponent({onChange}: {onChange: any}) {
+export default function SearchComponent({onChange, placeholder}: {onChange: any, placeholder: string}) {
     return (
         <form className="mt-1">
             <div className="relative">
@@ -21,7 +21,7 @@ export default function SearchComponent({onChange}: {onChange: any}) {
                 <input
                     onChange={onChange}
                     type="text"
-                    placeholder="Search"
+                    placeholder={placeholder}
                     className="w-full py-1 pl-12 text-gray-500 border rounded-md outline-none bg-white/[0.6] focus:bg-white/[0.7]"
                 />
             </div>

@@ -64,6 +64,7 @@ export default function Home() {
             </h1>
           </div>
           <SearchComponent
+            placeholder="Search"
             onChange={(event: any) => {
               setSearchTerm(event.target.value);
             }}
