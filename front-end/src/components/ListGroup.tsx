@@ -1,3 +1,5 @@
+import { GiTrophyCup } from "react-icons/gi";
+
 const people = [
     {
         name: 'Leslie Alexander',
@@ -54,8 +56,9 @@ const people = [
 ];
 
 export default function ListGroup() {
+    var max = 1000;
     return (
-        <ul role="list" className="divide-y divide-gray-100 bg-white p-[20px]">
+        <ul role="list" className="divide-y divide-gray-100 bg-white/[0.6] my-blur my-hover p-[20px]">
             {people.map((person) => (
                 <li
                     key={person.email}
@@ -78,26 +81,10 @@ export default function ListGroup() {
                     </div>
 
                     <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                        <p className="text-sm leading-6 text-gray-900">
-                            {person.role}
-                        </p>
-                        {person.lastSeen ? (
-                            <p className="mt-1 text-xs leading-5 text-gray-500">
-                                Last seen{' '}
-                                <time dateTime={person.lastSeenDateTime}>
-                                    {person.lastSeen}
-                                </time>
-                            </p>
-                        ) : (
-                            <div className="mt-1 flex items-center gap-x-1.5">
-                                <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                </div>
-                                <p className="text-xs leading-5 text-gray-500">
-                                    Online
-                                </p>
-                            </div>
-                        )}
+                        <div className='flex flex-row items-center text-amber-500 my-blur transparent-dark rounded-md px-3 py-1 text-sm font-medium'>
+                                <GiTrophyCup className="h-4 w-auto "/>
+                                <h3 className='m-1'>{max = Math.floor(Math.random() * max) + 1}</h3>
+                        </div>
                     </div>
                 </li>
             ))}

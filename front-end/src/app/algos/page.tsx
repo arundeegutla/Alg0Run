@@ -8,41 +8,31 @@ import { SiPython } from 'react-icons/si';
 import { FaJava } from 'react-icons/fa';
 import { TbBrandCpp } from 'react-icons/tb';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useRouter } from 'next/navigation';
 import { auth } from '../../../firebase/clientApp';
 import Loading from '@/components/Loading';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Home() {
     const [user, loading, error] = useAuthState(auth);
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState('');
 
-    if(user) {
+    if (user) {
         console.log(user.displayName);
-    } else if(loading) { 
-        return (
-            <Loading />
-        );
+    } else if (loading) {
+        return <Loading />;
     } else {
         router.push('/auth');
         return;
     }
-    
-    
-    let algos = [];
-    for (let i = 0; i < 20; i++) {
-        algos.push(DATA.algos[i].name);
-    }
 
-    
-    const goType = ({name}: {name:string}) => {
-        for (let i = 0; i < 20; i++) {
-            if(name == DATA.algos[i].name) {
-                useRouter().push('/type');
-                return;
-            }
-        }
-    }
+    const goType = ({ algo, lang }: { algo: number; lang: string }) => {
+        const state = { algo: algo, lang: lang };
+        router.push('/type?id=' + algo + '&lang=' + lang)
+        return;
+    };
+
 
     return (
         <main className="default flex-row items-center justify-center flex-wrap">
@@ -65,35 +55,46 @@ export default function Home() {
                         role="list"
                         className="divide-y divide-gray-100 p-[20px]"
                     >
-                        {algos.filter((algo) => {
+                        {DATA.algos
+                            .filter((algo) => {
                                 if (searchTerm == '') {
                                     return algo;
                                 } else if (
-                                    algo
+                                    algo.name
                                         .toLowerCase()
                                         .includes(searchTerm.toLowerCase())
                                 ) {
                                     return algo;
                                 }
-                            }).map((algo, id) => (
+                            })
+                            .map((algo, id) => (
                                 <li
                                     key={id}
                                     className="flex items-center justify-between gap-x-6 py-5"
                                 >
                                     <div className="flex min-w-0 gap-x-4">
                                         <div className="min-w-0 flex-auto">
-                                            <h2>{algo}</h2>
+                                            <h2>{algo.name}</h2>
                                         </div>
                                     </div>
                                     <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
                                         <div className="flex flex-row text-sm leading-6 text-gray-900 ">
-                                            <div className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                                            <div
+                                                onClick={() =>
+                                                    goType({algo: algo.id, lang: 'Python'})
+                                                }
+                                                className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200"
+                                            >
                                                 <SiPython className="h-8 w-auto " />
                                             </div>
-                                            <div className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                                            <div onClick={() =>
+                                                    goType({algo: algo.id, lang: 'Java'})
+                                                } className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
                                                 <FaJava className="h-8 w-auto " />
                                             </div>
-                                            <div className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                                            <div onClick={() =>
+                                                    goType({algo: algo.id, lang: 'Cpp'})
+                                                } className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
                                                 <TbBrandCpp className="h-8 w-auto " />
                                             </div>
                                         </div>

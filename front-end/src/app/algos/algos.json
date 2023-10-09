@@ -1,11 +1,12 @@
 {
     "algos": [
         {
+            "id": 0,
             "name": "Selection Sort",
             "link": "https://www.geeksforgeeks.org/selection-sort/",
             "time complexity": "O(N^2)",
             "description": "Selection Sort is a straightforward comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. The algorithm divides the input into two parts: the sorted portion and the unsorted portion. It repeatedly selects the smallest (or largest) element from the unsorted part and swaps it with the first element of the unsorted part, effectively expanding the sorted portion. This process continues until the entire list is sorted. While Selection Sort is easy to understand and implement, it is not very efficient for large datasets, as it has a time complexity of O(n^2), where n is the number of elements in the list. It is mainly used for educational purposes to teach the concept of sorting algorithms and is not typically used in practical applications for large datasets, where more efficient sorting algorithms like QuickSort or MergeSort are preferred.",
-            "Languages": {
+            "languages": {
                 "Python": "for i in range(len(A)):\n    min_idx = i\n    for j in range(i+1, len(A)):\n        if A[min_idx] > A[j]:\n            min_idx = j\n    A[i], A[min_idx] = A[min_idx], A[i]\n",
                 "Java": "void sort(int arr[])\n{\n    int n = arr.length;\n    for (int i = 0; i < n-1; i++)\n    {\n        int min_idx = i;\n        for (int j = i+1; j < n; j++)\n            if (arr[j] < arr[min_idx])\n                min_idx = j;\n        int temp = arr[min_idx];\n        arr[min_idx] = arr[i];\n        arr[i] = temp;\n    }\n}\n",
                 "Cpp": "void selectionSort(int arr[], int n)\n{\n    int i, j, min_idx;\n    for (i = 0; i < n - 1; i++) {\n        min_idx = i;\n        for (j = i + 1; j < n; j++) {\n            if (arr[j] < arr[min_idx])\n                min_idx = j;\n        }\n        if (min_idx != i)\n            swap(arr[min_idx], arr[i]);\n    }\n}\n"
@@ -13,6 +14,7 @@
         },
 
         {
+            "id": 1,
             "name": "Bubble Sort",
             "link": "https://www.geeksforgeeks.org/bubble-sort/",
             "time complexity": "O(N^2)",
@@ -24,6 +26,8 @@
             }
         },
         {
+            "id": 2,
+
             "name": "Insertion Sort",
             "link": "https://www.geeksforgeeks.org/insertion-sort/",
             "time complexity": "O(N^2)",
@@ -36,6 +40,8 @@
         },
     
         {
+            "id": 3,
+
             "name": "Linear Search",
             "link": "https://www.geeksforgeeks.org/linear-search/",
             "time complexity": "O(N)",
@@ -48,6 +54,8 @@
         },
     
         {
+            "id": 4,
+
             "name": "Binary Search",
             "link": "https://www.geeksforgeeks.org/binary-search/",
             "time complexity": "O(log N)",
@@ -60,6 +68,8 @@
         },
     
         {
+            "id": 5,
+
             "name": "Ternary Search",
             "link": "https://www.geeksforgeeks.org/ternary-search/",
             "time complexity": "O(log3 N)",
@@ -72,6 +82,8 @@
         },
     
         {
+            "id": 6,
+
             "name": "Modular Exponentiation",
             "link": "https://www.geeksforgeeks.org/modular-exponentiation-power-in-modular-arithmetic/",
             "time complexity": "O(log Y)",
@@ -84,6 +96,8 @@
         },
     
         {
+            "id": 7,
+
             "name": "Sieve of Eratosthenes",
             "link": "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/",
             "time complexity": "O(N*log(log(N)))",
@@ -96,6 +110,8 @@
         },
     
         {
+            "id": 8,
+
             "name": "Kadanes",
             "link": "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/",
             "time complexity": "O(N)",
@@ -108,6 +124,8 @@
         },
     
         {
+            "id": 9,
+
             "name": "Floyd Warshall",
             "link": "https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/",
             "time complexity": "O(V^3)",
@@ -120,6 +138,8 @@
         },
     
         {
+            "id": 10,
+
             "name": "GCD",
             "link": "https://www.geeksforgeeks.org/program-to-find-gcd-or-hcf-of-two-numbers/",
             "time complexity": "O(log(min(a, b)))",
@@ -132,6 +152,8 @@
         },
     
         {
+            "id": 11,
+
             "name": "LCM",
             "link": "https://www.geeksforgeeks.org/program-to-find-lcm-of-two-numbers/",
             "time complexity": "O(log(min(a, b)))",
@@ -144,6 +166,8 @@
         },
     
         {
+            "id": 12,
+
             "name": "Euler's Totient",
             "link": "https://www.geeksforgeeks.org/eulers-totient-function-for-all-numbers-smaller-than-or-equal-to-n/",
             "time complexity": "O(N^2)",
@@ -156,6 +180,8 @@
         },
     
         {
+            "id": 13,
+
             "name": "Chinese Remainder Theorem",
             "link": "https://www.geeksforgeeks.org/introduction-to-chinese-remainder-theorem/",
             "time complexity": "O(M); M = product of all elements in num",
@@ -168,6 +194,8 @@
         },
     
         {
+            "id": 14,
+
             "name": "Prefix Sum",
             "link": "https://www.geeksforgeeks.org/prefix-sum-array-implementation-applications-competitive-programming/",
             "time complexity": "O(N)",
@@ -180,6 +208,8 @@
         },
     
         {
+            "id": 15,
+
             "name": "Disjoint Set",
             "link": "https://www.geeksforgeeks.org/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/",
             "time complexity": "O(log N)",
@@ -192,6 +222,8 @@
         },
     
         {
+            "id": 16,
+
             "name": "Binary Index Tree",
             "link": "https://www.geeksforgeeks.org/binary-indexed-tree-or-fenwick-tree-2/",
             "time complexity": "O(NLogN) for range sum",
@@ -204,6 +236,8 @@
         },
     
         {
+            "id": 17,
+
             "name": "Sparse Table",
             "link": "https://www.geeksforgeeks.org/sparse-table/",
             "time complexity": "O(NLogN) preprocessing time and O(1) query",
@@ -216,6 +250,8 @@
         },
     
         {
+            "id": 18,
+
             "name": "Hello World",
             "link": "N/A",
             "time complexity": "O(1)",
@@ -228,6 +264,7 @@
         },
     
         {
+            "id": 19,
             "name": "Sliding Window",
             "link": "https://www.geeksforgeeks.org/window-sliding-technique/",
             "time complexity": "O(k*n)",
