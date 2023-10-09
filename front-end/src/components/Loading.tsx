@@ -3,7 +3,7 @@
 export default function Loading() {
 
     return (
-        <main className="default-full flex items-center">
+        <main className="default-full flex w-[100%] items-center">
             <div className="loader m-auto"></div>
         </main> 
     );

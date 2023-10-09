@@ -19,8 +19,7 @@ export async function isFirstTimeUser(idToken: string) {
 
 export async function createProfile(idToken: string, username: string) {
   const res = await isFirstTimeUser(idToken);
-
-  if (!res) {
+  if (!res.result) {
     return {
       error: "Profile already exists for user"
     }

@@ -15,6 +15,7 @@ export type ProfileBasic = {
 }
 
 export type Algo = {
+  id: string,
   name: string
   code: {
     python: string,
