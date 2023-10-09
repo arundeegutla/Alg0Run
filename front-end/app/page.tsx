@@ -28,7 +28,6 @@ export default function Page() {
 
     called = true;
     user.getIdTokenResult().then((idToken) => {
-      console.log(idToken)
       api.createProfile(idToken.token, user.displayName || "").then((res) => {
         console.log(res);
         api.getProfileByToken(idToken.token).then((res) => {
@@ -55,7 +54,7 @@ export default function Page() {
   return (
     <RootLayout>
       <div className='flex flex-col items-stretch flex-wrap'>
-        <ProfileComponent className='profile my-blur my-hover rounded-2xl' profile={{ metadata: user, score: (profile.totalScore || 0) }}></ProfileComponent>
+        <ProfileComponent className='profile my-blur my-hover rounded-2xl' profile={{ metadata: user, score: (profile.totalScore || -1) }}></ProfileComponent>
         <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={[]}></RecentPlays>
       </div>
       <div>

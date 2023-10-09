@@ -2,7 +2,7 @@
 import { User } from 'firebase/auth';
 import { FaUser } from 'react-icons/fa';
 import { GiTrophyCup } from 'react-icons/gi';
-import { Play } from '@/firebase/api';
+import { Play } from '@/firebase/models';
 
 
 

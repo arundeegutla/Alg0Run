@@ -1,9 +1,16 @@
 'use client'; // This is a client component 👈🏽
-import { User } from 'firebase/auth';
-import { FaUser } from 'react-icons/fa';
-import { GiTrophyCup } from 'react-icons/gi';
 import SearchComponent from './SearchBar';
 import { useState } from 'react';
+
+import dynamic from 'next/dynamic';
+
+const FaUser = dynamic(() => import('react-icons/fa').then((mod) => mod.FaUser), {
+  ssr: false, // Set to false to disable server-side rendering
+});
+
+const GiTrophyCup = dynamic(() => import('react-icons/gi').then((mod) => mod.GiTrophyCup), {
+  ssr: false, // Set to false to disable server-side rendering
+});
 
 const people = [
   {
@@ -77,7 +84,7 @@ export default function Profile({
             <li className='py-3'>
               <div className="flex items-center space-x-4">
                 <div className="flex-shrink-0">
-                  <FaUser className="h-8 w-auto rounded-full" />
+                  <div style={{ fontSize: "25px" }}><FaUser /></div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
@@ -85,7 +92,7 @@ export default function Profile({
                   </p>
                 </div>
                 <div className='flex flex-row items-center text-amber-500 my-blur transparent-dark rounded-md px-3 py-1 text-sm font-medium'>
-                  <GiTrophyCup className="h-4 w-auto " />
+                  <div style={{ fontSize: "20px" }}><GiTrophyCup /></div>
                   <h3 className='m-1'>{Math.floor(Math.random() * 1000) + 1}</h3>
                 </div>
               </div>
