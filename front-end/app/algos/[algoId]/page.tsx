@@ -100,7 +100,7 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
     let res = {
       language: language,
       code_length: length,
-      accuracy: (length - errorChar) / length,
+      accuracy: Math.max((length - errorChar) / length, 0),
       wpm: (60 * 1000 * length) / (4.7 * getDuration() || 1),
       // cpm: (60 * 1000 * length) / (getDuration() || 1),
       time: getDuration() / 1000,
