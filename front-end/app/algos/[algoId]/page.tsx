@@ -121,7 +121,7 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
 
     if (phase !== 2) {
       return (
-        <div style={{ background: "rgba(255, 255, 255, 0.5)", padding: "0px 50px 25px 50px" }} className="flex flex-col items-center ml-5 w-[100%]">
+        <div style={{ background: "rgba(255, 255, 255, 0.5)", padding: "0px 50px 25px 50px" }} className="flex flex-col items-center ml-5 w-[100%] rounded-2xl">
           <h1>Type!</h1>
           <div style={{ overflow: "scroll" }} className="text-left typing-test"
             onKeyDown={(e) => {
@@ -155,8 +155,8 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
     else {
       sendCompletion(playDetails);
       return (
-        <div className="flex flex-col items-center ml-5 bg-green-300 w-[100%]">
-          <h1 className="mt-10">Completed!</h1>
+        <div style={{ background: "rgba(255, 255, 255, 0.5)", padding: "0px 50px 25px 50px" }} className="flex flex-col items-center ml-5 w-[100%] rounded-2xl">
+          <h1 style={{ color: "#5cb85c", marginTop: "15px", WebkitTextStrokeWidth: "0.5px", WebkitTextStrokeColor: "black" }} className="mt-10">Completed!</h1>
           <h2 style={{ "fontSize": "xx-large" }}>Stats:</h2>
           <span className="font-bold">Time:</span><br />
           <span>{playDetails.time.toFixed(2)} seconds</span>
@@ -171,7 +171,7 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
               color: "black",
               backgroundColor: "black",
               height: "2px",
-              width: "20%"
+              width: "50%"
             }}
           />
           <span style={{ "fontSize": "x-large" }} className="font-bold">Score:</span><br />
