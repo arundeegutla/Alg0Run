@@ -32,7 +32,7 @@ export default function NavBar() {
   const signOut = () => {
     auth.signOut()
       .then(function () {
-        useRouter().push('/auth');
+        // useRouter().push('/auth');
       })
       .catch(function (error) {
         console.log(error);
