@@ -114,7 +114,8 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
       "cpp": 1.3
     }[language];
 
-    res.score = 0.005 * mult * Math.pow(res.code_length, 1.3) * res.accuracy * res.wpm / Math.sqrt(res.time);
+    res.score = 0.01 * mult * Math.pow(res.code_length, 1.3) * Math.pow(res.accuracy, 3) * res.wpm / Math.sqrt(res.time);
+    res.score = Math.round(res.score);
 
     const playDetails = res;
 
