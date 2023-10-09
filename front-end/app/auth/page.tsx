@@ -15,6 +15,7 @@ import Loading from '@/components/Loading';
 import { ChangeEvent, useState } from 'react';
 import { Seaweed_Script } from 'next/font/google';
 import { MenuButtonProps } from '@headlessui/react';
+import RootLayout from '../layout';
 
 interface MyFunctions {
   toggle: () => void;
@@ -70,7 +71,7 @@ const LogIn = ({ toggle }: MyFunctions) => {
       });
   };
   return (
-    <main className="default">
+    <RootLayout>
       <div className="h-full w-full py-16 px-4 flex items-center">
         <div className="flex flex-col items-center h-full w-full justify-center">
           <div className="bg-white shadow rounded-3xl lg:w-1/3  md:w-1/2 w-full p-10">
@@ -191,7 +192,7 @@ const LogIn = ({ toggle }: MyFunctions) => {
           </div>
         </div>
       </div>
-    </main>
+    </RootLayout>
   );
 };
 
@@ -247,7 +248,7 @@ const SignUp = ({ toggle }: MyFunctions) => {
       });
   };
   return (
-    <main className="default">
+    <RootLayout>
       <div className="h-full w-full py-16 px-4 flex items-center">
         <div className="flex flex-col items-center h-full w-full justify-center">
           <div className="bg-white shadow rounded-3xl lg:w-1/3  md:w-1/2 w-full p-10">
@@ -381,7 +382,7 @@ const SignUp = ({ toggle }: MyFunctions) => {
           </div>
         </div>
       </div>
-    </main>
+    </RootLayout>
   );
 };
 

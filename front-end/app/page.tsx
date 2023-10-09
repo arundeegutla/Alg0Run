@@ -23,7 +23,7 @@ export default function Page() {
   const [plays, setPlays] = useState([] as unknown as Play[]);
   var called = false;
 
-  useEffect(() => {
+  const refresh = () => {
     if (!user || called) return;
 
     called = true;
@@ -38,10 +38,13 @@ export default function Page() {
         });
       })
     });
-  }, [setProfile, setPlays]);
+  }
+
+  useEffect(refresh, []);
 
   if (user) {
     console.log(user.displayName);
+    if (!called && profile.totalScore === undefined) refresh();
   } else if (loading) {
     return (
       <Loading />
@@ -55,7 +58,7 @@ export default function Page() {
     <RootLayout>
       <div className='flex flex-col items-stretch flex-wrap'>
         <ProfileComponent className='profile my-blur my-hover rounded-2xl' profile={{ metadata: user, score: (profile.totalScore || -1) }}></ProfileComponent>
-        <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={[]}></RecentPlays>
+        <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={plays}></RecentPlays>
       </div>
       <div>
         <Friends className='profile my-blur my-hover rounded-2xl' friends={[]}></Friends>
