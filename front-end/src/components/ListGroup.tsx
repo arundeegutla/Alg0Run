@@ -31,7 +31,7 @@ export default function ListGroup() {
   return (
     <ul className="max-w-md divide-gray-200 dark:divide-gray-700">
       {profiles.map((profile, idx) => (
-        <li style={{ borderBottom: "1px solid black" }} className='py-3'>
+        <li key={idx} style={{ borderBottom: "1px solid black" }} className='py-3'>
           <div className="flex items-center space-x-4">
             <div style={{ width: "20px" }} className="flex-shrink-0">
               <div className="text-lg font-medium text-gray-900 truncate">
