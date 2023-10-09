@@ -15,6 +15,7 @@ export type ProfileBasic = {
 }
 
 export type Algo = {
+  id: string,
   name: string
   code: {
     python: string,
@@ -46,5 +47,5 @@ export type PlayDetails = {
   accuracy: number,
   wpm: number,
   time: number,
-  date_completed: EpochTimeStamp
+  date_completed: number
 }
