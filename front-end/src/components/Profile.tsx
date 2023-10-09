@@ -1,7 +1,15 @@
 'use client'; // This is a client component 👈🏽
 import { User } from 'firebase/auth';
-import { FaUser } from 'react-icons/fa';
-import { GiTrophyCup } from 'react-icons/gi'
+
+import dynamic from 'next/dynamic';
+
+const FaUser = dynamic(() => import('react-icons/fa').then((mod) => mod.FaUser), {
+  ssr: false, // Set to false to disable server-side rendering
+});
+
+const GiTrophyCup = dynamic(() => import('react-icons/gi').then((mod) => mod.GiTrophyCup), {
+  ssr: false, // Set to false to disable server-side rendering
+});
 
 declare global {
     type MyUser = {
@@ -10,7 +18,7 @@ declare global {
     };
 }
 
-export default function Profile({
+export default function ProfileComponent({
     profile,
     className,
 }: {
@@ -19,7 +27,7 @@ export default function Profile({
 }) {
     const getProfilePic = () => {
         if (!profile || !profile.metadata || !profile.metadata.photoURL)
-            return <FaUser className="h-40 aspect-square rounded-full" />;
+            return <div style={{ fontSize: "100px" }}><FaUser/></div>;
         const url: string =
             profile.metadata.photoURL !== null ? profile.metadata.photoURL : '';
         return <img src={url} className="h-40 aspect-square rounded-full" />;
@@ -44,8 +52,8 @@ export default function Profile({
                         <div className="block">
                             <div className="flex flex-row justify-center items-center ">
                                 <div className='flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium mb-2'>
-                                    <GiTrophyCup className="h-8 w-auto "/>
-                                    <h2 className='m-1'>20002</h2>
+                                    <div style={{ fontSize: "25px" }}><GiTrophyCup/></div>
+                                    <h2 className='m-1'>{profile.score}</h2>
                                 </div>
                             </div>
                         </div>
