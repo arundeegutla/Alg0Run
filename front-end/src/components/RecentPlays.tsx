@@ -27,9 +27,9 @@ export default function RecentPlays({
         <div className={className}>
             <div className="flex flex-col items-start w-[100%] h-[100%] rounded-2xl bg-white/[0.6] text-black p-8">
                 <h2 className="font-semibold">Recent Plays</h2>
-                {here_plays.map((play) => (
+                {here_plays.map((play, i) => (
                     <li
-                        key={play.algoId}
+                        key={i}
                         className="flex w-full justify-between py-5"
                     >
                         <div className="flex min-w-0 gap-x-4">

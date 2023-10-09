@@ -10,7 +10,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Loading from '@/components/Loading';
 import Friends from '@/components/Friends'
 import RecentPlays from '@/components/RecentPlays';
-import { Play, Profile } from "@/firebase/models";
+import { Play, Profile, ProfileBasic } from "@/firebase/models";
 import { useEffect, useState } from "react";
 import api from "@/firebase/api";
 
@@ -21,6 +21,7 @@ export default function Page() {
 
   const [profile, setProfile] = useState({} as unknown as Profile);
   const [plays, setPlays] = useState([] as unknown as Play[]);
+  const [friends, setFriends] = useState([] as unknown as ProfileBasic[]);
   var called = false;
 
   const refresh = () => {
@@ -29,11 +30,18 @@ export default function Page() {
     called = true;
     user.getIdTokenResult().then((idToken) => {
       api.createProfile(idToken.token, user.displayName || "").then((res) => {
-        console.log(res);
         api.getProfileByToken(idToken.token).then((res) => {
           if (res.data.error === "") {
+            const friendIds = res.data.profile.friends;
             setProfile(res.data.profile);
             setPlays(res.data.plays);
+            api.userLeaderboard().then((res) => {
+              if (res.data.error === "") {
+                const allProfiles = res.data.results as ProfileBasic[];
+                console.log(allProfiles);
+                setFriends(allProfiles.filter(pb => friendIds.includes(pb.id)));
+              }
+            })
           }
         });
       })
@@ -61,7 +69,7 @@ export default function Page() {
         <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={plays}></RecentPlays>
       </div>
       <div>
-        <Friends className='profile my-blur my-hover rounded-2xl' friends={[]}></Friends>
+        <Friends className='profile my-blur my-hover rounded-2xl' friends={friends}></Friends>
       </div>
     </RootLayout>
   );
