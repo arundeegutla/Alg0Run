@@ -57,7 +57,7 @@ export default function Page() {
   return (
     <RootLayout>
       <div className='flex flex-col items-stretch flex-wrap'>
-        <ProfileComponent className='profile my-blur my-hover rounded-2xl' profile={{ metadata: user, score: (profile.totalScore || -1) }}></ProfileComponent>
+        <ProfileComponent className='profile my-blur my-hover rounded-2xl' profile={{ metadata: user, score: (profile.totalScore || 0) }}></ProfileComponent>
         <RecentPlays className='profile my-blur my-hover rounded-2xl' plays={plays}></RecentPlays>
       </div>
       <div>
