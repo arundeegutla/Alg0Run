@@ -1,10 +1,11 @@
 'use client'; // This is a client component 👈🏽
-import { User } from 'firebase/auth';
-import { FaUser } from 'react-icons/fa';
-import { GiTrophyCup } from 'react-icons/gi';
-import { Play } from '@/firebase/models';
 
+import { Play, PlayDetails } from '@/firebase/models';
+import ALGOS from "@/firebase/algos.json" ;
 
+function getSeconds(playDetails: PlayDetails) {
+    return ((playDetails.date_completed as unknown) as { _seconds: number })._seconds * 1000
+}
 
 export default function RecentPlays({
     plays,
@@ -13,12 +14,14 @@ export default function RecentPlays({
     plays: Play[];
     className: string;
 }) {
+
+    const nameMap = new Map<string, string>(ALGOS.map(x => [x.id, x.name]));
     
     plays.sort((a, b) => {
-        return b.playDetails.date_completed - a.playDetails.date_completed;
+        return getSeconds(b.playDetails) - getSeconds(a.playDetails);
     });
 
-    const here_plays = plays.slice(0, 4);
+    const here_plays = plays.slice(0, Math.min(plays.length, 5));
 
     return (
         <div className={className}>
@@ -32,17 +35,17 @@ export default function RecentPlays({
                         <div className="flex min-w-0 gap-x-4">
                             <div className="min-w-0 flex-auto">
                                 <p className="text-sm font-semibold leading-6 text-gray-900">
-                                    {play.playDetails.language}
+                                    {nameMap.get(play.algoId)} - {play.playDetails.language}
                                 </p>
                                 <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                                    {play.playDetails.code_length}
+                                    {new Date(getSeconds(play.playDetails)).toLocaleString()}
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex sm:flex-col sm:items-end">
                             <p className="text-sm leading-6 text-gray-900">
-                                {play.playDetails.score}
+                                {play.playDetails.score.toFixed(0)} pts
                             </p>
                         </div>
                     </li>

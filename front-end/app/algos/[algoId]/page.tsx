@@ -25,6 +25,7 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
   const algoId = values[1] as string;
 
   const [algo, setAlgo] = useState({ code: {} } as unknown as Algo);
+  const [completed, setComplete] = useState(false);
 
   function getText(a: Algo, l: Language): string {
     return a.code[l] || "";
@@ -87,8 +88,9 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
 
   function view() {
     async function sendCompletion(playDetails: PlayDetails) {
-      if (!user) return;
+      if (!user || completed) return;
 
+      setComplete(true);
       const token = await user.getIdToken();
       const profile = (await api.getProfileByToken(token)).data.profile as Profile;
       console.log("creating play " + playDetails);
