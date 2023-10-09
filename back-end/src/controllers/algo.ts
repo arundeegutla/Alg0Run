@@ -40,9 +40,6 @@ export async function createPlay(algoId: string, profileId: string, playDetails:
   }
   
   const plays = await user.getPlays(profileId);
-  
-  const score = (LANGUAGE_MULTIPLIER.get(playDetails.language) || 0) * playDetails.code_length * playDetails.accuracy * playDetails.wpm / playDetails.time;
-  playDetails.score = score;
 
   const playId = await algo.createPlay(algoId, profileId, tmp.username, playDetails);
 
@@ -55,9 +52,9 @@ export async function createPlay(algoId: string, profileId: string, playDetails:
   const currentAlgoScores = plays.filter(p => p.algoId === algoId).map(p => p.playDetails.score);
   const highestCurrentScore = Math.max(...currentAlgoScores, 0);
 
-  if (score > highestCurrentScore) {
-    const newTotalScore = tmp.totalScore - highestCurrentScore + score;
-    await user.setScore(profileId, newTotalScore);
+  if (playDetails.score > highestCurrentScore) {
+    const newTotalScore = tmp.totalScore - highestCurrentScore + playDetails.score;
+    await user.setScore(profileId, Math.round(newTotalScore * 10) / 10.0);
   }
 
   return {

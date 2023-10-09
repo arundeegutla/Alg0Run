@@ -38,13 +38,11 @@ body {
     background-color: transparent;
     background: url('https://images.unsplash.com/photo-1663076125875-b8454612ed9b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3028&q=80');
     background-repeat: no-repeat;
-    background-size: cover;
     background-position: 0 0;
 
-    background-repeat: no-repeat;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    background-size: 100%;
+    background-size: auto;
 
     @apply flex h-screen p-5 pl-16 text-gray-50;
 }

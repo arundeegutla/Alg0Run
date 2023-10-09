@@ -11,7 +11,7 @@ import { FaUser } from 'react-icons/fa';
 import { PiTreeStructureFill } from 'react-icons/pi';
 
 // Auth
-import { auth } from '../../firebase/clientApp';
+import { auth } from '@/firebase/clientApp';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
