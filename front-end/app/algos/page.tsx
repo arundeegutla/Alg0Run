@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import SearchComponent from '@/components/SearchBar';
-import { SiPython } from 'react-icons/si';
-import { FaJava } from 'react-icons/fa';
-import { TbBrandCpp } from 'react-icons/tb';
+
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase/clientApp';
@@ -12,6 +10,20 @@ import api from '@/firebase/api';
 import Loading from '@/components/Loading';
 import { Algo } from '@/firebase/models';
 import RootLayout from '../layout';
+
+import dynamic from 'next/dynamic';
+
+const SiPython = dynamic(() => import('react-icons/si').then((mod) => mod.SiPython), {
+  ssr: false, // Set to false to disable server-side rendering
+});
+
+const FaJava = dynamic(() => import('react-icons/fa').then((mod) => mod.FaJava), {
+  ssr: false, // Set to false to disable server-side rendering
+});
+
+const TbBrandCpp = dynamic(() => import('react-icons/tb').then((mod) => mod.TbBrandCpp), {
+  ssr: false, // Set to false to disable server-side rendering
+});
 
 export default function Home() {
   const [user, loading, error] = useAuthState(auth);
@@ -75,13 +87,13 @@ export default function Home() {
                     <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
                       <div className="flex flex-row text-sm leading-6 text-gray-900 ">
                         <a href={"/algos/python__" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
-                          <SiPython className="h-8 w-auto " />
+                          <div style={{ fontSize: "35px" }}><SiPython /></div>
                         </a>
                         <a href={"/algos/java__" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
-                          <FaJava className="h-8 w-auto " />
+                          <div style={{ fontSize: "35px" }}><FaJava /></div>
                         </a>
                         <a href={"/algos/cpp__" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
-                          <TbBrandCpp className="h-8 w-auto " />
+                          <div style={{ fontSize: "35px" }}><TbBrandCpp /></div>
                         </a>
                       </div>
                     </div>
