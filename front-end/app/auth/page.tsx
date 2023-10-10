@@ -234,7 +234,6 @@ const SignUp = ({ toggle }: MyFunctions) => {
     const loginAuth = getAuth();
     createUserWithEmailAndPassword(loginAuth, email, password)
       .then(async function (result) {
-        alert(email)
         await updateProfile(result.user, {
           displayName: name,
           photoURL: 'https://cdn-icons-png.flaticon.com/512/147/147142.png',
