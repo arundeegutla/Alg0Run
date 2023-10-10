@@ -53,13 +53,10 @@ export default function Home() {
 
   return (
     <RootLayout>
-      <div style={{ height: "90vh" }} className="flex-row items-center justify-center flex-wrap">
-        <div style={{ minWidth: "200px" }} className="flex flex-col items-center  w-[60%] h-[100%] rounded-2xl bg-white/[0.6] text-black p-8">
+      <div style={{ height: "90vh" }} className="flex flex-row items-center justify-center flex-wrap m-auto w-full">
+        <div className="flex flex-col items-center h-[100%] rounded-2xl bg-white/[0.6] text-black p-8 min-w-[50%]">
           <div className="top">
-            <h1
-              className="head text-4xl"
-              style={{ textAlign: 'center' }}
-            >
+            <h1 className="head text-4xl" style={{ textAlign: 'center' }}>
               Algorithms
             </h1>
           </div>

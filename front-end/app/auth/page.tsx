@@ -72,7 +72,7 @@ const LogIn = ({ toggle }: MyFunctions) => {
   };
   return (
     <RootLayout>
-      <div className="h-full w-full py-16 px-4 flex items-center">
+      <div className="h-full w-full py-16 px-4 flex items-center rounded-2xl">
         <div className="flex flex-col items-center h-full w-full justify-center">
           <div className="bg-white shadow rounded-3xl lg:w-1/3  md:w-1/2 w-full p-10">
             <p
@@ -234,7 +234,7 @@ const SignUp = ({ toggle }: MyFunctions) => {
     const loginAuth = getAuth();
     createUserWithEmailAndPassword(loginAuth, email, password)
       .then(async function (result) {
-        console.log("Madeit");
+        alert(email)
         await updateProfile(result.user, {
           displayName: name,
           photoURL: 'https://cdn-icons-png.flaticon.com/512/147/147142.png',
