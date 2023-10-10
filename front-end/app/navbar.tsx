@@ -96,7 +96,7 @@ export default function NavBar() {
               {/* LOGO */}
               <div className="flex items-center justify-center">
                 <FaLaptopCode
-                  className="h-8 w-auto text-red-400 cursor-pointer hover:text-red-300 mb-4"
+                  className="h-8 w-auto text-red-400 mb-4"
                   alt="AlgoRun"
                 />
               </div>
