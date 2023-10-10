@@ -29,7 +29,7 @@ export default function ListGroup() {
   profiles.sort((a, b) => b.totalScore - a.totalScore);
 
   return (
-    <ul className="max-w-md divide-gray-200 dark:divide-gray-700">
+    <ul className=" divide-gray-200 dark:divide-gray-700 w-[100%]">
       {profiles.map((profile, idx) => (
         <li key={idx} style={{ borderBottom: "1px solid black" }} className='py-3'>
           <div className="flex items-center space-x-4">
