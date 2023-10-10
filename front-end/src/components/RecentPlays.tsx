@@ -21,7 +21,7 @@ export default function RecentPlays({
         return getSeconds(b.playDetails) - getSeconds(a.playDetails);
     });
 
-    const here_plays = plays.slice(0, Math.min(plays.length, 5));
+    const here_plays = plays.slice(0, Math.min(plays.length, 4));
 
     return (
         <div className={className}>
