@@ -119,35 +119,41 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
 
     const playDetails = res;
 
+    const defaultColor = "rgb(99 99 99)";
+    const correctColor = "white";
+    const wrongColor = "rgb(99 99 99)";
+
     if (phase !== 2) {
       return (
-        <div style={{ background: "rgba(255, 255, 255, 0.5)", padding: "0px 50px 25px 50px" }} className="flex flex-col items-center ml-5 w-[100%] rounded-2xl">
-          <h1>Type!</h1>
-          <div style={{ overflow: "scroll" }} className="text-left typing-test"
-            onKeyDown={(e) => {
-              handleKey(e.key);
-              e.preventDefault();
-            }}
-            tabIndex={0}
-          >
-            {getText(algo, language).split("").map((char: string, index: number) => {
-              let state = charsState[index];
-              let color =
-                state === CharStateType.Incomplete
-                  ? "black"
-                  : state === CharStateType.Correct
-                    ? "green"
-                    : "red";
-              return (
-                <span
-                  key={char + index}
-                  style={{ color }}
-                  className={currIndex + 1 === index ? "curr-letter" : ""}
-                >
-                  {char === "\n" ? " " : ""}{char}
-                </span>
-              );
-            })}
+        <div className="flex flex-col items-center justify-center mt-5">
+          <h1 className="text-5xl">Type</h1>
+          <div className="flex flex-col items-center justify-start rounded-2xl bg-[#282727]/[0.6] text-black p-8 mt-5 pt-2">
+            <div style={{ overflow: "scroll" }} className="text-left typing-test"
+              onKeyDown={(e) => {
+                handleKey(e.key);
+                e.preventDefault();
+              }}
+              tabIndex={0}
+            >
+              {getText(algo, language).split("").map((char: string, index: number) => {
+                let state = charsState[index];
+                let color =
+                  state === CharStateType.Incomplete
+                    ? defaultColor
+                    : state === CharStateType.Correct
+                      ? correctColor
+                      : wrongColor;
+                return (
+                  <span
+                    key={char + index}
+                    style={{color: color}}
+                    className={currIndex + 1 === index ? "curr-letter" : !(state === CharStateType.Incomplete || state === CharStateType.Correct) ? "bg-red-400" : ""}
+                  >
+                    {char === "\n" ? " " : ""}{char}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         </div>
       )
@@ -155,28 +161,46 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
     else {
       sendCompletion(playDetails);
       return (
-        <div style={{ background: "rgba(255, 255, 255, 0.5)", padding: "0px 50px 25px 50px" }} className="flex flex-col items-center ml-5 w-[100%] rounded-2xl">
-          <h1 style={{ color: "#5cb85c", marginTop: "15px", WebkitTextStrokeWidth: "0.5px", WebkitTextStrokeColor: "black" }} className="mt-10">Completed!</h1>
-          <h2 style={{ "fontSize": "xx-large" }}>Stats:</h2>
-          <span className="font-bold">Time:</span><br />
-          <span>{playDetails.time.toFixed(2)} seconds</span>
-          <span className="font-bold">Accuracy:</span><br />
-          <span>{(playDetails.accuracy * 100).toFixed(2)}%</span>
-          <span className="font-bold">Approx. WPM:</span><br />
-          <span>{playDetails.wpm.toFixed(0)} words/min</span>
-          <span className="font-bold">CPM:</span><br />
-          <span>{(playDetails.wpm * 4.7).toFixed(0)} chars/min</span>
-          <hr
-            style={{
-              color: "black",
-              backgroundColor: "black",
-              height: "2px",
-              width: "50%"
-            }}
-          />
-          <span style={{ "fontSize": "x-large" }} className="font-bold">Score:</span><br />
-          <span>{playDetails.score.toFixed(0)} pts</span>
+        
+        <div className="flex flex-row items-center justify-center h-full">
+          <div className="flex flex-col items-center justify-start rounded-2xl bg-white/[0.6] text-black p-8 m-5 h-[90%] w-[40%]">
+            <h1 className="text-5xl">Stats</h1>
+            <div className="flex flex-row items-center">
+              <div className="flex flex-col items-center p-8 m-2 w-[50%]">
+                <span>Time (seconds)</span>
+                <span className="text-3xl font-bold">{playDetails.time.toFixed(2)}</span>
+              </div>
+              <div className="flex flex-col items-center p-8 m-2 w-[50%]">
+                <span>Accuracy</span>
+                <span className="text-3xl font-bold">{(playDetails.accuracy * 100).toFixed(2)}%</span>
+              </div>
+            </div>
+            <div className="flex flex-row items-center">
+              <div className="flex flex-col items-center p-8 m-2 w-[50%]">
+                <span>WPM (words/min)</span>
+                <span className="text-3xl font-bold">{playDetails.wpm.toFixed(0)}</span>
+              </div>
+              <div className="flex flex-col items-center p-8 m-2 w-[50%]">
+                <span>CPM (chars/min)</span>
+                <span className="text-3xl font-bold">{(playDetails.wpm * 4.7).toFixed(0)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-row items-center justify-center">
+              <div className="flex flex-col items-center p-8 m-2 w-[50%]">
+                <span>Score (pts)</span>
+                <h1 className="text-amber-800">+{playDetails.score.toFixed(0)}</h1>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col items-start justify-start rounded-2xl bg-white/[0.6] text-black p-8 m-5 h-[90%] w-[60%]">
+            <h1 className="text-5xl">{algo.name}</h1>
+            <h2>{algo.time_complexity}</h2>
+            <div>{algo.description}</div>
+          </div>
         </div>
+        
       )
     }
   }
@@ -194,9 +218,7 @@ export default function TypingGameDemo({ params }: { params: { algoId: string } 
 
   return (
     <RootLayout>
-      <div style={{ height: "90vh" }}>
         {view()}
-      </div>
     </RootLayout>
   );
 };

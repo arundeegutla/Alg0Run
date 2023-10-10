@@ -39,18 +39,19 @@ body {
     background: url('https://images.unsplash.com/photo-1663076125875-b8454612ed9b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3028&q=80');
     background-repeat: no-repeat;
     background-position: 0 0;
+    background-size: cover;   -ms-background-size: cover;   -o-background-size: cover;   -moz-background-size: cover;   -webkit-background-size: cover;
 
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     background-size: auto;
 
-    @apply flex h-screen p-5 pl-16 text-gray-50;
+    @apply flex h-screen pl-16 text-gray-50;
 }
 
 .default-full {
     background-color: beige;
 
-    @apply flex h-screen text-gray-50 p-5;
+    @apply flex h-screen text-gray-50;
 }
 
 .my-hover {
@@ -60,7 +61,7 @@ body {
 
 .my-hover:hover {
     cursor: pointer;
-    margin: 9px;
+    margin: 8px;
 }
 
 h1 {
