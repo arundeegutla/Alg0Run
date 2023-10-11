@@ -5,7 +5,7 @@ import { PlayBasic, ProfileBasic } from "../util/models";
 
 export async function getProfiles() {
   return db.collection("Profiles")
-    .select("username", "totalScore")
+    .select("username", "totalScore", "photoURL")
     .get()
     .then(querySnapshot => querySnapshot.docs.map(doc => {return {...(doc.data()), ...{id: doc.id}} as ProfileBasic}));
 }
