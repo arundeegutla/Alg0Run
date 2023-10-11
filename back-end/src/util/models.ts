@@ -7,6 +7,7 @@ export type Profile = {
   id: string
   userId: string,
   username: string,
+  photoURL: string,
   totalScore: number,
   friends: string[]
 }
@@ -14,6 +15,7 @@ export type Profile = {
 export type ProfileBasic = {
   id: string,
   username: string,
+  photoURL: string,
   totalScore: number,
 }
 

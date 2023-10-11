@@ -51,7 +51,7 @@ export async function getPlays(profileId: string) {
     });
 }
 
-export async function createProfile(userId: string, username: string) {
+export async function createProfile(userId: string, username: string, photoURL: string) {
   const profileId = db.collection("Profiles").doc().id;
 
   try {
@@ -59,6 +59,7 @@ export async function createProfile(userId: string, username: string) {
       username: username,
       totalScore: 0,
       userId: userId,
+      photoURL: photoURL,
       friends: []
     });
     return profileId;

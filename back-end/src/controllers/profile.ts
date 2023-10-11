@@ -17,7 +17,7 @@ export async function isFirstTimeUser(idToken: string) {
   return { result: false };
 }
 
-export async function createProfile(idToken: string, username: string) {
+export async function createProfile(idToken: string, username: string, photoURL: string) {
   const res = await isFirstTimeUser(idToken);
   if (!res.result) {
     return {
@@ -31,7 +31,7 @@ export async function createProfile(idToken: string, username: string) {
     }
   }
 
-  const profileId = user.createProfile(res.userId, username);
+  const profileId = user.createProfile(res.userId, username, photoURL);
 
   if (profileId === undefined) {
     return {

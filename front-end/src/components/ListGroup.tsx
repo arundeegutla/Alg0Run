@@ -27,19 +27,21 @@ export default function ListGroup() {
   }, [setProfiles]);
 
   profiles.sort((a, b) => b.totalScore - a.totalScore);
+  const active_profiles = profiles.filter(x => x.totalScore > 0);
 
   return (
     <ul className=" divide-gray-200 dark:divide-gray-700 w-[100%]">
-      {profiles.map((profile, idx) => (
+      {active_profiles.map((profile, idx) => (
         <li key={idx} style={{ borderBottom: "1px solid black" }} className='py-3'>
           <div className="flex items-center space-x-4">
             <div style={{ width: "20px" }} className="flex-shrink-0">
-              <div className="text-lg font-medium text-gray-900 truncate">
+              <div className="text-lg font-medium text-gray-900">
                 {idx + 1}.
               </div>
             </div>
             <div className="flex-shrink-0">
-              <div style={{ fontSize: "30px" }}><FaUser/></div>
+              {!profile.photoURL ? <div style={{ fontSize: "30px" }}><FaUser/></div>
+              : <img className="w-8 h-8 rounded-full" src={profile.photoURL}/>}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-base font-medium text-gray-900 truncate">

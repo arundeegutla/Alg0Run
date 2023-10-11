@@ -4,7 +4,7 @@ import * as controller from "../controllers/profile"
 const router = require('express').Router()
 
 router.post('/create', async (req: Request, res: Response) => {
-  res.json(await controller.createProfile(req.body.idToken as string, req.body.username as string));
+  res.json(await controller.createProfile(req.body.idToken as string, req.body.username as string, req.body.photoURL as string));
 });
 router.post('/get', async (req: Request, res: Response) => {
   res.json(await controller.getProfile(req.body.profileId as string));

@@ -29,8 +29,8 @@ class ApiService {
     return http.post("/leaderboard/users");
   }
   
-  async createProfile(idToken: string, username: string) {
-    return http.post("/profile/create", { idToken: idToken, username: username });
+  async createProfile(idToken: string, username: string, photoURL: string) {
+    return http.post("/profile/create", { idToken: idToken, username: username, photoURL: photoURL });
   }
   
   async getProfile(profileId: string) {

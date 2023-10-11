@@ -13,7 +13,8 @@ const GiTrophyCup = dynamic(() => import('react-icons/gi').then((mod) => mod.GiT
 
 declare global {
     type MyUser = {
-        metadata: User | undefined | null;
+        username: string;
+        photoURL: string;
         score: number;
     };
 }
@@ -26,17 +27,17 @@ export default function ProfileComponent({
     className: string;
 }) {
     const getProfilePic = () => {
-        if (!profile || !profile.metadata || !profile.metadata.photoURL)
+        if (!profile.photoURL)
             return <div style={{ fontSize: "100px" }}><FaUser/></div>;
         const url: string =
-            profile.metadata.photoURL !== null ? profile.metadata.photoURL : '';
+            profile.photoURL !== null ? profile.photoURL : '';
         return <img src={url} className="h-40 aspect-square rounded-full" />;
     };
 
     const getName = () => {
-        if (!profile || !profile.metadata || !profile.metadata.displayName)
+        if (!profile.username)
             return 'No Name';
-        return profile.metadata.displayName;
+        return profile.username;
     };
 
     return (
