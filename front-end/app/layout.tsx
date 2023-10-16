@@ -10,7 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ alignItems: "flex-start"}} className="default flex-row items-center justify-center flex-wrap">
+      <body style={{ alignItems: "flex-start"}} className="default flex-row items-center justify-center flex-wrap scrollbar-hide">
         <Navbar/>
         {children}
       </body>
