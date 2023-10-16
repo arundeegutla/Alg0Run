@@ -25,6 +25,16 @@ body {
     font-family: 'Poppins', serif !important;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
 .my-blur {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
