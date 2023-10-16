@@ -66,7 +66,7 @@ export default function Home() {
               setSearchTerm(event.target.value);
             }}
           />
-          <div style={{ overflow: "scroll" }} className="flex flex-col h-[100%] mt-2">
+          <div className="flex flex-col h-[100%] mt-2 scrollbar-hide overflow-auto">
             <ul
               role="list"
               className="divide-y divide-gray-100 p-[20px]"

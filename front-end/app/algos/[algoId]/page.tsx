@@ -181,8 +181,7 @@ export default function TypingGameDemo({
           <div className="relative flex flex-col items-center justify-start rounded-2xl bg-[#282727]/[0.6] text-black p-4 mt-5">
             
             <div
-              style={{ overflow: 'scroll' }}
-              className="text-left typing-test"
+              className="text-left typing-test scrollbar-hide overflow-auto"
               tabIndex={0}
             >
               {getText(algo, language)

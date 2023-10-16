@@ -30,7 +30,7 @@ export default function Leaderboard() {
     <RootLayout>
       <div className="flex items-center justify-center flex-col w-full px-[20%] h-full">
         <h1 className='text-4xl'>Leaderboard</h1>
-        <div style={{ overflowY: "auto" }}  className="flex flex-col rounded-2xl bg-white/[0.6] text-black p-4 max-h-[90%] w-[60%]">
+        <div className="flex flex-col rounded-2xl bg-white/[0.6] text-green p-4 max-h-[90%] w-[60%] overflow-y-auto scrollbar-hide">
           <ListGroup />
         </div>
       </div>
