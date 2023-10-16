@@ -26,7 +26,6 @@ function classNames(...classes: string[]) {
 
 export default function NavBar() {
   const current = usePathname();
-
   const [user, loading, error] = useAuthState(auth);
 
   const signOut = () => {
@@ -76,19 +75,19 @@ export default function NavBar() {
   const getIcon = (value: string) => {
     if (value == 'Home')
       return (
-        <AiFillHome className="h-8 w-auto text-white cursor-pointer" />
+        <AiFillHome className="h-8 w-auto cursor-pointer" />
       );
     if (value == 'Leaderboard')
       return (
-        <MdLeaderboard className="h-8 w-auto text-white cursor-pointer" />
+        <MdLeaderboard className="h-8 w-auto cursor-pointer" />
       );
     return (
-      <PiTreeStructureFill className="h-8 w-auto text-white cursor-pointer" />
+      <PiTreeStructureFill className="h-8 w-auto cursor-pointer" />
     );
   };
 
   return (
-    <div className="top-0 left-0 absolute w-16">
+    <div className="top-0 left-0 absolute w-16 z-50">
       <Disclosure as="nav" className="my-blur transparent-dark">
         <div className="my-auto max-w-7xl pb-12 pt-4 h-screen ">
           <div className="relative flex flex-col justify-between h-[100%] items-center">
@@ -108,13 +107,13 @@ export default function NavBar() {
                       key={item.name}
                       href={item.href}
                       className={classNames(
-                        item.name == current
-                          ? 'bg-gray-900 text-white'
+                        item.href == current
+                          ? 'bg-fuchsia-50 text-red-400'
                           : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'rounded-md px-3 py-2 text-sm font-medium mb-2'
                       )}
                       aria-current={
-                        item.name == current
+                        item.href == current
                           ? 'page'
                           : undefined
                       }
