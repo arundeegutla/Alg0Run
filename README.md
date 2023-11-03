@@ -3,7 +3,7 @@
 ## Table of Contents
 1. [Overview](#Overview)
 2. [Description](#Description)
-3. [Tech Stack](#Tech-Stack)
+3. [Tech Stack](#Tech-Stack-and-Tools)
 4. [Screens](#Screens)
 5. [Credit](#Credit)
 
@@ -13,10 +13,11 @@ All-in-one source repository for Alg0Run. Production is live [here](http://alg0r
 Alg0Run is an educational coding typing platform that combines a user-friendly and gamified interface to enhance data structure and algorithm skills while boosting typing speed. The 36-hour journey was challenging, but incredibly rewarding, thanks to the support and guidance from the talented individuals we met during the event.
 
 
-## Tech Stack
-1. Firebase
-2. Express.js
-3. Next.js
+## Tech Stack and Tools
+1. Firebase - backend and authentication
+2. Express.js - API Framework
+3. Next.js - Frontend Framework
+4. DigitalOcean - Hosting
    
 ## Screens
 ![Screenshot 2023-10-16 at 12 24 21 AM](https://github.com/arundeegutla/Alg0Run/assets/55728123/aa603029-2859-4945-8313-29f723c29300)
