@@ -3,7 +3,7 @@
 ## Table of Contents
 1. [Overview](#Overview)
 2. [Description](#Description)
-3. [Tech Stack](#TechStack)
+3. [Tech Stack](#Tech_Stack)
 4. [Screens](#Screens)
 5. [Credit](#Credit)
 
