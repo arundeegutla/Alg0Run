@@ -36,7 +36,7 @@ export default async function handler(
           return res.status(404).json({ error: 'Endpoint not found' });
       }
     } else {
-      return res.status(405).json({ error: 'Method not allowed' });
+      return res.status(405).json({ error: 'Method not allowed' + method });
     }
   } catch (error) {
     console.error(`Error in ${slug}:`, error);

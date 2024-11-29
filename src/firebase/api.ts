@@ -2,7 +2,7 @@ import axios from 'axios';
 import { PlayDetails } from './models';
 
 export const http = axios.create({
-  baseURL: '/Alg0Run/api',
+  baseURL: '/api',
   headers: {
     'Content-type': 'application/json',
   },
