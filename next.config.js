@@ -4,6 +4,7 @@ const nextConfig = {
     unoptimized: true,
   },
   basePath: '/Alg0Run',
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;
