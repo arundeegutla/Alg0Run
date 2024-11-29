@@ -7,7 +7,7 @@ name: Deploy Next.js site to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: ['main']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,13 +21,31 @@ permissions:
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_apiKey: ${{ secrets.NEXT_PUBLIC_apiKey }}
+      NEXT_PUBLIC_authDomain: ${{ secrets.NEXT_PUBLIC_authDomain }}
+      NEXT_PUBLIC_projectId: ${{ secrets.NEXT_PUBLIC_projectId }}
+      NEXT_PUBLIC_storageBucket: ${{ secrets.NEXT_PUBLIC_storageBucket }}
+      NEXT_PUBLIC_messagingSenderId: ${{ secrets.NEXT_PUBLIC_messagingSenderId }}
+      NEXT_PUBLIC_appId: ${{ secrets.NEXT_PUBLIC_appId }}
+      NODE_type: ${{ secrets.NODE_type }}
+      NODE_project_id: ${{ secrets.NODE_project_id }}
+      NODE_private_key_id: ${{ secrets.NODE_private_key_id }}
+      NODE_private_key: ${{ secrets.NODE_private_key }}
+      NODE_client_email: ${{ secrets.NODE_client_email }}
+      NODE_client_id: ${{ secrets.NODE_client_id }}
+      NODE_auth_uri: ${{ secrets.NODE_auth_uri }}
+      NODE_token_uri: ${{ secrets.NODE_token_uri }}
+      NODE_auth_provider_x509_cert_url: ${{ secrets.NODE_auth_provider_x509_cert_url }}
+      NODE_client_x509_cert_url: ${{ secrets.NODE_client_x509_cert_url }}
+      NODE_universe_domain: ${{ secrets.NODE_universe_domain }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,7 +69,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
