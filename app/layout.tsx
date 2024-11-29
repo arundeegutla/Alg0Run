@@ -2,6 +2,7 @@
 
 import Navbar from "./navbar"
 import './globals.css'
+import { Suspense } from "react";
 
 export default function RootLayout({
   children, // will be a page or nested layout
@@ -10,10 +11,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ alignItems: "flex-start"}} className="default flex-row items-center justify-center flex-wrap scrollbar-hide">
-        <Navbar/>
-        {children}
+      <body style={{ alignItems: "flex-start" }} className="default flex-row items-center justify-center flex-wrap scrollbar-hide">
+        <Navbar />
+        <Suspense>
+          {children}
+        </Suspense>
       </body>
+
+
     </html>
   )
 }
