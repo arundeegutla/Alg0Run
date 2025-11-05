@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '@/firebase/clientApp';
 import api from '@/firebase/api';
 import Loading from '@/components/Loading';
-import RootLayout from '../../layout';
+import RootLayout from '../layout';
 
 export default function TypingGameDemo() {
   const [user, loading, error] = useAuthState(auth);
@@ -123,14 +123,18 @@ export default function TypingGameDemo() {
 
   function view() {
     async function sendCompletion(playDetails: PlayDetails) {
-      if (!user || completed) return;
+      if (completed) return;
 
       setComplete(true);
-      const token = await user.getIdToken();
-      const profile = (await api.getProfileByToken(token)).data
-        .profile as Profile;
-      console.log('creating play ' + playDetails);
-      api.createPlay(algoId, profile.id, playDetails);
+      
+      // Only save the play if user is logged in
+      if (user) {
+        const token = await user.getIdToken();
+        const profile = (await api.getProfileByToken(token)).data
+          .profile as Profile;
+        console.log('creating play ' + playDetails);
+        api.createPlay(algoId, profile.id, playDetails);
+      }
     }
 
     let res = {
@@ -229,6 +233,11 @@ export default function TypingGameDemo() {
         <div className="flex flex-row items-center justify-center h-full">
           <div className="flex flex-col items-center justify-start rounded-2xl bg-white/[0.6] text-black p-8 m-5 h-[90%] w-[40%]">
             <h1 className="text-5xl">Stats</h1>
+            {!user && (
+              <p className="text-sm text-gray-600 mt-2">
+                Sign in to save your score!
+              </p>
+            )}
             <div className="flex flex-row items-center">
               <div className="flex flex-col items-center p-8 m-2 w-[50%]">
                 <span>Time (seconds)</span>
@@ -262,7 +271,7 @@ export default function TypingGameDemo() {
               <div className="flex flex-col items-center p-8 m-2 w-[50%]">
                 <span>Score (pts)</span>
                 <h1 className="text-green-800">
-                  +{playDetails.score.toFixed(0)}
+                  {user ? '+' : ''}{playDetails.score.toFixed(0)}
                 </h1>
               </div>
             </div>
@@ -278,13 +287,9 @@ export default function TypingGameDemo() {
     }
   }
 
-  if (user) {
-    console.log(user.displayName);
-  } else if (loading) {
+  // Show loading only during initial auth check
+  if (loading) {
     return <Loading />;
-  } else {
-    router.push('/auth');
-    return;
   }
 
   return <RootLayout>{view()}</RootLayout>;
