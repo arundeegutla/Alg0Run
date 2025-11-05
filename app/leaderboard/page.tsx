@@ -15,15 +15,11 @@ export default function Leaderboard() {
   const [user, loading, error] = useAuthState(auth);
   const router = useRouter();
 
-  if (user) {
-    console.log(user.displayName);
-  } else if (loading) {
+  // Show loading only during initial auth check
+  if (loading) {
     return (
       <Loading />
     );
-  } else {
-    router.push('/auth');
-    return;
   }
 
   return (
