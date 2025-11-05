@@ -1,91 +1,99 @@
-'use client';
+'use client'; // This is a client component 👈🏽
 
+import { useEffect, useState } from 'react';
+import SearchComponent from '@/components/SearchBar';
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/firebase/clientApp';
+import api from '@/firebase/api';
+import Loading from '@/components/Loading';
+import { Algo } from '@/firebase/models';
 import RootLayout from './layout';
 
-import ProfileComponent from '@/components/Profile';
+import dynamic from 'next/dynamic';
 
-import { auth } from '@/firebase/clientApp';
-import { useRouter } from 'next/navigation';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import Loading from '@/components/Loading';
-import Friends from '@/components/Friends';
-import RecentPlays from '@/components/RecentPlays';
-import { Play, Profile, ProfileBasic } from '@/firebase/models';
-import { useEffect, useState } from 'react';
-import api from '@/firebase/api';
+const SiPython = dynamic(() => import('react-icons/si').then((mod) => mod.SiPython), {
+  ssr: false, // Set to false to disable server-side rendering
+});
 
-export default function Page() {
+const FaJava = dynamic(() => import('react-icons/fa').then((mod) => mod.FaJava), {
+  ssr: false, // Set to false to disable server-side rendering
+});
+
+const TbBrandCpp = dynamic(() => import('react-icons/tb').then((mod) => mod.TbBrandCpp), {
+  ssr: false, // Set to false to disable server-side rendering
+});
+
+export default function Home() {
   const [user, loading, error] = useAuthState(auth);
-  const [profileStatus, setProfileStatus] = useState(false);
-
-
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const [profile, setProfile] = useState({} as unknown as Profile);
-  const [plays, setPlays] = useState([] as unknown as Play[]);
-  const [friends, setFriends] = useState([] as unknown as ProfileBasic[]);
+  const [algos, setAlgos] = useState([] as Algo[]);
 
-  const refresh = () => {
-    if (!user || profileStatus) return;
+  useEffect(() => {
+    api.getAllAlgos().then((res) => {
+      if (res.data.error === "") {
+        setAlgos(res.data.results);
+      }
+    })
+  }, [setAlgos]);
 
-    setProfileStatus(true);
-    console.log(user.displayName);
-    user.getIdTokenResult().then((idToken) => {
-      api.createProfile(idToken.token, user.displayName || '', user.photoURL || '').then(
-        (res) => {
-          api.getProfileByToken(idToken.token).then((res) => {
-            if (res.data.error === '') {
-              const friendIds = res.data.profile.friends;
-              setProfile(res.data.profile);
-              setPlays(res.data.plays);
-              api.userLeaderboard().then((res) => {
-                if (res.data.error === '') {
-                  const allProfiles = res.data
-                    .results as ProfileBasic[];
-                  setFriends(
-                    allProfiles.filter((pb) =>
-                      friendIds.includes(pb.id)
-                    )
-                  );
-                }
-              });
-            }
-          });
-        }
-      );
-    });
-  };
-
-  useEffect(refresh, [profileStatus, user]);
-
-  if (user) {
-    if (!profileStatus && profile.totalScore === undefined) refresh();
-  } else if (loading) {
-    return <Loading />;
-  } else {
-    router.push('/auth');
-    return;
+  // Show loading only during initial auth check
+  if (loading) {
+    return (
+      <Loading />
+    );
   }
 
   return (
     <RootLayout>
-      <div className="w-full flex flex-row items-center h-full justify-center">
-        <div className='flex flex-row items-start'>
-          <div className="flex flex-col items-stretch flex-wrap">
-            <ProfileComponent
-              className="profile my-blur my-hover rounded-2xl"
-              profile={{ username: user.displayName || "", photoURL: user.photoURL || "", score: profile.totalScore || 0, }}
-            ></ProfileComponent>
-            <RecentPlays
-              className="profile my-blur my-hover rounded-2xl"
-              plays={plays}
-            ></RecentPlays>
+      <div style={{ height: "90vh" }} className="flex flex-row items-center justify-center flex-wrap m-auto w-full">
+        <div className="flex flex-col items-center h-[100%] rounded-2xl bg-white/[0.6] text-black p-8 min-w-[50%]">
+          <div className="top">
+            <h1 className="head text-4xl" style={{ textAlign: 'center' }}>
+              Algorithms
+            </h1>
           </div>
-          <div>
-            <Friends
-              className="profile my-blur my-hover rounded-2xl"
-              friends={friends}
-            ></Friends>
+          <SearchComponent
+            placeholder="Search"
+            onChange={(event: any) => {
+              setSearchTerm(event.target.value);
+            }}
+          />
+          <div className="flex flex-col h-[100%] mt-2 scrollbar-hide overflow-auto">
+            <ul
+              role="list"
+              className="divide-y divide-gray-100 p-[20px]"
+            >
+              {algos.filter((algo) => algo.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .map((algo) => (
+                  <li
+                    key={algo.id}
+                    className="flex items-center justify-between gap-x-6 py-5"
+                  >
+                    <div className="flex min-w-0 gap-x-4">
+                      <div className="min-w-0 flex-auto">
+                        <h2>{algo.name}</h2>
+                      </div>
+                    </div>
+                    <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                      <div className="flex flex-row text-sm leading-6 text-gray-900 ">
+                        <a href={"/algos/run?lang=python&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                          <div style={{ fontSize: "35px" }}><SiPython /></div>
+                        </a>
+                        <a href={"/algos/run?lang=java&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                          <div style={{ fontSize: "35px" }}><FaJava /></div>
+                        </a>
+                        <a href={"/algos/run?lang=cpp&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                          <div style={{ fontSize: "35px" }}><TbBrandCpp /></div>
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+            </ul>
           </div>
         </div>
       </div>
