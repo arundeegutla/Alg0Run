@@ -81,13 +81,13 @@ export default function Home() {
                     </div>
                     <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
                       <div className="flex flex-row text-sm leading-6 text-gray-900 ">
-                        <a href={"/algos/run?lang=python&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                        <a href={"/run?lang=python&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
                           <div style={{ fontSize: "35px" }}><SiPython /></div>
                         </a>
-                        <a href={"/algos/run?lang=java&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                        <a href={"/run?lang=java&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
                           <div style={{ fontSize: "35px" }}><FaJava /></div>
                         </a>
-                        <a href={"/algos/run?lang=cpp&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
+                        <a href={"/run?lang=cpp&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
                           <div style={{ fontSize: "35px" }}><TbBrandCpp /></div>
                         </a>
                       </div>
