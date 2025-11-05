@@ -1,6 +1,7 @@
 'use client'; // This is a client component 👈🏽
 
 import { auth } from '@/firebase/clientApp';
+import { errorMsg } from '@/firebase/authErrors';
 import {
   signInWithPopup,
   GoogleAuthProvider,
@@ -16,6 +17,8 @@ import { ChangeEvent, useState } from 'react';
 import { Seaweed_Script } from 'next/font/google';
 import { MenuButtonProps } from '@headlessui/react';
 import RootLayout from '../layout';
+import Alert from '@/components/Alert';
+
 
 interface MyFunctions {
   toggle: () => void;
@@ -36,6 +39,8 @@ const LogIn = ({ toggle }: MyFunctions) => {
   const router = useRouter();
   const [email, setUserName] = useState('');
   const [password, setPassword] = useState('');
+    const [authError, setAuthError] = useState('');
+
 
   const getUserName = (e: ChangeEvent<HTMLInputElement>) => {
     // 👇 Store the input value to local state
@@ -54,9 +59,12 @@ const LogIn = ({ toggle }: MyFunctions) => {
         router.push('/');
         return;
       }
-    } catch (error) { }
-
-    router.push('/auth');
+      router.push('/auth');
+    } catch (error: any) { 
+      var msg =
+        errorMsg[error.code?.replace('auth/', '') as keyof typeof errorMsg];
+      setAuthError(msg ?? 'User Not Found');
+    }
   };
   const loginManually = async () => {
     if (!email || !password) return;
@@ -178,6 +186,11 @@ const LogIn = ({ toggle }: MyFunctions) => {
                 </div>
               </div>
             </div>
+            {authError.length > 0 && (
+        <Alert alertType="danger" className="mx-auto max-w-[350px]">
+          {authError}
+        </Alert>
+      )}
             <div className="mt-8">
               <button
                 onClick={loginManually}
