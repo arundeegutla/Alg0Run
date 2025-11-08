@@ -1,63 +1,112 @@
-import Image from "next/image";
+/* eslint-disable react-hooks/set-state-in-effect */
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const Keyboard3D = dynamic(() => import('@/src/components/Keyboard3D'), {
+  ssr: false,
+});
 
 export default function Home() {
+  const [isClient, setIsClient] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const user = localStorage.getItem('alg0_user');
+    setIsLoggedIn(!!user);
+  }, []);
+
+  if (!isClient) return null;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className='min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-foreground'>
+      {/* Navigation */}
+      <nav className='border-b border-slate-700 backdrop-blur-sm sticky top-0 z-50'>
+        <div className='max-w-7xl mx-auto px-6 py-4 flex items-center justify-between'>
+          <div className='font-mono text-xl font-bold'>
+            <span className='text-slate-400'>{`<`}</span>
+            <span className='text-cyan-400'>Alg0Run</span>
+            <span className='text-slate-400'>{`/>`}</span>
+          </div>
+          <div className='flex gap-4'>
+            <Link
+              href='/leaderboard'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              {`[ leaderboard ]`}
+            </Link>
+            <Link
+              href='/type'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              {`[ type ]`}
+            </Link>
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem('alg0_user');
+                  setIsLoggedIn(false);
+                }}
+                className='text-slate-300 hover:text-red-400 transition font-mono text-sm'
+              >
+                {`[ logout ]`}
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  const username = prompt('Enter username:');
+                  if (username) {
+                    localStorage.setItem('alg0_user', username);
+                    setIsLoggedIn(true);
+                  }
+                }}
+                className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
+              >
+                {`[ login ]`}
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </nav>
+
+      {/* Hero Section */}
+      <main className="min-h-[calc(100vh-73px)] flex flex-col items-center justify-between px-6 py-12">
+        <div className="max-w-4xl mx-auto text-center space-y-8 flex-1 flex flex-col justify-center">
+          {/* Title with dev syntax */}
+          <div className="space-y-4">
+            <h1 className="text-6xl md:text-7xl font-mono font-bold tracking-tight">
+              <span className="text-slate-400">{`// `}</span>
+              <span className="text-cyan-400">Algorithm</span>
+              <br />
+              <span className="text-slate-400">{`// `}</span>
+              <span className="text-purple-400">Speed</span>
+              <span className="text-slate-400">{` Typing`}</span>
+            </h1>
+            <p className="text-xl text-slate-400 font-mono max-w-2xl mx-auto">
+              {`[ Type complex algorithms, race against peers, dominate the leaderboard ]`}
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <div className="space-y-4">
+            <Link
+              href="/type"
+              className="inline-block px-8 py-4 bg-linear-to-r from-cyan-500 to-blue-500 text-white font-mono font-bold rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105"
+            >
+              {`$ start typing...`}
+            </Link>
+            <p className="text-slate-500 font-mono text-sm">
+              {`[ master algorithms, build muscle memory, climb the ranks ]`}
+            </p>
+          </div>
+        </div>
+
+        {/* 3D Keyboard - At Bottom */}
+        <div className="w-full max-w-7xl mx-auto mt-8" style={{ height: '500px' }}>
+          <Keyboard3D />
         </div>
       </main>
     </div>
