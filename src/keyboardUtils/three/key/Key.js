@@ -211,11 +211,16 @@ export class Key {
       this.cap.position.y + this.press_velocity * this.direction;
 
     // Update glow effect on key label based on key state
-    if (this.state === KEYSTATES.MOVING_DOWN || this.state === KEYSTATES.MOVING_UP) {
+    if (
+      this.state === KEYSTATES.MOVING_DOWN ||
+      this.state === KEYSTATES.MOVING_UP
+    ) {
       // Calculate intensity based on how far down the key is
-      const progress = Math.abs((this.cap.position.y - this.start_y) / this.dist_pressed);
+      const progress = Math.abs(
+        (this.cap.position.y - this.start_y) / this.dist_pressed
+      );
       const glowIntensity = progress * 0.8; // Max glow intensity when pressed
-      
+
       // Apply emissive glow to all materials (label will glow)
       this.cap.material.forEach((mat) => {
         mat.emissive = new THREE.Color(this.foregroundColor);

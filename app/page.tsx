@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
-const Keyboard3D = dynamic(() => import('@/src/components/Keyboard3D'), {
+const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
 });
 
@@ -24,23 +24,29 @@ export default function Home() {
   return (
     <div className='flex flex-col h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-foreground'>
       {/* Navigation */}
-      <nav className='border-b border-slate-700 backdrop-blur-sm z-50 shrink-0'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-between'>
-          <div className='font-mono text-lg sm:text-xl font-bold'>
-            <span className='text-slate-400'>{`<`}</span>
-            <span className='text-cyan-400'>Alg0Run</span>
-            <span className='text-slate-400'>{`/>`}</span>
-          </div>
-          <div className='flex gap-2 sm:gap-4'>
+      <nav className='sticky top-4 z-50 flex justify-center px-6'>
+        <div className='bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full px-8 py-3 flex items-center gap-8'>
+          <Link
+            href='/'
+            className='font-mono text-lg font-bold hover:opacity-80 transition'
+          >
+            <span className='text-slate-400'>{`{ `}</span>
+            <span className='text-slate-300'>alg0run</span>
+            <span className='text-slate-400'>{` }`}</span>
+          </Link>
+
+          <div className='h-6 w-px bg-slate-700/50'></div>
+
+          <div className='flex gap-6'>
             <Link
               href='/leaderboard'
-              className='text-slate-300 hover:text-cyan-400 transition font-mono text-xs sm:text-sm'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
             >
               {`[ leaderboard ]`}
             </Link>
             <Link
               href='/type'
-              className='text-slate-300 hover:text-cyan-400 transition font-mono text-xs sm:text-sm'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
             >
               {`[ type ]`}
             </Link>
@@ -50,7 +56,7 @@ export default function Home() {
                   localStorage.removeItem('alg0_user');
                   setIsLoggedIn(false);
                 }}
-                className='text-slate-300 hover:text-red-400 transition font-mono text-xs sm:text-sm'
+                className='text-slate-300 hover:text-red-400 transition font-mono text-sm'
               >
                 {`[ logout ]`}
               </button>
@@ -63,7 +69,7 @@ export default function Home() {
                     setIsLoggedIn(true);
                   }
                 }}
-                className='text-slate-300 hover:text-cyan-400 transition font-mono text-xs sm:text-sm'
+                className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
               >
                 {`[ login ]`}
               </button>
@@ -98,9 +104,6 @@ export default function Home() {
             >
               {`$ start typing...`}
             </Link>
-            <p className='text-slate-500 font-mono text-[8px] sm:text-[10px] px-2'>
-              {`[ master algorithms, build muscle memory, climb the ranks ]`}
-            </p>
           </div>
         </div>
       </main>
