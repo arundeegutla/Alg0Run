@@ -50,7 +50,7 @@ export default function SecondarySidebar({
       </div>
 
       {/* Keyboard 3D */}
-      <div className='w-full h-28'>
+      <div className='w-full h-24'>
         <Keyboard3D />
       </div>
 

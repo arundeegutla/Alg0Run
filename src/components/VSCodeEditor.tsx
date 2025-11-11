@@ -1,14 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Algo } from '~/firebase/models';
 import {
   VscLayoutSidebarLeft,
   VscLayoutSidebarRight,
   VscClose,
-  VscCircleFilled,
   VscRefresh,
 } from 'react-icons/vsc';
+import { SiPython, SiCplusplus } from 'react-icons/si';
+import { FaJava } from 'react-icons/fa';
+import useTypingGame, {
+  CharStateType,
+  PhaseType,
+} from 'react-typing-game-hook';
 
 interface VSCodeEditorProps {
   algo: Algo | null;
@@ -32,114 +37,116 @@ export default function VSCodeEditor({
   onTogglePrimarySidebar,
   onToggleSecondarySidebar,
 }: VSCodeEditorProps) {
-  const [userInput, setUserInput] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [errors, setErrors] = useState<number[]>([]);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [isComplete, setIsComplete] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const targetCode = algo?.code[language] || '';
 
-  // Reset on algo or language change
-  useEffect(() => {
-    const resetEditor = () => {
-      setUserInput('');
-      setCurrentIndex(0);
-      setErrors([]);
-      setStartTime(null);
-      setIsComplete(false);
-    };
-    resetEditor();
-    textareaRef.current?.focus();
-  }, [algo, language]);
+  const {
+    states: { charsState, length, currIndex, correctChar, errorChar, phase },
+    actions: { insertTyping, resetTyping, deleteTyping, getDuration },
+  } = useTypingGame(targetCode, {
+    skipCurrentWordOnSpace: false,
+  });
 
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  // Reset hook when algo or language (text) changes
   useEffect(() => {
-    // Calculate stats
-    if (!startTime || !algo) {
-      onStatsUpdate({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
+    resetTyping();
+    editorRef.current?.focus();
+  }, [targetCode, resetTyping]);
+
+  // Stats calculation
+  useEffect(() => {
+    if (!algo || phase === PhaseType.NotStarted) {
+      onStatsUpdate({ wpm: 0, accuracy: 100, time: 0, progress: 0 });
       return;
     }
 
-    const timeElapsed = (Date.now() - startTime) / 1000;
-    const wordsTyped = userInput.length / 5; // Standard: 5 chars = 1 word
-    const wpm = Math.round((wordsTyped / timeElapsed) * 60);
+    const durationMs = getDuration();
+    const timeSec = durationMs / 1000;
+    const typedCount = currIndex >= 0 ? currIndex + 1 : 0; // number of chars attempted
+    const wordsTyped = typedCount / 5;
+    const wpm = timeSec > 0 ? Math.round((wordsTyped / timeSec) * 60) : 0;
+    const accuracyBase = correctChar + errorChar;
     const accuracy =
-      userInput.length > 0
-        ? ((userInput.length - errors.length) / userInput.length) * 100
-        : 100;
-    const progress = (currentIndex / targetCode.length) * 100;
+      accuracyBase > 0 ? (correctChar / accuracyBase) * 100 : 100;
+    const progress = length > 0 ? (typedCount / length) * 100 : 0;
 
     onStatsUpdate({
       wpm: isNaN(wpm) ? 0 : wpm,
       accuracy: isNaN(accuracy) ? 100 : accuracy,
-      time: timeElapsed,
+      time: timeSec,
       progress: isNaN(progress) ? 0 : progress,
     });
   }, [
-    userInput,
-    currentIndex,
-    startTime,
-    errors,
     algo,
-    targetCode,
-    isComplete,
+    currIndex,
+    correctChar,
+    errorChar,
+    length,
+    phase,
+    getDuration,
     onStatsUpdate,
   ]);
 
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-
-    // Start timer on first keystroke
-    if (!startTime && value.length === 1) {
-      setStartTime(Date.now());
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    let key = e.key;
+    // Prevent default browser actions like scrolling on space
+    if (key.length === 1 || key === 'Backspace' || key === 'Escape') {
+      e.preventDefault();
     }
-
-    // Don't allow typing past the target
-    if (value.length > targetCode.length) {
+    if (key === 'Escape') {
+      resetTyping();
+      return;
+    }
+    if (key === 'Backspace') {
+      deleteTyping(false);
       return;
     }
 
-    setUserInput(value);
-
-    // Track errors
-    const newErrors: number[] = [];
-    for (let i = 0; i < value.length; i++) {
-      if (value[i] !== targetCode[i]) {
-        newErrors.push(i);
+    if (key === 'Tab') key = '\t';
+    if (key === 'Enter') key = '\n';
+    if (key.length === 1) {
+      if (
+        targetCode[currIndex + 1] === '\n' &&
+        targetCode[currIndex + 1] !== key
+      ) {
+        return;
       }
-    }
-    setErrors(newErrors);
-    setCurrentIndex(value.length);
 
-    // Check completion
-    if (value === targetCode) {
-      setIsComplete(true);
+      insertTyping(key);
+
+      if (key === '\n' && currIndex + 2 < length) {
+        let i = currIndex + 1;
+        while (targetCode[i + 1].trim() === '') {
+          insertTyping(' ');
+          i += 1;
+        }
+      }
     }
   };
 
   const handleReset = () => {
-    setUserInput('');
-    setCurrentIndex(0);
-    setErrors([]);
-    setStartTime(null);
-    setIsComplete(false);
-    textareaRef.current?.focus();
+    resetTyping();
+    editorRef.current?.focus();
   };
 
   const getLanguageIcon = (lang: string) => {
-    const colors = {
-      python: '#3776ab',
-      cpp: '#00599c',
-      java: '#007396',
-    };
-    return (
-      <VscCircleFilled
-        size={10}
-        style={{ color: colors[lang as keyof typeof colors] }}
-      />
-    );
+    const iconProps = { size: 14 };
+    switch (lang) {
+      case 'python':
+        return <SiPython {...iconProps} />;
+      case 'cpp':
+        return <SiCplusplus {...iconProps} />;
+      case 'java':
+        return <FaJava {...iconProps} />;
+      default:
+        return null;
+    }
   };
+
+  const defaultColor = 'rgb(99 99 99)';
+  const correctColor = 'white';
+  const wrongColor = 'rgb(99 99 99)';
 
   return (
     <div className='flex flex-col h-full'>
@@ -159,21 +166,6 @@ export default function VSCodeEditor({
         >
           <VscLayoutSidebarRight size={16} />
         </button>
-
-        <div className='flex items-center gap-4 text-[#cccccc]'>
-          <span className='hover:bg-[#505050] px-2 py-1 rounded cursor-pointer'>
-            File
-          </span>
-          <span className='hover:bg-[#505050] px-2 py-1 rounded cursor-pointer'>
-            Edit
-          </span>
-          <span className='hover:bg-[#505050] px-2 py-1 rounded cursor-pointer'>
-            View
-          </span>
-          <span className='hover:bg-[#505050] px-2 py-1 rounded cursor-pointer'>
-            Run
-          </span>
-        </div>
 
         <div className='ml-auto text-[#cccccc] text-xs'>
           {algo ? algo.name : 'No Algorithm Selected'}
@@ -209,7 +201,7 @@ export default function VSCodeEditor({
                 <button
                   key={lang}
                   onClick={() => onLanguageChange(lang)}
-                  className={`px-3 py-1 text-xs rounded ${
+                  className={`cursor-pointer px-3 py-1 text-xs rounded ${
                     language === lang
                       ? 'bg-[#37373d] text-[#cccccc]'
                       : 'text-[#858585] hover:bg-[#2a2d2e]'
@@ -250,52 +242,70 @@ export default function VSCodeEditor({
             {/* Code Editor */}
             <div className='flex-1 relative'>
               {/* Target code (background) */}
-              <pre className='absolute inset-0 p-4 font-mono text-sm leading-6 text-[#4d4d4d] overflow-auto whitespace-pre'>
-                {targetCode}
-              </pre>
+              {/* Unified scroll container */}
+              <div
+                ref={editorRef}
+                tabIndex={0}
+                onKeyDown={handleKeyDown}
+                className='absolute inset-0 overflow-auto focus:outline-none'
+              >
+                <div className='relative p-4 font-mono text-sm leading-6 whitespace-pre'>
+                  {/* Target code underlay */}
+                  {/* <pre className='text-[#4d4d4d] whitespace-pre'>
+                    {targetCode}
+                  </pre> */}
 
-              {/* User input overlay */}
-              <div className='absolute inset-0 p-4 font-mono text-sm leading-6 overflow-auto pointer-events-none'>
-                {userInput.split('').map((char, idx) => {
-                  const isError = errors.includes(idx);
-                  const isCorrect = !isError && char === targetCode[idx];
+                  {/* Typed overlay (no pointer events so scroll is shared) */}
+                  <div className='typing-test pointer-events-none absolute inset-0 p-4 top-0 left-0'>
+                    {/* {chars.split('').map((char, idx) => {
+                      const state = charsState[idx];
+                      let className = '';
+                      if (state === CharStateType.Correct)
+                        className += ' text-[#cccccc]';
+                      else if (state === CharStateType.Incorrect)
+                        className += ' bg-red-500/30 text-red-300';
+                      else className += ' text-transparent';
+                      return (
+                        <span key={idx + char} className={className}>
+                          {char}
+                        </span>
+                      );
+                    })} */}
 
-                  return (
-                    <span
-                      key={idx}
-                      className={
-                        isError
-                          ? 'bg-red-500/30 text-red-300'
-                          : isCorrect
-                            ? 'text-[#cccccc]'
-                            : 'text-[#858585]'
-                      }
-                    >
-                      {char}
-                    </span>
-                  );
-                })}
-                {/* Cursor */}
-                {!isComplete && (
-                  <span className='inline-block w-0.5 h-5 bg-white animate-pulse ml-0.5' />
-                )}
+                    {targetCode.split('').map((char: string, index: number) => {
+                      const state = charsState[index];
+                      const color =
+                        state === CharStateType.Incomplete
+                          ? defaultColor
+                          : state === CharStateType.Correct
+                            ? correctColor
+                            : wrongColor;
+                      return (
+                        <span
+                          key={char + index}
+                          style={{ color: color }}
+                          className={
+                            currIndex + 1 === index
+                              ? 'curr-letter'
+                              : !(
+                                    state === CharStateType.Incomplete ||
+                                    state === CharStateType.Correct
+                                  )
+                                ? 'bg-red-400'
+                                : ''
+                          }
+                        >
+                          {char === '\n' ? ' ' : ''}
+                          {char}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              {/* Invisible textarea for input */}
-              <textarea
-                ref={textareaRef}
-                value={userInput}
-                onChange={handleInput}
-                className='absolute inset-0 p-4 font-mono text-sm leading-6 bg-transparent text-transparent caret-transparent outline-none resize-none'
-                spellCheck={false}
-                autoComplete='off'
-                autoCorrect='off'
-                autoCapitalize='off'
-                style={{ caretColor: 'transparent' }}
-              />
-
               {/* Completion message */}
-              {isComplete && (
+              {phase === PhaseType.Ended && (
                 <div className='absolute inset-0 flex items-center justify-center bg-[#1e1e1e]/90'>
                   <div className='bg-[#2d2d2d] border border-[#3e3e42] rounded-lg p-8 text-center'>
                     <div className='text-4xl mb-4'>🎉</div>

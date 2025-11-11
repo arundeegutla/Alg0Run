@@ -91,7 +91,7 @@ export default function PrimarySidebar({
   return (
     <div className='flex h-full w-[300px] bg-[#252526] border-r border-[#3e3e42]'>
       {/* Activity Bar */}
-      <div className='w-12 bg-[#333333] flex flex-col items-center py-2 border-r border-[#3e3e42]'>
+      <div className='w-12 bg-[#333333] flex flex-col items-center border-r border-[#3e3e42]'>
         <button
           onClick={() => setActiveView('explorer')}
           className={`p-3 mb-1 hover:bg-[#2a2d2e] rounded ${activeView === 'explorer' ? 'bg-[#37373d] border-l-2 border-[#007acc]' : ''}`}
