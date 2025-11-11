@@ -13,9 +13,9 @@
 
 import * as THREE from 'three';
 import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
-import { LAYOUT_65 } from '@/src/keyboardUtils/config/keyboard';
-import type { KeyboardSettings } from '@/src/keyboardUtils/config/settings';
-import LAYOUTS from '@/src/keyboardUtils/config/layouts/layouts';
+import { LAYOUT_65 } from '@/keyboardUtils/config/keyboard';
+import type { KeyboardSettings } from '@/keyboardUtils/config/settings';
+import LAYOUTS from '@/keyboardUtils/config/layouts/layouts';
 import case_1 from './case_1';
 import case_2 from './case_2';
 import badge from './badge';
@@ -26,13 +26,13 @@ import type { StaticImageData } from 'next/image';
 import { subscribe } from 'redux-subscriber';
 
 // Asset imports
-import shadowPath from '@/src/assets/dist/shadow-key-noise.png';
-import noisePath from '@/src/assets/dist/noise.png';
-import brushedRoughness from '@/src/assets/dist/brushed-metal_roughness-512.png';
-import brushedAlbedo from '@/src/assets/dist/brushed-metal_albedo-512.png';
-import brushedAo from '@/src/assets/dist/brushed-metal_ao-512.png';
+import shadowPath from '@/assets/dist/shadow-key-noise.png';
+import noisePath from '@/assets/dist/noise.png';
+import brushedRoughness from '@/assets/dist/brushed-metal_roughness-512.png';
+import brushedAlbedo from '@/assets/dist/brushed-metal_albedo-512.png';
+import brushedAo from '@/assets/dist/brushed-metal_ao-512.png';
 
-import shadow_path_65 from '@/src/assets/shadows/65.png';
+import shadow_path_65 from '@/assets/shadows/65.png';
 
 // Helper to get image src from StaticImageData
 const getImageSrc = (img: StaticImageData | string): string => {

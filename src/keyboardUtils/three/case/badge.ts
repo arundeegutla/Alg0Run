@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
-import roughnessMapPath from '@/src/assets/dist/lightgold_roughness-512.png';
-import albedoMapPath from '@/src/assets/dist/lightgold_albedo-512.png';
+import roughnessMapPath from '@/assets/dist/lightgold_roughness-512.png';
+import albedoMapPath from '@/assets/dist/lightgold_albedo-512.png';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createBadge = (w: number, cm: any) => {

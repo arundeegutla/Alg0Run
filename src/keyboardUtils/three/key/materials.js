@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { keyTexture } from './texture';
 import { initial_settings } from '../../store/startup';
 import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
-import ambiantOcclusionPath from '@/src/assets/dist/shadow-key-noise.png';
-import lightMapPath from '@/src/assets/materials/white.png';
+import ambiantOcclusionPath from '@/assets/dist/shadow-key-noise.png';
+import lightMapPath from '@/assets/materials/white.png';
 
 const loader = new TextureLoader();
 const ambiantOcclusionMap = loader.load(ambiantOcclusionPath);

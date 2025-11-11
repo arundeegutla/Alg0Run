@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import KeyManager from '@/src/keyboardUtils/three/key/KeyManager';
-import CaseManager from '@/src/keyboardUtils/three/case/CaseManager';
+import KeyManager from '@/keyboardUtils/three/key/KeyManager';
+import CaseManager from '@/keyboardUtils/three/case/CaseManager';
 import {
   loadDefaultSettings,
   loadColorway,
   type KeyboardSettings,
-} from '@/src/keyboardUtils/config/settings';
+} from '@/keyboardUtils/config/settings';
 
 interface Colorway {
   id: string;
