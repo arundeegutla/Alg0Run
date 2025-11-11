@@ -1,242 +1,242 @@
 [
-    {
-        "time_complexity": "O(log N)",
-        "code": {
-            "python": "def binarySearch(arr, l, r, x):\n    while l <= r:\n        if arr[mid] == x:\n            return mid\n        elif arr[mid] < x:\n            l = mid + 1\n        else:\n            r = mid - 1\n    return -1\n",
-            "cpp": "int binarySearch(int arr[], int l, int r, int x)\n{\n    while (l <= r) {\n        int m = l + (r - l) / 2;\n        if (arr[m] == x)\n            return m;\n        if (arr[m] < x)\n            l = m + 1;\n        else\n            r = m - 1;\n    }\n    return -1;\n}\n",
-            "java": "int binarySearch(int arr[], int x)\n{\n    int l = 0, r = arr.length - 1;\n    while (l <= r) {\n        int m = l + (r - l) / 2;\n        if (arr[m] == x)\n            return m;\n        if (arr[m] < x)\n            l = m + 1;\n        else\n            r = m - 1;\n    }\n    return -1;\n}\n"
-        },
-        "name": "Binary Search",
-        "link": "https://www.geeksforgeeks.org/binary-search/",
-        "description": "Binary search is an efficient searching algorithm used to find a specific element within a sorted list or array. It works by repeatedly dividing the search space in half and comparing the target element with the middle element of the current range. If the middle element matches the target, the search is successful. If the target is smaller, the search continues in the left half; if larger, it continues in the right half. This process continues until the target element is found or it's determined that the element doesn't exist in the list. Binary search has a time complexity of O(log n), making it much faster than linear search for large datasets. It is widely used in various applications, including searching in databases, phone directories, and efficiently locating items in sorted arrays or lists.",
-        "id": "0i98Ztd7HIWlVI8hJqUa"
+  {
+    "time_complexity": "O(log N)",
+    "code": {
+      "python": "def binarySearch(arr, l, r, x):\n    while l <= r:\n        if arr[mid] == x:\n            return mid\n        elif arr[mid] < x:\n            l = mid + 1\n        else:\n            r = mid - 1\n    return -1\n",
+      "cpp": "int binarySearch(int arr[], int l, int r, int x)\n{\n    while (l <= r) {\n        int m = l + (r - l) / 2;\n        if (arr[m] == x)\n            return m;\n        if (arr[m] < x)\n            l = m + 1;\n        else\n            r = m - 1;\n    }\n    return -1;\n}\n",
+      "java": "int binarySearch(int arr[], int x)\n{\n    int l = 0, r = arr.length - 1;\n    while (l <= r) {\n        int m = l + (r - l) / 2;\n        if (arr[m] == x)\n            return m;\n        if (arr[m] < x)\n            l = m + 1;\n        else\n            r = m - 1;\n    }\n    return -1;\n}\n"
     },
-    {
-        "time_complexity": "O(log(min(a, b)))",
-        "code": {
-            "python": "def gcd(a,b):\n    if (b == 0):\n         return a\n    return gcd(b, a%b)\n",
-            "cpp": "int gcd(int a, int b)\n{\n    return b == 0 ? a : gcd(b, a % b);\n}\n",
-            "java": "static int gcd(int a, int b)\n{\n  if (b == 0)\n    return a;\n  return gcd(b, a % b);\n}\n"
-        },
-        "name": "GCD",
-        "link": "https://www.geeksforgeeks.org/program-to-find-gcd-or-hcf-of-two-numbers/",
-        "description": "GCD stands for \"Greatest Common Divisor,\" which is the largest positive integer that divides two or more numbers without leaving a remainder. The GCD is a fundamental concept in number theory and arithmetic. It is used in various mathematical and practical applications, such as simplifying fractions, finding common factors in mathematical expressions, solving modular equations, and determining the periodicity of repeating decimals. In computer science and cryptography, GCD plays a crucial role in algorithms like the Euclidean Algorithm, which is used for tasks such as finding modular inverses and ensuring the security of cryptographic systems like RSA.",
-        "id": "4ssk87cYidvofckzKCnH"
+    "name": "Binary Search",
+    "link": "https://www.geeksforgeeks.org/binary-search/",
+    "description": "Binary search is an efficient searching algorithm used to find a specific element within a sorted list or array. It works by repeatedly dividing the search space in half and comparing the target element with the middle element of the current range. If the middle element matches the target, the search is successful. If the target is smaller, the search continues in the left half; if larger, it continues in the right half. This process continues until the target element is found or it's determined that the element doesn't exist in the list. Binary search has a time complexity of O(log n), making it much faster than linear search for large datasets. It is widely used in various applications, including searching in databases, phone directories, and efficiently locating items in sorted arrays or lists.",
+    "id": "0i98Ztd7HIWlVI8hJqUa"
+  },
+  {
+    "time_complexity": "O(log(min(a, b)))",
+    "code": {
+      "python": "def gcd(a,b):\n    if (b == 0):\n         return a\n    return gcd(b, a%b)\n",
+      "cpp": "int gcd(int a, int b)\n{\n    return b == 0 ? a : gcd(b, a % b);\n}\n",
+      "java": "static int gcd(int a, int b)\n{\n  if (b == 0)\n    return a;\n  return gcd(b, a % b);\n}\n"
     },
-    {
-        "time_complexity": "O(log Y)",
-        "code": {
-            "python": "def power(x, y, p):\n    res = 1\n    while (y > 0):\n        if ((y & 1) != 0):\n            res = res * x\n    return res % p\n",
-            "cpp": "int power(int x, int y, int p)\n{\n    int res = 1;\n    while (y > 0) {\n        if (y % 2 == 1)\n            res = (res * x);\n        y = y >> 1;\n        x = (x * x);\n    }\n    return res % p;\n}\n",
-            "java": "static int power(int x, int y, int p)\n{\n    while (y > 0) {\n        if ((y & 1) != 0)\n            res = res * x;\n    }\n    return res % p;\n}\n"
-        },
-        "name": "Modular Exponentiation",
-        "link": "https://www.geeksforgeeks.org/modular-exponentiation-power-in-modular-arithmetic/",
-        "description": "Modular exponentiation is a mathematical operation used to efficiently compute the remainder when a number is raised to a power and divided by another number, known as the modulo operation. It's particularly valuable in computer science and cryptography. This operation allows us to perform large exponentiations and obtain the result within a specified range, which is crucial for encryption algorithms like RSA and the security of digital communication. Modular exponentiation ensures that the result remains manageable in size, making it a fundamental tool for secure and efficient data encryption and decryption, as well as various other applications in number theory and computer science.",
-        "id": "BxmoBSmjKpL46UHJBveM"
+    "name": "GCD",
+    "link": "https://www.geeksforgeeks.org/program-to-find-gcd-or-hcf-of-two-numbers/",
+    "description": "GCD stands for \"Greatest Common Divisor,\" which is the largest positive integer that divides two or more numbers without leaving a remainder. The GCD is a fundamental concept in number theory and arithmetic. It is used in various mathematical and practical applications, such as simplifying fractions, finding common factors in mathematical expressions, solving modular equations, and determining the periodicity of repeating decimals. In computer science and cryptography, GCD plays a crucial role in algorithms like the Euclidean Algorithm, which is used for tasks such as finding modular inverses and ensuring the security of cryptographic systems like RSA.",
+    "id": "4ssk87cYidvofckzKCnH"
+  },
+  {
+    "time_complexity": "O(log Y)",
+    "code": {
+      "python": "def power(x, y, p):\n    res = 1\n    while (y > 0):\n        if ((y & 1) != 0):\n            res = res * x\n    return res % p\n",
+      "cpp": "int power(int x, int y, int p)\n{\n    int res = 1;\n    while (y > 0) {\n        if (y % 2 == 1)\n            res = (res * x);\n        y = y >> 1;\n        x = (x * x);\n    }\n    return res % p;\n}\n",
+      "java": "static int power(int x, int y, int p)\n{\n    while (y > 0) {\n        if ((y & 1) != 0)\n            res = res * x;\n    }\n    return res % p;\n}\n"
     },
-    {
-        "time_complexity": "O(M); M = product of all elements in num",
-        "code": {
-            "python": "def findMinX(num, rem, k):\n    while(True):\n        j = 0;\n        while(j < k):\n            if (x % num[j] != rem[j]):\n                break\n            j += 1;\n        if (j == k):\n            return x\n        x += 1\n",
-            "cpp": "int findMinX(int num[], int rem[], int k)\n{\n    while (true)\n    {\n        int j;\n        for (j=0; j<k; j++ )\n            if (x%num[j] != rem[j])\n               break;\n        if (j == k)\n            return x;\n        x++;\n    }\n    return x;\n}\n",
-            "java": "static int findMinX(int num[], int rem[], int k)\n{\n    while (true)\n    {\n        int j;\n        for (j=0; j<k; j++ )\n            if (x%num[j] != rem[j])\n              break;\n        if (j == k)\n            return x;\n        x++;\n    }\n}\n"
-        },
-        "name": "Chinese Remainder Theorem",
-        "link": "https://www.geeksforgeeks.org/introduction-to-chinese-remainder-theorem/",
-        "description": "The Chinese Remainder Theorem (CRT) is a mathematical theorem used to solve a system of linear congruences, where each equation has the form \"x ≡ a (mod m),\" and the moduli (m values) are pairwise coprime (meaning they share no common factors other than 1). CRT allows you to find a unique solution for the variable 'x' that satisfies all the congruences simultaneously. It's a valuable tool in number theory, modular arithmetic, and cryptography. CRT is used in various practical applications, including computing days of the week, recovering information from error-correcting codes, optimizing computer algorithms, and in certain cryptographic algorithms like RSA to speed up decryption processes by working with smaller numbers and improving efficiency.",
-        "id": "CEJZBIqpjQQHUKXBm4Mg"
+    "name": "Modular Exponentiation",
+    "link": "https://www.geeksforgeeks.org/modular-exponentiation-power-in-modular-arithmetic/",
+    "description": "Modular exponentiation is a mathematical operation used to efficiently compute the remainder when a number is raised to a power and divided by another number, known as the modulo operation. It's particularly valuable in computer science and cryptography. This operation allows us to perform large exponentiations and obtain the result within a specified range, which is crucial for encryption algorithms like RSA and the security of digital communication. Modular exponentiation ensures that the result remains manageable in size, making it a fundamental tool for secure and efficient data encryption and decryption, as well as various other applications in number theory and computer science.",
+    "id": "BxmoBSmjKpL46UHJBveM"
+  },
+  {
+    "time_complexity": "O(M); M = product of all elements in num",
+    "code": {
+      "python": "def findMinX(num, rem, k):\n    while(True):\n        j = 0;\n        while(j < k):\n            if (x % num[j] != rem[j]):\n                break\n            j += 1;\n        if (j == k):\n            return x\n        x += 1\n",
+      "cpp": "int findMinX(int num[], int rem[], int k)\n{\n    while (true)\n    {\n        int j;\n        for (j=0; j<k; j++ )\n            if (x%num[j] != rem[j])\n               break;\n        if (j == k)\n            return x;\n        x++;\n    }\n    return x;\n}\n",
+      "java": "static int findMinX(int num[], int rem[], int k)\n{\n    while (true)\n    {\n        int j;\n        for (j=0; j<k; j++ )\n            if (x%num[j] != rem[j])\n              break;\n        if (j == k)\n            return x;\n        x++;\n    }\n}\n"
     },
-    {
-        "time_complexity": "O(NLogN) preprocessing time and O(1) query",
-        "code": {
-            "python": "MAX = 500\nlookup = [[0 for i in range(MAX)] for j in range(MAX)]\ndef buildSparseTable(arr, n):\n    for i in range(0, n):\n        lookup[i][0] = arr[i]\n    j = 1\n    while (1 << j) <= n:\n        i = 0\n        while (i + (1 << j) - 1) < n:\n            if (lookup[i][j - 1] <\n                lookup[i + (1 << (j - 1))][j - 1]):\n              lookup[i][j] = lookup[i][j - 1]\n            else:\n                lookup[i][j] = \\n                        lookup[i + (1 << (j - 1))][j - 1]\n            i += 1\n        j += 1\ndef query(L, R):\n    j = int(math.log2(R - L + 1))\n    if lookup[L][j] <= lookup[R - (1 << j) + 1][j]:\n        return lookup[L][j]\n    else:\n        return lookup[R - (1 << j) + 1][j]\n",
-            "cpp": "#define MAX 500\nint lookup[MAX][MAX];\nvoid buildSparseTable(int arr[], int n)\n{\n    for (int i = 0; i < n; i++)\n        lookup[i][0] = arr[i];\n    for (int j = 1; (1 << j) <= n; j++) {\n        for (int i = 0; (i + (1 << j) - 1) < n; i++) {\n            if (lookup[i][j - 1] <\n                        lookup[i + (1 << (j - 1))][j - 1])\n                lookup[i][j] = lookup[i][j - 1];\n            else\n                lookup[i][j] =\n                         lookup[i + (1 << (j - 1))][j - 1];\n        }\n    }\n}\nint query(int L, int R)\n{\n    int j = (int)log2(R - L + 1);\n    if (lookup[L][j] <= lookup[R - (1 << j) + 1][j])\n        return lookup[L][j];\n    else\n        return lookup[R - (1 << j) + 1][j];\n}\n",
-            "java": "static int MAX =500;\nstatic int [][]lookup = new int[MAX][MAX];\nstatic void buildSparseTable(int arr[], int n)\n{\n    for (int i = 0; i < n; i++)\n        lookup[i][0] = arr[i];\n    for (int j = 1; (1 << j) <= n; j++) {\n        for (int i = 0; (i + (1 << j) - 1) < n; i++) {\n            if (lookup[i][j - 1] <\n                        lookup[i + (1 << (j - 1))][j - 1])\n                lookup[i][j] = lookup[i][j - 1];\n            else\n                lookup[i][j] =\n                        lookup[i + (1 << (j - 1))][j - 1];\n        }\n    }\n}\nstatic int query(int L, int R)\n{\n    int j = (int)Math.log(R - L + 1);\n    if (lookup[L][j] <= lookup[R - (1 << j) + 1][j])\n        return lookup[L][j];\n    else\n        return lookup[R - (1 << j) + 1][j];\n}\n"
-        },
-        "name": "Sparse Table",
-        "link": "https://www.geeksforgeeks.org/sparse-table/",
-        "description": "A Sparse Table is a data structure used for efficiently answering range queries on an array of values, typically in the form of finding the minimum or maximum value within a specified range. It precomputes and stores specific values from the array to speed up range queries significantly. The Sparse Table is particularly useful for static arrays, where elements do not change after construction. It divides the range into segments and stores precomputed values for each segment. This allows it to answer range queries in logarithmic time complexity, making it valuable in various algorithms and applications, such as solving the lowest common ancestor (LCA) problem in trees, range minimum/maximum queries in arrays, and other problems requiring efficient range-based computations.",
-        "id": "DNDtyvzY2A39tf7qjOj1"
+    "name": "Chinese Remainder Theorem",
+    "link": "https://www.geeksforgeeks.org/introduction-to-chinese-remainder-theorem/",
+    "description": "The Chinese Remainder Theorem (CRT) is a mathematical theorem used to solve a system of linear congruences, where each equation has the form \"x ≡ a (mod m),\" and the moduli (m values) are pairwise coprime (meaning they share no common factors other than 1). CRT allows you to find a unique solution for the variable 'x' that satisfies all the congruences simultaneously. It's a valuable tool in number theory, modular arithmetic, and cryptography. CRT is used in various practical applications, including computing days of the week, recovering information from error-correcting codes, optimizing computer algorithms, and in certain cryptographic algorithms like RSA to speed up decryption processes by working with smaller numbers and improving efficiency.",
+    "id": "CEJZBIqpjQQHUKXBm4Mg"
+  },
+  {
+    "time_complexity": "O(NLogN) preprocessing time and O(1) query",
+    "code": {
+      "python": "MAX = 500\nlookup = [[0 for i in range(MAX)] for j in range(MAX)]\ndef buildSparseTable(arr, n):\n    for i in range(0, n):\n        lookup[i][0] = arr[i]\n    j = 1\n    while (1 << j) <= n:\n        i = 0\n        while (i + (1 << j) - 1) < n:\n            if (lookup[i][j - 1] <\n                lookup[i + (1 << (j - 1))][j - 1]):\n              lookup[i][j] = lookup[i][j - 1]\n            else:\n                lookup[i][j] = \\n                        lookup[i + (1 << (j - 1))][j - 1]\n            i += 1\n        j += 1\ndef query(L, R):\n    j = int(math.log2(R - L + 1))\n    if lookup[L][j] <= lookup[R - (1 << j) + 1][j]:\n        return lookup[L][j]\n    else:\n        return lookup[R - (1 << j) + 1][j]\n",
+      "cpp": "#define MAX 500\nint lookup[MAX][MAX];\nvoid buildSparseTable(int arr[], int n)\n{\n    for (int i = 0; i < n; i++)\n        lookup[i][0] = arr[i];\n    for (int j = 1; (1 << j) <= n; j++) {\n        for (int i = 0; (i + (1 << j) - 1) < n; i++) {\n            if (lookup[i][j - 1] <\n                        lookup[i + (1 << (j - 1))][j - 1])\n                lookup[i][j] = lookup[i][j - 1];\n            else\n                lookup[i][j] =\n                         lookup[i + (1 << (j - 1))][j - 1];\n        }\n    }\n}\nint query(int L, int R)\n{\n    int j = (int)log2(R - L + 1);\n    if (lookup[L][j] <= lookup[R - (1 << j) + 1][j])\n        return lookup[L][j];\n    else\n        return lookup[R - (1 << j) + 1][j];\n}\n",
+      "java": "static int MAX =500;\nstatic int [][]lookup = new int[MAX][MAX];\nstatic void buildSparseTable(int arr[], int n)\n{\n    for (int i = 0; i < n; i++)\n        lookup[i][0] = arr[i];\n    for (int j = 1; (1 << j) <= n; j++) {\n        for (int i = 0; (i + (1 << j) - 1) < n; i++) {\n            if (lookup[i][j - 1] <\n                        lookup[i + (1 << (j - 1))][j - 1])\n                lookup[i][j] = lookup[i][j - 1];\n            else\n                lookup[i][j] =\n                        lookup[i + (1 << (j - 1))][j - 1];\n        }\n    }\n}\nstatic int query(int L, int R)\n{\n    int j = (int)Math.log(R - L + 1);\n    if (lookup[L][j] <= lookup[R - (1 << j) + 1][j])\n        return lookup[L][j];\n    else\n        return lookup[R - (1 << j) + 1][j];\n}\n"
     },
-    {
-        "time_complexity": "O(k*n)",
-        "code": {
-            "python": "def maxSum(arr, n, k):\n    max_sum = INT_MIN\n    for i in range(n - k + 1):\n        current_sum = 0\n        for j in range(k):\n            current_sum = current_sum + arr[i + j]\n        max_sum = max(current_sum, max_sum)\n    return max_sum\n",
-            "cpp": "int maxSum(int arr[], int n, int k)\n{\n    int max_sum = INT_MIN;\n    for (int i = 0; i < n - k + 1; i++) {\n        int current_sum = 0;\n        for (int j = 0; j < k; j++)\n            current_sum = current_sum + arr[i + j];\n        max_sum = max(current_sum, max_sum);\n    }\n    return max_sum;\n}\n",
-            "java": "static int maxSum(int arr[], int n, int k)\n{\n    int max_sum = Integer.MIN_VALUE;\n    for (int i = 0; i < n - k + 1; i++) {\n        int current_sum = 0;\n        for (int j = 0; j < k; j++)\n            current_sum = current_sum + arr[i + j];\n        max_sum = Math.max(current_sum, max_sum);\n    }\n    return max_sum;\n}\n"
-        },
-        "name": "Sliding Window",
-        "link": "https://www.geeksforgeeks.org/window-sliding-technique/",
-        "description": "A Sliding Window is a technique used in computer science and data processing to efficiently perform operations on a fixed-size subset of elements within a larger dataset. It involves defining a window of a specified size that \"slides\" or moves over the data, typically in a sequential manner. This technique is often used for tasks like calculating running averages, finding maximum or minimum values in a moving window, and solving problems involving data streams, time series, or arrays. Sliding windows are valuable for optimizing algorithms where you need to process and analyze data in continuous or overlapping segments, helping to reduce time and space complexity.",
-        "id": "PxlSRpyB9xqpZWK9mnB5"
+    "name": "Sparse Table",
+    "link": "https://www.geeksforgeeks.org/sparse-table/",
+    "description": "A Sparse Table is a data structure used for efficiently answering range queries on an array of values, typically in the form of finding the minimum or maximum value within a specified range. It precomputes and stores specific values from the array to speed up range queries significantly. The Sparse Table is particularly useful for static arrays, where elements do not change after construction. It divides the range into segments and stores precomputed values for each segment. This allows it to answer range queries in logarithmic time complexity, making it valuable in various algorithms and applications, such as solving the lowest common ancestor (LCA) problem in trees, range minimum/maximum queries in arrays, and other problems requiring efficient range-based computations.",
+    "id": "DNDtyvzY2A39tf7qjOj1"
+  },
+  {
+    "time_complexity": "O(k*n)",
+    "code": {
+      "python": "def maxSum(arr, n, k):\n    max_sum = INT_MIN\n    for i in range(n - k + 1):\n        current_sum = 0\n        for j in range(k):\n            current_sum = current_sum + arr[i + j]\n        max_sum = max(current_sum, max_sum)\n    return max_sum\n",
+      "cpp": "int maxSum(int arr[], int n, int k)\n{\n    int max_sum = INT_MIN;\n    for (int i = 0; i < n - k + 1; i++) {\n        int current_sum = 0;\n        for (int j = 0; j < k; j++)\n            current_sum = current_sum + arr[i + j];\n        max_sum = max(current_sum, max_sum);\n    }\n    return max_sum;\n}\n",
+      "java": "static int maxSum(int arr[], int n, int k)\n{\n    int max_sum = Integer.MIN_VALUE;\n    for (int i = 0; i < n - k + 1; i++) {\n        int current_sum = 0;\n        for (int j = 0; j < k; j++)\n            current_sum = current_sum + arr[i + j];\n        max_sum = Math.max(current_sum, max_sum);\n    }\n    return max_sum;\n}\n"
     },
-    {
-        "time_complexity": "O(log(min(a, b)))",
-        "code": {
-            "python": "def gcd(a,b):\n    if a == 0:\n        return b\n    return gcd(b % a, a)\ndef lcm(a,b):\n",
-            "cpp": "long long gcd(long long int a, long long int b)\n{\n  if (b == 0)\n    return a;\n  return gcd(b, a % b);\n}\nlong long lcm(int a, int b)\n{\n    return (a / gcd(a, b)) * b;\n}\n",
-            "java": "static int gcd(int a, int b)\n{\n    if (a == 0)\n        return b;\n    return gcd(b % a, a);\n}\nstatic int lcm(int a, int b)\n{\n    return (a / gcd(a, b)) * b;\n}\n"
-        },
-        "name": "LCM",
-        "link": "https://www.geeksforgeeks.org/program-to-find-lcm-of-two-numbers/",
-        "description": "LCM stands for \"Least Common Multiple,\" which is the smallest positive integer that is a multiple of two or more numbers. It is used in mathematics for a variety of purposes, such as finding a common denominator when adding or subtracting fractions, calculating the time it takes for two or more events to align or repeat together (e.g., in scheduling and periodic phenomena), and solving problems involving proportions. LCM is also important in computer science and programming for tasks like handling time intervals, managing system resources, and scheduling tasks in algorithms and software applications.",
-        "id": "Ssjia7MYzaekig0rStjJ"
+    "name": "Sliding Window",
+    "link": "https://www.geeksforgeeks.org/window-sliding-technique/",
+    "description": "A Sliding Window is a technique used in computer science and data processing to efficiently perform operations on a fixed-size subset of elements within a larger dataset. It involves defining a window of a specified size that \"slides\" or moves over the data, typically in a sequential manner. This technique is often used for tasks like calculating running averages, finding maximum or minimum values in a moving window, and solving problems involving data streams, time series, or arrays. Sliding windows are valuable for optimizing algorithms where you need to process and analyze data in continuous or overlapping segments, helping to reduce time and space complexity.",
+    "id": "PxlSRpyB9xqpZWK9mnB5"
+  },
+  {
+    "time_complexity": "O(log(min(a, b)))",
+    "code": {
+      "python": "def gcd(a,b):\n    if a == 0:\n        return b\n    return gcd(b % a, a)\ndef lcm(a,b):\n",
+      "cpp": "long long gcd(long long int a, long long int b)\n{\n  if (b == 0)\n    return a;\n  return gcd(b, a % b);\n}\nlong long lcm(int a, int b)\n{\n    return (a / gcd(a, b)) * b;\n}\n",
+      "java": "static int gcd(int a, int b)\n{\n    if (a == 0)\n        return b;\n    return gcd(b % a, a);\n}\nstatic int lcm(int a, int b)\n{\n    return (a / gcd(a, b)) * b;\n}\n"
     },
-    {
-        "time_complexity": "O(N)",
-        "code": {
-            "python": "def maxSubArraySum(a, size):\n    max_so_far = -maxint - 1\n    max_ending_here = 0\n    for i in range(0, size):\n        max_ending_here = max_ending_here + a[i]\n        if (max_so_far < max_ending_here):\n            max_so_far = max_ending_here\n        if max_ending_here < 0:\n            max_ending_here = 0\n    return max_so_far\n",
-            "cpp": "int maxSubArraySum(int a[], int size)\n{\n    int max_so_far = INT_MIN, max_ending_here = 0;\n    for (int i = 0; i < size; i++) {\n        max_ending_here = max_ending_here + a[i];\n        if (max_so_far < max_ending_here)\n            max_so_far = max_ending_here;\n        if (max_ending_here < 0)\n            max_ending_here = 0;\n    }\n    return max_so_far;\n}\n",
-            "java": "static int maxSubArraySum(int a[])\n{\n    int size = a.length;\n    int max_so_far = Integer.MIN_VALUE, max_ending_here = 0;\n    for (int i = 0; i < size; i++) {\n        max_ending_here = max_ending_here + a[i];\n        if (max_so_far < max_ending_here)\n            max_so_far = max_ending_here;\n        if (max_ending_here < 0)\n            max_ending_here = 0;\n    }\n    return max_so_far;\n}\n"
-        },
-        "name": "Kadanes",
-        "link": "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/",
-        "description": "Kadane's algorithm is a concise and efficient algorithm used for finding the maximum subarray sum within a given array of numbers. It operates by iteratively updating the maximum sum as it traverses the array, considering both the current element and the cumulative sum of elements encountered so far. By maintaining these values, Kadane's algorithm can identify the maximum sum subarray in a single pass through the array. This algorithm is particularly valuable in applications where you need to find the most extensive subarray with the highest sum, such as in financial analysis, data processing, and various optimization problems.",
-        "id": "TeTMztXRmtXOVj0vz9Pv"
+    "name": "LCM",
+    "link": "https://www.geeksforgeeks.org/program-to-find-lcm-of-two-numbers/",
+    "description": "LCM stands for \"Least Common Multiple,\" which is the smallest positive integer that is a multiple of two or more numbers. It is used in mathematics for a variety of purposes, such as finding a common denominator when adding or subtracting fractions, calculating the time it takes for two or more events to align or repeat together (e.g., in scheduling and periodic phenomena), and solving problems involving proportions. LCM is also important in computer science and programming for tasks like handling time intervals, managing system resources, and scheduling tasks in algorithms and software applications.",
+    "id": "Ssjia7MYzaekig0rStjJ"
+  },
+  {
+    "time_complexity": "O(N)",
+    "code": {
+      "python": "def maxSubArraySum(a, size):\n    max_so_far = -maxint - 1\n    max_ending_here = 0\n    for i in range(0, size):\n        max_ending_here = max_ending_here + a[i]\n        if (max_so_far < max_ending_here):\n            max_so_far = max_ending_here\n        if max_ending_here < 0:\n            max_ending_here = 0\n    return max_so_far\n",
+      "cpp": "int maxSubArraySum(int a[], int size)\n{\n    int max_so_far = INT_MIN, max_ending_here = 0;\n    for (int i = 0; i < size; i++) {\n        max_ending_here = max_ending_here + a[i];\n        if (max_so_far < max_ending_here)\n            max_so_far = max_ending_here;\n        if (max_ending_here < 0)\n            max_ending_here = 0;\n    }\n    return max_so_far;\n}\n",
+      "java": "static int maxSubArraySum(int a[])\n{\n    int size = a.length;\n    int max_so_far = Integer.MIN_VALUE, max_ending_here = 0;\n    for (int i = 0; i < size; i++) {\n        max_ending_here = max_ending_here + a[i];\n        if (max_so_far < max_ending_here)\n            max_so_far = max_ending_here;\n        if (max_ending_here < 0)\n            max_ending_here = 0;\n    }\n    return max_so_far;\n}\n"
     },
-    {
-        "time_complexity": "O(N*log(log(N)))",
-        "code": {
-            "python": "Primes = [0] * 500001\ndef SieveOfEratosthenes(n) :\n    Primes[0] = 1\n    i = 3\n    while(i*i <= n) :\n            for j in range(3 * i, n+1, 2 * i) :\n        i += 2\n",
-            "cpp": "bitset<500001> Primes;\nvoid SieveOfEratosthenes(int n)\n{\n    Primes[0] = 1;\n    for (int i = 3; i*i <= n; i += 2) {\n        if (Primes[i / 2] == 0) {\n            for (int j = 3 * i; j <= n; j += 2 * i)\n                Primes[j / 2] = 1;\n        }\n    }\n}\n",
-            "java": "static int[] Primes = new int[500001];\nstatic void SieveOfEratosthenes(int n)\n{\n  Primes[0] = 1;\n  for (int i = 3; i * i <= n; i += 2) {\n    if (Primes[i / 2] == 0) {\n      for (int j = 3 * i; j <= n; j += 2 * i)\n        Primes[j / 2] = 1;\n    }\n  }\n}\n"
-        },
-        "name": "Sieve of Eratosthenes",
-        "link": "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/",
-        "description": "The Sieve of Eratosthenes is a classic and straightforward algorithm for finding all prime numbers up to a specified limit. It operates by iteratively marking or \"sieving out\" the multiples of each prime number starting from 2, which is the first prime number. As the algorithm progresses, it identifies and retains the unmarked numbers, which are prime. The Sieve of Eratosthenes is used to efficiently generate a list of prime numbers, making it a fundamental tool in number theory, cryptography, and various computational tasks where prime numbers play a critical role, such as in generating secure encryption keys or optimizing algorithms for performance.",
-        "id": "TmqZuK3iR7wrCxLawWGc"
+    "name": "Kadanes",
+    "link": "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/",
+    "description": "Kadane's algorithm is a concise and efficient algorithm used for finding the maximum subarray sum within a given array of numbers. It operates by iteratively updating the maximum sum as it traverses the array, considering both the current element and the cumulative sum of elements encountered so far. By maintaining these values, Kadane's algorithm can identify the maximum sum subarray in a single pass through the array. This algorithm is particularly valuable in applications where you need to find the most extensive subarray with the highest sum, such as in financial analysis, data processing, and various optimization problems.",
+    "id": "TeTMztXRmtXOVj0vz9Pv"
+  },
+  {
+    "time_complexity": "O(N*log(log(N)))",
+    "code": {
+      "python": "Primes = [0] * 500001\ndef SieveOfEratosthenes(n) :\n    Primes[0] = 1\n    i = 3\n    while(i*i <= n) :\n            for j in range(3 * i, n+1, 2 * i) :\n        i += 2\n",
+      "cpp": "bitset<500001> Primes;\nvoid SieveOfEratosthenes(int n)\n{\n    Primes[0] = 1;\n    for (int i = 3; i*i <= n; i += 2) {\n        if (Primes[i / 2] == 0) {\n            for (int j = 3 * i; j <= n; j += 2 * i)\n                Primes[j / 2] = 1;\n        }\n    }\n}\n",
+      "java": "static int[] Primes = new int[500001];\nstatic void SieveOfEratosthenes(int n)\n{\n  Primes[0] = 1;\n  for (int i = 3; i * i <= n; i += 2) {\n    if (Primes[i / 2] == 0) {\n      for (int j = 3 * i; j <= n; j += 2 * i)\n        Primes[j / 2] = 1;\n    }\n  }\n}\n"
     },
-    {
-        "time_complexity": "O(NLogN) for range sum",
-        "code": {
-            "python": "def getsum(BITTree,i):\n    i = i+1\n    while i > 0:\n        s += BITTree[i]\n        i -= i & (-i)\n    return s\ndef updatebit(BITTree , n , i ,v):\n    i += 1\n    while i <= n:\n        BITTree[i] += v\n        i += i & (-i)\ndef construct(arr, n):\n    BITTree = [0]*(n+1)\n    for i in range(n):\n        updatebit(BITTree, n, i, arr[i])\n    return BITTree\n",
-            "cpp": "int getSum(int BITree[], int index)\n{\n    index = index + 1;\n    while (index>0)\n    {\n        sum += BITree[index];\n        index -= index & (-index);\n    }\n    return sum;\n}\nvoid updateBIT(int BITree[], int n, int index, int val)\n{\n    index = index + 1;\n    while (index <= n)\n    {\n    BITree[index] += val;\n    index += index & (-index);\n    }\n}\nint *constructBITree(int arr[], int n)\n{\n    int *BITree = new int[n+1];\n    for (int i=1; i<=n; i++)\n        BITree[i] = 0;\n    for (int i=0; i<n; i++)\n        updateBIT(BITree, n, i, arr[i]);\n    return BITree;\n}\n",
-            "java": "final static int MAX = 1000;\nstatic int BITree[] = new int[MAX];\nint getSum(int index)\n{\n    index = index + 1;\n    while(index>0)\n    {\n        sum += BITree[index];\n        index -= index & (-index);\n    }\n    return sum;\n}\npublic static void updateBIT(int n, int index, int val)\n{\n    index = index + 1;\n    while(index <= n)\n    {\n    BITree[index] += val;\n    index += index & (-index);\n    }\n}\nvoid constructBITree(int arr[], int n)\n{\n    for(int i=1; i<=n; i++)\n        BITree[i] = 0;\n    for(int i = 0; i < n; i++)\n        updateBIT(n, i, arr[i]);\n}\n"
-        },
-        "name": "Binary Index Tree",
-        "link": "https://www.geeksforgeeks.org/binary-indexed-tree-or-fenwick-tree-2/",
-        "description": "A Binary Indexed Tree (BIT), also known as a Fenwick Tree, is a specialized data structure used to efficiently perform two main operations on an array of values: updating an element and querying the cumulative sum of elements up to a specific index. BITs are particularly useful for handling dynamic cumulative frequency or prefix sum calculations, where elements in an array are modified, and you need to calculate the cumulative sum for various ranges quickly. They have applications in a variety of algorithms, including range queries in data structures, solving dynamic programming problems, and optimizing various numerical computations, such as finding the inversion count in an array, simulating prefix sums in databases, or optimizing certain graph algorithms.",
-        "id": "Zs4vdvlK3ZiFBSNXoyOt"
+    "name": "Sieve of Eratosthenes",
+    "link": "https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/",
+    "description": "The Sieve of Eratosthenes is a classic and straightforward algorithm for finding all prime numbers up to a specified limit. It operates by iteratively marking or \"sieving out\" the multiples of each prime number starting from 2, which is the first prime number. As the algorithm progresses, it identifies and retains the unmarked numbers, which are prime. The Sieve of Eratosthenes is used to efficiently generate a list of prime numbers, making it a fundamental tool in number theory, cryptography, and various computational tasks where prime numbers play a critical role, such as in generating secure encryption keys or optimizing algorithms for performance.",
+    "id": "TmqZuK3iR7wrCxLawWGc"
+  },
+  {
+    "time_complexity": "O(NLogN) for range sum",
+    "code": {
+      "python": "def getsum(BITTree,i):\n    i = i+1\n    while i > 0:\n        s += BITTree[i]\n        i -= i & (-i)\n    return s\ndef updatebit(BITTree , n , i ,v):\n    i += 1\n    while i <= n:\n        BITTree[i] += v\n        i += i & (-i)\ndef construct(arr, n):\n    BITTree = [0]*(n+1)\n    for i in range(n):\n        updatebit(BITTree, n, i, arr[i])\n    return BITTree\n",
+      "cpp": "int getSum(int BITree[], int index)\n{\n    index = index + 1;\n    while (index>0)\n    {\n        sum += BITree[index];\n        index -= index & (-index);\n    }\n    return sum;\n}\nvoid updateBIT(int BITree[], int n, int index, int val)\n{\n    index = index + 1;\n    while (index <= n)\n    {\n    BITree[index] += val;\n    index += index & (-index);\n    }\n}\nint *constructBITree(int arr[], int n)\n{\n    int *BITree = new int[n+1];\n    for (int i=1; i<=n; i++)\n        BITree[i] = 0;\n    for (int i=0; i<n; i++)\n        updateBIT(BITree, n, i, arr[i]);\n    return BITree;\n}\n",
+      "java": "final static int MAX = 1000;\nstatic int BITree[] = new int[MAX];\nint getSum(int index)\n{\n    index = index + 1;\n    while(index>0)\n    {\n        sum += BITree[index];\n        index -= index & (-index);\n    }\n    return sum;\n}\npublic static void updateBIT(int n, int index, int val)\n{\n    index = index + 1;\n    while(index <= n)\n    {\n    BITree[index] += val;\n    index += index & (-index);\n    }\n}\nvoid constructBITree(int arr[], int n)\n{\n    for(int i=1; i<=n; i++)\n        BITree[i] = 0;\n    for(int i = 0; i < n; i++)\n        updateBIT(n, i, arr[i]);\n}\n"
     },
-    {
-        "time_complexity": "O(N^2)",
-        "code": {
-            "python": "def computeTotient(n):\n    phi=[]\n    for i in range(n + 2):\n        phi.append(0)\n    for i in range(1, n+1):\n    for p in range(2,n+1):\n        if (phi[p] == p):\n            phi[p] = p-1\n            for i in range(2*p,n+1,p):\n    for i in range(1,n+1):\n",
-            "cpp": "void computeTotient(int n)\n{\n    long long phi[n+1];\n    for (int i=1; i<=n; i++)\n    for (int p=2; p<=n; p++)\n    {\n        if (phi[p] == p)\n        {\n            phi[p] = p-1;\n            for (int i = 2*p; i<=n; i += p)\n            {\n            phi[i] = (phi[i]/p) * (p-1);\n            }\n        }\n    }\n}\n",
-            "java": "static void computeTotient(int n) {\n    long phi[] = new long[n + 1];\n    for (int i = 1; i <= n; i++)\n    for (int p = 2; p <= n; p++) {\n    if (phi[p] == p) {\n        phi[p] = p - 1;\n        for (int i = 2 * p; i <= n; i += p) {\n        phi[i] = (phi[i] / p) * (p - 1);\n        }\n    }\n    }\n}\n"
-        },
-        "name": "Euler's Totient",
-        "link": "https://www.geeksforgeeks.org/eulers-totient-function-for-all-numbers-smaller-than-or-equal-to-n/",
-        "description": "Euler's Totient, often denoted as φ(n), is a mathematical function that calculates the count of positive integers less than or equal to a given integer 'n' that are relatively prime to 'n,' meaning they share no common factors other than 1. Euler's Totient function is used in number theory and cryptography to analyze and solve various problems related to modular arithmetic, prime factorization, and integer factorization. It plays a crucial role in RSA encryption, where it helps determine the security of the encryption system by calculating the totient of large composite numbers, which is a challenging task for potential attackers. Euler's Totient function also has applications in algorithms that involve modular exponentiation and solving equations in modular arithmetic.",
-        "id": "bdoggfmUY8BhjRMBjy8Z"
+    "name": "Binary Index Tree",
+    "link": "https://www.geeksforgeeks.org/binary-indexed-tree-or-fenwick-tree-2/",
+    "description": "A Binary Indexed Tree (BIT), also known as a Fenwick Tree, is a specialized data structure used to efficiently perform two main operations on an array of values: updating an element and querying the cumulative sum of elements up to a specific index. BITs are particularly useful for handling dynamic cumulative frequency or prefix sum calculations, where elements in an array are modified, and you need to calculate the cumulative sum for various ranges quickly. They have applications in a variety of algorithms, including range queries in data structures, solving dynamic programming problems, and optimizing various numerical computations, such as finding the inversion count in an array, simulating prefix sums in databases, or optimizing certain graph algorithms.",
+    "id": "Zs4vdvlK3ZiFBSNXoyOt"
+  },
+  {
+    "time_complexity": "O(N^2)",
+    "code": {
+      "python": "def computeTotient(n):\n    phi=[]\n    for i in range(n + 2):\n        phi.append(0)\n    for i in range(1, n+1):\n    for p in range(2,n+1):\n        if (phi[p] == p):\n            phi[p] = p-1\n            for i in range(2*p,n+1,p):\n    for i in range(1,n+1):\n",
+      "cpp": "void computeTotient(int n)\n{\n    long long phi[n+1];\n    for (int i=1; i<=n; i++)\n    for (int p=2; p<=n; p++)\n    {\n        if (phi[p] == p)\n        {\n            phi[p] = p-1;\n            for (int i = 2*p; i<=n; i += p)\n            {\n            phi[i] = (phi[i]/p) * (p-1);\n            }\n        }\n    }\n}\n",
+      "java": "static void computeTotient(int n) {\n    long phi[] = new long[n + 1];\n    for (int i = 1; i <= n; i++)\n    for (int p = 2; p <= n; p++) {\n    if (phi[p] == p) {\n        phi[p] = p - 1;\n        for (int i = 2 * p; i <= n; i += p) {\n        phi[i] = (phi[i] / p) * (p - 1);\n        }\n    }\n    }\n}\n"
     },
-    {
-        "time_complexity": "O(1)",
-        "code": {
-            "python": "print(\"Hello World\")",
-            "cpp": "cout << \"Hello World\";",
-            "java": "System.out.println(\"Hello World\")"
-        },
-        "name": "Hello World",
-        "link": "N/A",
-        "description": "\"Hello, World!\" is a simple and traditional computer program that is often the first program people write when learning a new programming language",
-        "id": "fXdZT2RhfQ2Vkqbewkpr"
+    "name": "Euler's Totient",
+    "link": "https://www.geeksforgeeks.org/eulers-totient-function-for-all-numbers-smaller-than-or-equal-to-n/",
+    "description": "Euler's Totient, often denoted as φ(n), is a mathematical function that calculates the count of positive integers less than or equal to a given integer 'n' that are relatively prime to 'n,' meaning they share no common factors other than 1. Euler's Totient function is used in number theory and cryptography to analyze and solve various problems related to modular arithmetic, prime factorization, and integer factorization. It plays a crucial role in RSA encryption, where it helps determine the security of the encryption system by calculating the totient of large composite numbers, which is a challenging task for potential attackers. Euler's Totient function also has applications in algorithms that involve modular exponentiation and solving equations in modular arithmetic.",
+    "id": "bdoggfmUY8BhjRMBjy8Z"
+  },
+  {
+    "time_complexity": "O(1)",
+    "code": {
+      "python": "print(\"Hello World\")",
+      "cpp": "cout << \"Hello World\";",
+      "java": "System.out.println(\"Hello World\")"
     },
-    {
-        "time_complexity": "O(log N)",
-        "code": {
-            "python": "class DisjSet:\n    def __init__(self, n):\n        self.rank = [1] * n\n        self.parent = [i for i in range(n)]\n    def find(self, x):\n        if (self.parent[x] != x):\n            self.parent[x] = self.find(self.parent[x])\n        return self.parent[x]\n    def Union(self, x, y):\n        xset = self.find(x)\n        yset = self.find(y)\n        if xset == yset:\n            return\n        if self.rank[xset] < self.rank[yset]:\n            self.parent[xset] = yset\n        elif self.rank[xset] > self.rank[yset]:\n            self.parent[yset] = xset\n        else:\n            self.parent[yset] = xset\n            self.rank[xset] = self.rank[xset] + 1\n",
-            "cpp": "class DisjSet {\n    int *rank, *parent, n;\npublic:\n    DisjSet(int n)\n    {\n        rank = new int[n];\n        parent = new int[n];\n        this->n = n;\n        makeSet();\n    }\n    void makeSet()\n    {\n        for (int i = 0; i < n; i++) {\n            parent[i] = i;\n        }\n    }\n    int find(int x)\n    {\n        if (parent[x] != x) {\n            parent[x] = find(parent[x]);\n        }\n        return parent[x];\n    }\n    void Union(int x, int y)\n    {\n        int xset = find(x);\n        int yset = find(y);\n        if (xset == yset)\n            return;\n        if (rank[xset] < rank[yset]) {\n            parent[xset] = yset;\n        }\n        else if (rank[xset] > rank[yset]) {\n            parent[yset] = xset;\n        }\n        else {\n            parent[yset] = xset;\n            rank[xset] = rank[xset] + 1;\n        }\n    }\n};\n",
-            "java": "class DisjointUnionSets {\n    int[] rank, parent;\n    int n;\n    public DisjointUnionSets(int n)\n    {\n        rank = new int[n];\n        parent = new int[n];\n        this.n = n;\n        makeSet();\n    }\n    void makeSet()\n    {\n        for (int i = 0; i < n; i++) {\n            parent[i] = i;\n        }\n    }\n    int find(int x)\n    {\n        if (parent[x] != x) {\n            parent[x] = find(parent[x]);\n        }\n        return parent[x];\n    }\n    void union(int x, int y)\n    {\n        int xRoot = find(x), yRoot = find(y);\n        if (xRoot == yRoot)\n            return;\n        if (rank[xRoot] < rank[yRoot])\n            parent[xRoot] = yRoot;\n        else if (rank[yRoot] < rank[xRoot])\n            parent[yRoot] = xRoot;\n        {\n            parent[yRoot] = xRoot;\n            rank[xRoot] = rank[xRoot] + 1;\n        }\n    }\n}\n"
-        },
-        "name": "Disjoint Set",
-        "link": "https://www.geeksforgeeks.org/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/",
-        "description": "A Disjoint Set, also known as a Union-Find data structure, is used to maintain a collection of disjoint or non-overlapping sets of elements. It is designed to efficiently answer two fundamental operations: union, which combines two sets into a single set, and find, which determines which set an element belongs to. Disjoint sets are used in a variety of applications, including algorithms for finding connected components in graphs, cycle detection in graphs, and partitioning data into distinct groups or clusters. They're also employed in algorithms for efficiently solving problems like Kruskal's algorithm for finding minimum spanning trees and in certain optimizations for pathfinding algorithms like Dijkstra's and A* to reduce redundant computations.",
-        "id": "mPnjKYKC3x5lDyRDpaoN"
+    "name": "Hello World",
+    "link": "N/A",
+    "description": "\"Hello, World!\" is a simple and traditional computer program that is often the first program people write when learning a new programming language",
+    "id": "fXdZT2RhfQ2Vkqbewkpr"
+  },
+  {
+    "time_complexity": "O(log N)",
+    "code": {
+      "python": "class DisjSet:\n    def __init__(self, n):\n        self.rank = [1] * n\n        self.parent = [i for i in range(n)]\n    def find(self, x):\n        if (self.parent[x] != x):\n            self.parent[x] = self.find(self.parent[x])\n        return self.parent[x]\n    def Union(self, x, y):\n        xset = self.find(x)\n        yset = self.find(y)\n        if xset == yset:\n            return\n        if self.rank[xset] < self.rank[yset]:\n            self.parent[xset] = yset\n        elif self.rank[xset] > self.rank[yset]:\n            self.parent[yset] = xset\n        else:\n            self.parent[yset] = xset\n            self.rank[xset] = self.rank[xset] + 1\n",
+      "cpp": "class DisjSet {\n    int *rank, *parent, n;\npublic:\n    DisjSet(int n)\n    {\n        rank = new int[n];\n        parent = new int[n];\n        this->n = n;\n        makeSet();\n    }\n    void makeSet()\n    {\n        for (int i = 0; i < n; i++) {\n            parent[i] = i;\n        }\n    }\n    int find(int x)\n    {\n        if (parent[x] != x) {\n            parent[x] = find(parent[x]);\n        }\n        return parent[x];\n    }\n    void Union(int x, int y)\n    {\n        int xset = find(x);\n        int yset = find(y);\n        if (xset == yset)\n            return;\n        if (rank[xset] < rank[yset]) {\n            parent[xset] = yset;\n        }\n        else if (rank[xset] > rank[yset]) {\n            parent[yset] = xset;\n        }\n        else {\n            parent[yset] = xset;\n            rank[xset] = rank[xset] + 1;\n        }\n    }\n};\n",
+      "java": "class DisjointUnionSets {\n    int[] rank, parent;\n    int n;\n    public DisjointUnionSets(int n)\n    {\n        rank = new int[n];\n        parent = new int[n];\n        this.n = n;\n        makeSet();\n    }\n    void makeSet()\n    {\n        for (int i = 0; i < n; i++) {\n            parent[i] = i;\n        }\n    }\n    int find(int x)\n    {\n        if (parent[x] != x) {\n            parent[x] = find(parent[x]);\n        }\n        return parent[x];\n    }\n    void union(int x, int y)\n    {\n        int xRoot = find(x), yRoot = find(y);\n        if (xRoot == yRoot)\n            return;\n        if (rank[xRoot] < rank[yRoot])\n            parent[xRoot] = yRoot;\n        else if (rank[yRoot] < rank[xRoot])\n            parent[yRoot] = xRoot;\n        {\n            parent[yRoot] = xRoot;\n            rank[xRoot] = rank[xRoot] + 1;\n        }\n    }\n}\n"
     },
-    {
-        "time_complexity": "O(log3 N)",
-        "code": {
-            "python": "def ternarySearch(l, r, key, ar):\n    if (r >= l):\n        if (ar[mid1] == key):\n            return mid1\n        if (ar[mid2] == key):\n            return mid2\n        if (key < ar[mid1]):\n            return ternarySearch(l, mid1 - 1, key, ar)\n        elif (key > ar[mid2]):\n            return ternarySearch(mid2 + 1, r, key, ar)\n        else:\n            return ternarySearch(mid1 + 1, mid2 - 1, key, ar)\n    return -1\n",
-            "cpp": "int ternarySearch(int l, int r, int key, int ar[])\n{\n    while (r >= l) {\n        int mid1 = l + (r - l) / 3;\n        int mid2 = r - (r - l) / 3;\n        if (ar[mid1] == key) {\n            return mid1;\n        }\n        if (ar[mid2] == key) {\n            return mid2;\n        }\n        if (key < ar[mid1]) {\n            r = mid1 - 1;\n        }\n        else if (key > ar[mid2]) {\n            l = mid2 + 1;\n        }\n        else {\n            l = mid1 + 1;\n            r = mid2 - 1;\n        }\n    }\n    return -1;\n}\n",
-            "java": "static int ternarySearch(int l, int r, int key, int ar[])\n{\n    while (r >= l) {\n        int mid1 = l + (r - l) / 3;\n        int mid2 = r - (r - l) / 3;\n        if (ar[mid1] == key) {\n            return mid1;\n        }\n        if (ar[mid2] == key) {\n            return mid2;\n        }\n        if (key < ar[mid1]) {\n            r = mid1 - 1;\n        }\n        else if (key > ar[mid2]) {\n            l = mid2 + 1;\n        }\n        else {\n            l = mid1 + 1;\n            r = mid2 - 1;\n        }\n    }\n    return -1;\n}\n"
-        },
-        "name": "Ternary Search",
-        "link": "https://www.geeksforgeeks.org/ternary-search/",
-        "description": "Ternary search is a searching algorithm similar in principle to binary search but divides the search space into three parts instead of two. It works by comparing the target element with two midpoints in the current range, dividing it into three equal parts. Based on these comparisons, the algorithm narrows down the search space to one of these three parts. If the target element is found in one of these comparisons, the search is successful. Ternary search continues recursively on the appropriate third of the range until the target element is located or it's determined that the element doesn't exist in the list. While ternary search can be more efficient than linear search, it is not as widely used as binary search and can have a time complexity of O(log3 n), which is less efficient than binary search's O(log2 n). Ternary search is often employed in specialized situations where it is advantageous to divide the search space into more than two parts.",
-        "id": "mxLMOm8SuQIUwmlH8ry6"
+    "name": "Disjoint Set",
+    "link": "https://www.geeksforgeeks.org/introduction-to-disjoint-set-data-structure-or-union-find-algorithm/",
+    "description": "A Disjoint Set, also known as a Union-Find data structure, is used to maintain a collection of disjoint or non-overlapping sets of elements. It is designed to efficiently answer two fundamental operations: union, which combines two sets into a single set, and find, which determines which set an element belongs to. Disjoint sets are used in a variety of applications, including algorithms for finding connected components in graphs, cycle detection in graphs, and partitioning data into distinct groups or clusters. They're also employed in algorithms for efficiently solving problems like Kruskal's algorithm for finding minimum spanning trees and in certain optimizations for pathfinding algorithms like Dijkstra's and A* to reduce redundant computations.",
+    "id": "mPnjKYKC3x5lDyRDpaoN"
+  },
+  {
+    "time_complexity": "O(log3 N)",
+    "code": {
+      "python": "def ternarySearch(l, r, key, ar):\n    if (r >= l):\n        if (ar[mid1] == key):\n            return mid1\n        if (ar[mid2] == key):\n            return mid2\n        if (key < ar[mid1]):\n            return ternarySearch(l, mid1 - 1, key, ar)\n        elif (key > ar[mid2]):\n            return ternarySearch(mid2 + 1, r, key, ar)\n        else:\n            return ternarySearch(mid1 + 1, mid2 - 1, key, ar)\n    return -1\n",
+      "cpp": "int ternarySearch(int l, int r, int key, int ar[])\n{\n    while (r >= l) {\n        int mid1 = l + (r - l) / 3;\n        int mid2 = r - (r - l) / 3;\n        if (ar[mid1] == key) {\n            return mid1;\n        }\n        if (ar[mid2] == key) {\n            return mid2;\n        }\n        if (key < ar[mid1]) {\n            r = mid1 - 1;\n        }\n        else if (key > ar[mid2]) {\n            l = mid2 + 1;\n        }\n        else {\n            l = mid1 + 1;\n            r = mid2 - 1;\n        }\n    }\n    return -1;\n}\n",
+      "java": "static int ternarySearch(int l, int r, int key, int ar[])\n{\n    while (r >= l) {\n        int mid1 = l + (r - l) / 3;\n        int mid2 = r - (r - l) / 3;\n        if (ar[mid1] == key) {\n            return mid1;\n        }\n        if (ar[mid2] == key) {\n            return mid2;\n        }\n        if (key < ar[mid1]) {\n            r = mid1 - 1;\n        }\n        else if (key > ar[mid2]) {\n            l = mid2 + 1;\n        }\n        else {\n            l = mid1 + 1;\n            r = mid2 - 1;\n        }\n    }\n    return -1;\n}\n"
     },
-    {
-        "time_complexity": "O(N^2)",
-        "code": {
-            "python": "def bubbleSort(arr):\n    n = len(arr)\n    for i in range(n):\n        swapped = False\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n                swapped = True\n        if (swapped == False):\n            break\n",
-            "cpp": "void bubbleSort(int arr[], int n)\n{\n    int i, j;\n    bool swapped;\n    for (i = 0; i < n - 1; i++) {\n        swapped = false;\n        for (j = 0; j < n - i - 1; j++) {\n            if (arr[j] > arr[j + 1]) {\n                swap(arr[j], arr[j + 1]);\n                swapped = true;\n            }\n        }\n        if (swapped == false)\n            break;\n    }\n}\n",
-            "java": "static void bubbleSort(int arr[], int n)\n{\n    int i, j, temp;\n    boolean swapped;\n    for (i = 0; i < n - 1; i++) {\n        swapped = false;\n        for (j = 0; j < n - i - 1; j++) {\n            if (arr[j] > arr[j + 1]) {\n                temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n                swapped = true;\n            }\n        }\n        if (swapped == false)\n            break;\n    }\n}\n"
-        },
-        "name": "Bubble Sort",
-        "link": "https://www.geeksforgeeks.org/bubble-sort/",
-        "description": "Bubble Sort is a basic comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. It repeatedly compares adjacent elements in the list and swaps them if they are in the wrong order. The pass through the list continues until no more swaps are needed, indicating that the list is sorted. Bubble Sort is easy to understand and implement, making it a common choice for educational purposes and small datasets. However, it's not efficient for large datasets due to its time complexity of O(n^2), where n is the number of elements in the list. As a result, it's not typically used in practical applications for large-scale sorting tasks, where more efficient sorting algorithms like QuickSort or MergeSort are preferred.",
-        "id": "oD4cEGXjoJmQaHEUYtBO"
+    "name": "Ternary Search",
+    "link": "https://www.geeksforgeeks.org/ternary-search/",
+    "description": "Ternary search is a searching algorithm similar in principle to binary search but divides the search space into three parts instead of two. It works by comparing the target element with two midpoints in the current range, dividing it into three equal parts. Based on these comparisons, the algorithm narrows down the search space to one of these three parts. If the target element is found in one of these comparisons, the search is successful. Ternary search continues recursively on the appropriate third of the range until the target element is located or it's determined that the element doesn't exist in the list. While ternary search can be more efficient than linear search, it is not as widely used as binary search and can have a time complexity of O(log3 n), which is less efficient than binary search's O(log2 n). Ternary search is often employed in specialized situations where it is advantageous to divide the search space into more than two parts.",
+    "id": "mxLMOm8SuQIUwmlH8ry6"
+  },
+  {
+    "time_complexity": "O(N^2)",
+    "code": {
+      "python": "def bubbleSort(arr):\n    n = len(arr)\n    for i in range(n):\n        swapped = False\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n                swapped = True\n        if (swapped == False):\n            break\n",
+      "cpp": "void bubbleSort(int arr[], int n)\n{\n    int i, j;\n    bool swapped;\n    for (i = 0; i < n - 1; i++) {\n        swapped = false;\n        for (j = 0; j < n - i - 1; j++) {\n            if (arr[j] > arr[j + 1]) {\n                swap(arr[j], arr[j + 1]);\n                swapped = true;\n            }\n        }\n        if (swapped == false)\n            break;\n    }\n}\n",
+      "java": "static void bubbleSort(int arr[], int n)\n{\n    int i, j, temp;\n    boolean swapped;\n    for (i = 0; i < n - 1; i++) {\n        swapped = false;\n        for (j = 0; j < n - i - 1; j++) {\n            if (arr[j] > arr[j + 1]) {\n                temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n                swapped = true;\n            }\n        }\n        if (swapped == false)\n            break;\n    }\n}\n"
     },
-    {
-        "time_complexity": "O(N^2)",
-        "code": {
-            "python": "for i in range(len(A)):\n    min_idx = i\n    for j in range(i+1, len(A)):\n        if A[min_idx] > A[j]:\n            min_idx = j\n    A[i], A[min_idx] = A[min_idx], A[i]\n",
-            "cpp": "void selectionSort(int arr[], int n)\n{\n    int i, j, min_idx;\n    for (i = 0; i < n - 1; i++) {\n        min_idx = i;\n        for (j = i + 1; j < n; j++) {\n            if (arr[j] < arr[min_idx])\n                min_idx = j;\n        }\n        if (min_idx != i)\n            swap(arr[min_idx], arr[i]);\n    }\n}\n",
-            "java": "void sort(int arr[])\n{\n    int n = arr.length;\n    for (int i = 0; i < n-1; i++)\n    {\n        int min_idx = i;\n        for (int j = i+1; j < n; j++)\n            if (arr[j] < arr[min_idx])\n                min_idx = j;\n        int temp = arr[min_idx];\n        arr[min_idx] = arr[i];\n        arr[i] = temp;\n    }\n}\n"
-        },
-        "name": "Selection Sort",
-        "link": "https://www.geeksforgeeks.org/selection-sort/",
-        "description": "Selection Sort is a straightforward comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. The algorithm divides the input into two parts: the sorted portion and the unsorted portion. It repeatedly selects the smallest (or largest) element from the unsorted part and swaps it with the first element of the unsorted part, effectively expanding the sorted portion. This process continues until the entire list is sorted. While Selection Sort is easy to understand and implement, it is not very efficient for large datasets, as it has a time complexity of O(n^2), where n is the number of elements in the list. It is mainly used for educational purposes to teach the concept of sorting algorithms and is not typically used in practical applications for large datasets, where more efficient sorting algorithms like QuickSort or MergeSort are preferred.",
-        "id": "ow76V5LgAyqBItP3txDf"
+    "name": "Bubble Sort",
+    "link": "https://www.geeksforgeeks.org/bubble-sort/",
+    "description": "Bubble Sort is a basic comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. It repeatedly compares adjacent elements in the list and swaps them if they are in the wrong order. The pass through the list continues until no more swaps are needed, indicating that the list is sorted. Bubble Sort is easy to understand and implement, making it a common choice for educational purposes and small datasets. However, it's not efficient for large datasets due to its time complexity of O(n^2), where n is the number of elements in the list. As a result, it's not typically used in practical applications for large-scale sorting tasks, where more efficient sorting algorithms like QuickSort or MergeSort are preferred.",
+    "id": "oD4cEGXjoJmQaHEUYtBO"
+  },
+  {
+    "time_complexity": "O(N^2)",
+    "code": {
+      "python": "for i in range(len(A)):\n    min_idx = i\n    for j in range(i+1, len(A)):\n        if A[min_idx] > A[j]:\n            min_idx = j\n    A[i], A[min_idx] = A[min_idx], A[i]\n",
+      "cpp": "void selectionSort(int arr[], int n)\n{\n    int i, j, min_idx;\n    for (i = 0; i < n - 1; i++) {\n        min_idx = i;\n        for (j = i + 1; j < n; j++) {\n            if (arr[j] < arr[min_idx])\n                min_idx = j;\n        }\n        if (min_idx != i)\n            swap(arr[min_idx], arr[i]);\n    }\n}\n",
+      "java": "void sort(int arr[])\n{\n    int n = arr.length;\n    for (int i = 0; i < n-1; i++)\n    {\n        int min_idx = i;\n        for (int j = i+1; j < n; j++)\n            if (arr[j] < arr[min_idx])\n                min_idx = j;\n        int temp = arr[min_idx];\n        arr[min_idx] = arr[i];\n        arr[i] = temp;\n    }\n}\n"
     },
-    {
-        "time_complexity": "O(N)",
-        "code": {
-            "python": "def search(arr, N, x): \n    for i in range(0, N): \n        if (arr[i] == x): \n            return i \n    return -1\n",
-            "cpp": "int search(int arr[], int N, int x)\n{\n    for (int i = 0; i < N; i++)\n        if (arr[i] == x)\n            return i;\n    return -1;\n}\n",
-            "java": "public static int search(int arr[], int N, int x)\n{\n    for (int i = 0; i < N; i++) {\n        if (arr[i] == x)\n            return i;\n    }\n    return -1;\n}\n"
-        },
-        "name": "Linear Search",
-        "link": "https://www.geeksforgeeks.org/linear-search/",
-        "description": "Linear Search, also known as sequential search, is a basic searching algorithm used to find a specific element within a list or array. It works by sequentially checking each element in the list until a match is found or the entire list has been searched. Linear Search is straightforward to implement and is suitable for unsorted lists. However, it has a time complexity of O(n), where n is the number of elements in the list, making it less efficient for large datasets compared to more advanced search algorithms like Binary Search for sorted lists. It's often used when the dataset is relatively small, or when you need to find an element within an unordered collection.",
-        "id": "reFlej171wZkMm2WamYa"
+    "name": "Selection Sort",
+    "link": "https://www.geeksforgeeks.org/selection-sort/",
+    "description": "Selection Sort is a straightforward comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. The algorithm divides the input into two parts: the sorted portion and the unsorted portion. It repeatedly selects the smallest (or largest) element from the unsorted part and swaps it with the first element of the unsorted part, effectively expanding the sorted portion. This process continues until the entire list is sorted. While Selection Sort is easy to understand and implement, it is not very efficient for large datasets, as it has a time complexity of O(n^2), where n is the number of elements in the list. It is mainly used for educational purposes to teach the concept of sorting algorithms and is not typically used in practical applications for large datasets, where more efficient sorting algorithms like QuickSort or MergeSort are preferred.",
+    "id": "ow76V5LgAyqBItP3txDf"
+  },
+  {
+    "time_complexity": "O(N)",
+    "code": {
+      "python": "def search(arr, N, x): \n    for i in range(0, N): \n        if (arr[i] == x): \n            return i \n    return -1\n",
+      "cpp": "int search(int arr[], int N, int x)\n{\n    for (int i = 0; i < N; i++)\n        if (arr[i] == x)\n            return i;\n    return -1;\n}\n",
+      "java": "public static int search(int arr[], int N, int x)\n{\n    for (int i = 0; i < N; i++) {\n        if (arr[i] == x)\n            return i;\n    }\n    return -1;\n}\n"
     },
-    {
-        "time_complexity": "O(N)",
-        "code": {
-            "python": "def fillPrefixSum(arr, n, prefixSum):\n    prefixSum[0] = arr[0]\n    for i in range(1, n):\n        prefixSum[i] = prefixSum[i - 1] + arr[i]\n",
-            "cpp": "void fillPrefixSum(int arr[], int n, int prefixSum[])\n{\n    prefixSum[0] = arr[0];\n    for (int i = 1; i < n; i++)\n        prefixSum[i] = prefixSum[i - 1] + arr[i];\n}\n",
-            "java": "static void fillPrefixSum(int arr[], int n, int prefixSum[])\n{\n    prefixSum[0] = arr[0];\n    for (int i = 1; i < n; ++i)\n        prefixSum[i] = prefixSum[i - 1] + arr[i];\n}\n"
-        },
-        "name": "Prefix Sum",
-        "link": "https://www.geeksforgeeks.org/prefix-sum-array-implementation-applications-competitive-programming/",
-        "description": "Prefix Sum, also known as the cumulative sum, is a simple and useful computational technique used to efficiently calculate the cumulative sum of elements in an array or list. It works by creating a new array where each element at a particular index is the sum of all the elements preceding it in the original array. This can be computed in a single pass through the array, which makes it highly efficient for various tasks. Prefix Sum has a wide range of applications, including image processing, dynamic programming in algorithms, and solving problems that require quick range queries or updates in an array. For example, it's used in real-time image processing to compute sums of pixel values in rectangular regions, and in algorithms like Fenwick Trees for efficient range query operations in data structures.",
-        "id": "sYNjZEQHI6UkAiwSIZcJ"
+    "name": "Linear Search",
+    "link": "https://www.geeksforgeeks.org/linear-search/",
+    "description": "Linear Search, also known as sequential search, is a basic searching algorithm used to find a specific element within a list or array. It works by sequentially checking each element in the list until a match is found or the entire list has been searched. Linear Search is straightforward to implement and is suitable for unsorted lists. However, it has a time complexity of O(n), where n is the number of elements in the list, making it less efficient for large datasets compared to more advanced search algorithms like Binary Search for sorted lists. It's often used when the dataset is relatively small, or when you need to find an element within an unordered collection.",
+    "id": "reFlej171wZkMm2WamYa"
+  },
+  {
+    "time_complexity": "O(N)",
+    "code": {
+      "python": "def fillPrefixSum(arr, n, prefixSum):\n    prefixSum[0] = arr[0]\n    for i in range(1, n):\n        prefixSum[i] = prefixSum[i - 1] + arr[i]\n",
+      "cpp": "void fillPrefixSum(int arr[], int n, int prefixSum[])\n{\n    prefixSum[0] = arr[0];\n    for (int i = 1; i < n; i++)\n        prefixSum[i] = prefixSum[i - 1] + arr[i];\n}\n",
+      "java": "static void fillPrefixSum(int arr[], int n, int prefixSum[])\n{\n    prefixSum[0] = arr[0];\n    for (int i = 1; i < n; ++i)\n        prefixSum[i] = prefixSum[i - 1] + arr[i];\n}\n"
     },
-    {
-        "time_complexity": "O(N^2)",
-        "code": {
-            "python": "def insertionSort(arr):\n    for i in range(1, len(arr)):\n        key = arr[i]\n        j = i-1\n        while j >= 0 and key < arr[j] :\n                arr[j + 1] = arr[j]\n                j -= 1\n        arr[j + 1] = key\n",
-            "cpp": "void insertionSort(int arr[], int n)\n{\n    int i, key, j;\n    for (i = 1; i < n; i++) {\n        key = arr[i];\n        j = i - 1;\n        while (j >= 0 && arr[j] > key) {\n            arr[j + 1] = arr[j];\n            j = j - 1;\n        }\n        arr[j + 1] = key;\n    }\n}\n",
-            "java": "void sort(int arr[])\n{\n    int n = arr.length;\n    for (int i = 1; i < n; ++i) {\n        int key = arr[i];\n        int j = i - 1;\n        while (j >= 0 && arr[j] > key) {\n            arr[j + 1] = arr[j];\n            j = j - 1;\n        }\n        arr[j + 1] = key;\n    }\n}\n"
-        },
-        "name": "Insertion Sort",
-        "link": "https://www.geeksforgeeks.org/insertion-sort/",
-        "description": "nsertion Sort is a straightforward comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. It works by dividing the list into two parts: the sorted portion and the unsorted portion. In each iteration, it takes an element from the unsorted portion and inserts it into its correct position within the sorted portion, shifting other elements as necessary. This process continues until the entire list is sorted. Insertion Sort is particularly efficient for small datasets or partially sorted lists, and it has a simple implementation. However, for larger datasets, its time complexity of O(n^2) makes it less efficient compared to more advanced sorting algorithms like QuickSort or MergeSort, which are preferred for larger-scale sorting tasks.",
-        "id": "tToNg2ViN4E412J4qDJY"
+    "name": "Prefix Sum",
+    "link": "https://www.geeksforgeeks.org/prefix-sum-array-implementation-applications-competitive-programming/",
+    "description": "Prefix Sum, also known as the cumulative sum, is a simple and useful computational technique used to efficiently calculate the cumulative sum of elements in an array or list. It works by creating a new array where each element at a particular index is the sum of all the elements preceding it in the original array. This can be computed in a single pass through the array, which makes it highly efficient for various tasks. Prefix Sum has a wide range of applications, including image processing, dynamic programming in algorithms, and solving problems that require quick range queries or updates in an array. For example, it's used in real-time image processing to compute sums of pixel values in rectangular regions, and in algorithms like Fenwick Trees for efficient range query operations in data structures.",
+    "id": "sYNjZEQHI6UkAiwSIZcJ"
+  },
+  {
+    "time_complexity": "O(N^2)",
+    "code": {
+      "python": "def insertionSort(arr):\n    for i in range(1, len(arr)):\n        key = arr[i]\n        j = i-1\n        while j >= 0 and key < arr[j] :\n                arr[j + 1] = arr[j]\n                j -= 1\n        arr[j + 1] = key\n",
+      "cpp": "void insertionSort(int arr[], int n)\n{\n    int i, key, j;\n    for (i = 1; i < n; i++) {\n        key = arr[i];\n        j = i - 1;\n        while (j >= 0 && arr[j] > key) {\n            arr[j + 1] = arr[j];\n            j = j - 1;\n        }\n        arr[j + 1] = key;\n    }\n}\n",
+      "java": "void sort(int arr[])\n{\n    int n = arr.length;\n    for (int i = 1; i < n; ++i) {\n        int key = arr[i];\n        int j = i - 1;\n        while (j >= 0 && arr[j] > key) {\n            arr[j + 1] = arr[j];\n            j = j - 1;\n        }\n        arr[j + 1] = key;\n    }\n}\n"
     },
-    {
-        "time_complexity": "O(V^3)",
-        "code": {
-            "python": "nV = 4\nINF = 9999\ndef floyd_warshall(G):\n    distance = list(map(lambda i: list(map(lambda j: j, i)), G))\n    for k in range(nV):\n        for i in range(nV):\n           for j in range(nV):\n                distance[i][j] = min(distance[i][j], distance[i][k] + distance[k][j])\n    print_solution(distance)\n",
-            "cpp": "void floydWarshall(int graph[][nV]) {\n  int matrix[nV][nV], i, j, k;\n  for (i = 0; i < nV; i++)\n    for (j = 0; j < nV; j++)\n      matrix[i][j] = graph[i][j];\n  for (k = 0; k < nV; k++) {\n    for (i = 0; i < nV; i++) {\n      for (j = 0; j < nV; j++) {\n        if (matrix[i][k] + matrix[k][j] < matrix[i][j])\n          matrix[i][j] = matrix[i][k] + matrix[k][j];\n      }\n    }\n  }\n  printMatrix(matrix);\n}\n",
-            "java": "#define nV 4\n#define INF 9999\nfinal static int INF = 9999, nV = 4;\nvoid floydWarshall(int graph[][]) {\n  int matrix[][] = new int[nV][nV];\n  int i, j, k;\n  for (i = 0; i < nV; i++)\n    for (j = 0; j < nV; j++)\n      matrix[i][j] = graph[i][j];\n  for (k = 0; k < nV; k++) {\n    for (i = 0; i < nV; i++) {\n      for (j = 0; j < nV; j++) {\n        if (matrix[i][k] + matrix[k][j] < matrix[i][j])\n          matrix[i][j] = matrix[i][k] + matrix[k][j];\n      }\n    }\n  }\n  printMatrix(matrix);\n}\n"
-        },
-        "name": "Floyd Warshall",
-        "link": "https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/",
-        "description": "Floyd-Warshall is an algorithm used to find the shortest paths between all pairs of vertices in a weighted directed graph. It operates by iteratively updating the shortest path distances between pairs of vertices, considering all possible paths through other vertices. The algorithm is particularly valuable in network routing, where it helps determine the most efficient routes between multiple points in a network. It's also used in various applications involving distance or connectivity analysis, such as finding optimal transportation routes and solving graph-based problems in computer science and logistics.",
-        "id": "ybE8WMuXJClY8XNJjVSB"
-    }
+    "name": "Insertion Sort",
+    "link": "https://www.geeksforgeeks.org/insertion-sort/",
+    "description": "nsertion Sort is a straightforward comparison-based sorting algorithm used to arrange a list of elements in ascending or descending order. It works by dividing the list into two parts: the sorted portion and the unsorted portion. In each iteration, it takes an element from the unsorted portion and inserts it into its correct position within the sorted portion, shifting other elements as necessary. This process continues until the entire list is sorted. Insertion Sort is particularly efficient for small datasets or partially sorted lists, and it has a simple implementation. However, for larger datasets, its time complexity of O(n^2) makes it less efficient compared to more advanced sorting algorithms like QuickSort or MergeSort, which are preferred for larger-scale sorting tasks.",
+    "id": "tToNg2ViN4E412J4qDJY"
+  },
+  {
+    "time_complexity": "O(V^3)",
+    "code": {
+      "python": "nV = 4\nINF = 9999\ndef floyd_warshall(G):\n    distance = list(map(lambda i: list(map(lambda j: j, i)), G))\n    for k in range(nV):\n        for i in range(nV):\n           for j in range(nV):\n                distance[i][j] = min(distance[i][j], distance[i][k] + distance[k][j])\n    print_solution(distance)\n",
+      "cpp": "void floydWarshall(int graph[][nV]) {\n  int matrix[nV][nV], i, j, k;\n  for (i = 0; i < nV; i++)\n    for (j = 0; j < nV; j++)\n      matrix[i][j] = graph[i][j];\n  for (k = 0; k < nV; k++) {\n    for (i = 0; i < nV; i++) {\n      for (j = 0; j < nV; j++) {\n        if (matrix[i][k] + matrix[k][j] < matrix[i][j])\n          matrix[i][j] = matrix[i][k] + matrix[k][j];\n      }\n    }\n  }\n  printMatrix(matrix);\n}\n",
+      "java": "#define nV 4\n#define INF 9999\nfinal static int INF = 9999, nV = 4;\nvoid floydWarshall(int graph[][]) {\n  int matrix[][] = new int[nV][nV];\n  int i, j, k;\n  for (i = 0; i < nV; i++)\n    for (j = 0; j < nV; j++)\n      matrix[i][j] = graph[i][j];\n  for (k = 0; k < nV; k++) {\n    for (i = 0; i < nV; i++) {\n      for (j = 0; j < nV; j++) {\n        if (matrix[i][k] + matrix[k][j] < matrix[i][j])\n          matrix[i][j] = matrix[i][k] + matrix[k][j];\n      }\n    }\n  }\n  printMatrix(matrix);\n}\n"
+    },
+    "name": "Floyd Warshall",
+    "link": "https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/",
+    "description": "Floyd-Warshall is an algorithm used to find the shortest paths between all pairs of vertices in a weighted directed graph. It operates by iteratively updating the shortest path distances between pairs of vertices, considering all possible paths through other vertices. The algorithm is particularly valuable in network routing, where it helps determine the most efficient routes between multiple points in a network. It's also used in various applications involving distance or connectivity analysis, such as finding optimal transportation routes and solving graph-based problems in computer science and logistics.",
+    "id": "ybE8WMuXJClY8XNJjVSB"
+  }
 ]

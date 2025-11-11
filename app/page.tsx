@@ -1,103 +1,117 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+'use client';
 
-'use client'; // This is a client component 👈🏽
-
-import { useEffect, useState } from 'react';
-import SearchComponent from '@/components/SearchBar';
-
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useRouter } from 'next/navigation';
-import { auth } from '@/firebase/clientApp';
-import api from '@/firebase/api';
-import Loading from '@/components/Loading';
-import { Algo } from '@/firebase/models';
-import RootLayout from './layout';
-
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
-const SiPython = dynamic(() => import('react-icons/si').then((mod) => mod.SiPython), {
-  ssr: false, // Set to false to disable server-side rendering
-});
-
-const FaJava = dynamic(() => import('react-icons/fa').then((mod) => mod.FaJava), {
-  ssr: false, // Set to false to disable server-side rendering
-});
-
-const TbBrandCpp = dynamic(() => import('react-icons/tb').then((mod) => mod.TbBrandCpp), {
-  ssr: false, // Set to false to disable server-side rendering
+const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
+  ssr: false,
 });
 
 export default function Home() {
-  const [user, loading, error] = useAuthState(auth);
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const [algos, setAlgos] = useState([] as Algo[]);
+  const [isClient, setIsClient] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    api.getAllAlgos().then((res) => {
-      if (res.data.error === "") {
-        setAlgos(res.data.results);
-      }
-    })
-  }, [setAlgos]);
+    setIsClient(true);
+    const user = localStorage.getItem('alg0_user');
+    setIsLoggedIn(!!user);
+  }, []);
 
-  // Show loading only during initial auth check
-  if (loading) {
-    return (
-      <Loading />
-    );
-  }
+  if (!isClient) return null;
 
   return (
-    <RootLayout>
-      <div style={{ height: "90vh" }} className="flex flex-row items-center justify-center flex-wrap m-auto w-full">
-        <div className="flex flex-col items-center h-[100%] rounded-2xl bg-white/[0.6] text-black p-8 min-w-[50%]">
-          <div className="top">
-            <h1 className="head text-4xl" style={{ textAlign: 'center' }}>
-              Algorithms
-            </h1>
-          </div>
-          <SearchComponent
-            placeholder="Search"
-            onChange={(event: any) => {
-              setSearchTerm(event.target.value);
-            }}
-          />
-          <div className="flex flex-col h-[100%] mt-2 scrollbar-hide overflow-auto">
-            <ul
-              role="list"
-              className="divide-y divide-gray-100 p-[20px]"
+    <div className='flex flex-col h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-foreground'>
+      {/* Navigation */}
+      <nav className='sticky top-4 z-50 flex justify-center px-6'>
+        <div className='bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full px-8 py-3 flex items-center gap-8'>
+          <Link
+            href='/'
+            className='font-mono text-lg font-bold hover:opacity-80 transition'
+          >
+            <span className='text-slate-400'>{`{ `}</span>
+            <span className='text-slate-300'>alg0run</span>
+            <span className='text-slate-400'>{` }`}</span>
+          </Link>
+
+          <div className='h-6 w-px bg-slate-700/50'></div>
+
+          <div className='flex gap-6'>
+            <Link
+              href='/leaderboard'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
             >
-              {algos.filter((algo) => algo.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map((algo) => (
-                  <li
-                    key={algo.id}
-                    className="flex items-center justify-between gap-x-6 py-5"
-                  >
-                    <div className="flex min-w-0 gap-x-4">
-                      <div className="min-w-0 flex-auto">
-                        <h2>{algo.name}</h2>
-                      </div>
-                    </div>
-                    <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                      <div className="flex flex-row text-sm leading-6 text-gray-900 ">
-                        <a href={"/run?lang=python&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
-                          <div style={{ fontSize: "35px" }}><SiPython /></div>
-                        </a>
-                        <a href={"/run?lang=java&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
-                          <div style={{ fontSize: "35px" }}><FaJava /></div>
-                        </a>
-                        <a href={"/run?lang=cpp&id=" + algo.id} className="flex flex-row items-center text-amber-500 bg-gray-700 rounded-md px-3 py-2 text-sm font-medium m-2 my-hover hover:cursor-pointer hover:text-violet-200">
-                          <div style={{ fontSize: "35px" }}><TbBrandCpp /></div>
-                        </a>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-            </ul>
+              {`[ leaderboard ]`}
+            </Link>
+            <Link
+              href='/type'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
+            >
+              {`[ type ]`}
+            </Link>
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem('alg0_user');
+                  setIsLoggedIn(false);
+                }}
+                className='text-slate-300 hover:text-red-400 transition font-mono text-sm'
+              >
+                {`[ logout ]`}
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  const username = prompt('Enter username:');
+                  if (username) {
+                    localStorage.setItem('alg0_user', username);
+                    setIsLoggedIn(true);
+                  }
+                }}
+                className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
+              >
+                {`[ login ]`}
+              </button>
+            )}
           </div>
         </div>
+      </nav>
+
+      {/* Hero Section */}
+      <main className='flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 sm:py-3 z-10 min-h-0 overflow-hidden'>
+        <div className='max-w-4xl mx-auto text-center space-y-2 sm:space-y-3'>
+          {/* Title with dev syntax */}
+          <div className='space-y-1 sm:space-y-2'>
+            <h1 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-mono font-bold tracking-tight leading-tight'>
+              <span className='text-slate-400'>{`// `}</span>
+              <span className='text-cyan-400'>Algorithm</span>
+              <br />
+              <span className='text-slate-400'>{`// `}</span>
+              <span className='text-purple-400'>Speed</span>
+              <span className='text-slate-400'>{` Typing`}</span>
+            </h1>
+            <p className='text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-400 font-mono max-w-2xl mx-auto px-2'>
+              {`[ Type complex algorithms, race against peers, dominate the leaderboard ]`}
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <div className='space-y-1 sm:space-y-2'>
+            <Link
+              href='/type'
+              className='inline-block px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 bg-linear-to-r from-cyan-500 to-blue-500 text-white font-mono font-bold rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs'
+            >
+              {`$ start typing...`}
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      {/* 3D Keyboard - Fixed to Bottom */}
+      <div className='shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px]'>
+        <Keyboard3D />
       </div>
-    </RootLayout>
+    </div>
   );
 }
