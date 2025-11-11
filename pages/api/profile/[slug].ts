@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as controller from '~/server/src/controllers/profile';
 
-
 type Data = {
   success?: boolean;
   error?: string;

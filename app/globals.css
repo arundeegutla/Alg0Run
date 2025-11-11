@@ -142,3 +142,15 @@
     background: #475569;
   }
 }
+
+.typing-test {
+  outline: none;
+}
+
+.curr-letter {
+  text-decoration: underline;
+}
+
+span {
+  white-space: pre;
+}
