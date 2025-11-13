@@ -33,9 +33,9 @@ export default function SecondarySidebar({
   };
 
   return (
-    <div className='w-[320px] bg-[#252526] border-l border-[#3e3e42] flex flex-col h-full overflow-hidden'>
+    <div className='w-[320px] bg-[#252526] border-l border-[#3e3e42] flex flex-col h-full overflow-hidden font-mono'>
       {/* Header */}
-      <div className='px-4 py-2 text-xs font-semibold uppercase text-[#cccccc] border-b border-[#3e3e42] flex items-center justify-between'>
+      <div className='px-4 py-2 text-xs font-semibold uppercase text-[#cccccc] border-b border-[#3e3e42] flex items-center justify-between font-mono'>
         <div className='flex items-center gap-2'>
           <VscGraphLine size={16} />
           <span>Statistics</span>
@@ -60,16 +60,16 @@ export default function SecondarySidebar({
           <div className='space-y-6'>
             {/* Current Session Stats */}
             <div className='space-y-3'>
-              <h3 className='text-sm font-semibold text-[#cccccc] border-b border-[#3e3e42] pb-2'>
+              <h3 className='text-sm font-semibold text-[#cccccc] border-b border-[#3e3e42] pb-2 font-mono'>
                 Current Session
               </h3>
 
               {/* WPM */}
-              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42]'>
-                <div className='text-xs text-[#858585] uppercase mb-1'>
+              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42] font-mono'>
+                <div className='text-xs text-[#858585] uppercase mb-1 font-mono'>
                   Words Per Minute
                 </div>
-                <div className='text-3xl font-bold text-[#4ec9b0]'>
+                <div className='text-3xl font-bold text-[#4ec9b0] font-mono'>
                   {stats.wpm}
                 </div>
                 <div className='mt-2 h-2 bg-[#3e3e42] rounded-full overflow-hidden'>
@@ -83,11 +83,11 @@ export default function SecondarySidebar({
               </div>
 
               {/* Accuracy */}
-              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42]'>
-                <div className='text-xs text-[#858585] uppercase mb-1'>
+              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42] font-mono'>
+                <div className='text-xs text-[#858585] uppercase mb-1 font-mono'>
                   Accuracy
                 </div>
-                <div className='text-3xl font-bold text-[#569cd6]'>
+                <div className='text-3xl font-bold text-[#569cd6] font-mono'>
                   {stats.accuracy.toFixed(1)}%
                 </div>
                 <div className='mt-2 h-2 bg-[#3e3e42] rounded-full overflow-hidden'>
@@ -99,21 +99,21 @@ export default function SecondarySidebar({
               </div>
 
               {/* Time */}
-              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42]'>
-                <div className='text-xs text-[#858585] uppercase mb-1'>
+              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42] font-mono'>
+                <div className='text-xs text-[#858585] uppercase mb-1 font-mono'>
                   Time Elapsed
                 </div>
-                <div className='text-3xl font-bold text-[#dcdcaa]'>
+                <div className='text-3xl font-bold text-[#dcdcaa] font-mono'>
                   {formatTime(stats.time)}
                 </div>
               </div>
 
               {/* Progress */}
-              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42]'>
-                <div className='text-xs text-[#858585] uppercase mb-1'>
+              <div className='bg-[#1e1e1e] rounded-lg p-4 border border-[#3e3e42] font-mono'>
+                <div className='text-xs text-[#858585] uppercase mb-1 font-mono'>
                   Progress
                 </div>
-                <div className='text-3xl font-bold text-[#c586c0]'>
+                <div className='text-3xl font-bold text-[#c586c0] font-mono'>
                   {stats.progress.toFixed(0)}%
                 </div>
                 <div className='mt-2 h-2 bg-[#3e3e42] rounded-full overflow-hidden'>
@@ -125,55 +125,12 @@ export default function SecondarySidebar({
               </div>
             </div>
 
-            {/* Algorithm Info */}
-            <div className='space-y-3'>
-              <h3 className='text-sm font-semibold text-[#cccccc] border-b border-[#3e3e42] pb-2'>
-                Algorithm Details
-              </h3>
-
-              <div className='space-y-2'>
-                <div>
-                  <div className='text-xs text-[#858585] uppercase'>Name</div>
-                  <div className='text-sm text-[#cccccc]'>{algo.name}</div>
-                </div>
-
-                <div>
-                  <div className='text-xs text-[#858585] uppercase'>
-                    Time Complexity
-                  </div>
-                  <div className='text-sm text-[#4ec9b0] font-mono'>
-                    {algo.time_complexity}
-                  </div>
-                </div>
-
-                <div>
-                  <div className='text-xs text-[#858585] uppercase'>
-                    Description
-                  </div>
-                  <div className='text-sm text-[#cccccc] leading-relaxed'>
-                    {algo.description}
-                  </div>
-                </div>
-
-                {algo.usage && (
-                  <div>
-                    <div className='text-xs text-[#858585] uppercase'>
-                      Usage
-                    </div>
-                    <div className='text-sm text-[#cccccc] leading-relaxed'>
-                      {algo.usage}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Tips */}
             <div className='space-y-3'>
-              <h3 className='text-sm font-semibold text-[#cccccc] border-b border-[#3e3e42] pb-2'>
+              <h3 className='text-sm font-semibold text-[#cccccc] border-b border-[#3e3e42] pb-2 font-mono'>
                 Tips
               </h3>
-              <div className='space-y-2 text-sm text-[#858585]'>
+              <div className='space-y-2 text-sm text-[#858585] font-mono'>
                 <div className='flex items-start gap-2'>
                   <span className='text-[#4ec9b0]'>•</span>
                   <span>Focus on accuracy over speed</span>
@@ -190,7 +147,7 @@ export default function SecondarySidebar({
             </div>
           </div>
         ) : (
-          <div className='text-center text-[#858585] mt-8'>
+          <div className='text-center text-[#858585] mt-8 font-mono'>
             Select an algorithm to view statistics
           </div>
         )}

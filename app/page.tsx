@@ -1,17 +1,113 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
+import type { Keyboard3DHandle } from '@/components/Keyboard3D';
+import { Boxes } from '@/components/ui/background-boxes';
+import { Component } from '@/components/ui/animated-hero-with-web-gl-glitter';
 
 const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
 });
 
+const TARGET_TEXT = `// Algorithm Speed Typing`;
+
+// Map characters to QMK key codes
+const charToKeyCode = (char: string): string | null => {
+  const charMap: Record<string, string> = {
+    A: 'KC_A',
+    B: 'KC_B',
+    C: 'KC_C',
+    D: 'KC_D',
+    E: 'KC_E',
+    F: 'KC_F',
+    G: 'KC_G',
+    H: 'KC_H',
+    I: 'KC_I',
+    J: 'KC_J',
+    K: 'KC_K',
+    L: 'KC_L',
+    M: 'KC_M',
+    N: 'KC_N',
+    O: 'KC_O',
+    P: 'KC_P',
+    Q: 'KC_Q',
+    R: 'KC_R',
+    S: 'KC_S',
+    T: 'KC_T',
+    U: 'KC_U',
+    V: 'KC_V',
+    W: 'KC_W',
+    X: 'KC_X',
+    Y: 'KC_Y',
+    Z: 'KC_Z',
+    ' ': 'KC_SPC',
+    '/': 'KC_SLSH',
+    ':': 'KC_SCLN',
+  };
+  return charMap[char.toUpperCase()] || null;
+};
+
+function FloatingPaths({ position }: { position: number }) {
+  const paths = Array.from({ length: 36 }, (_, i) => ({
+    id: i,
+    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
+      380 - i * 5 * position
+    } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
+      152 - i * 5 * position
+    } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
+      684 - i * 5 * position
+    } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
+    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
+    width: 0.5 + i * 0.03,
+  }));
+
+  return (
+    <div className='absolute inset-0 pointer-events-none'>
+      <svg
+        className='w-full h-full text-white/20'
+        viewBox='0 0 696 316'
+        fill='none'
+      >
+        <title>Background Paths</title>
+        {paths.map((path) => (
+          <motion.path
+            key={path.id}
+            d={path.d}
+            stroke='currentColor'
+            strokeWidth={path.width}
+            strokeOpacity={0.1 + path.id * 0.03}
+            initial={{ pathLength: 0.3, opacity: 0.6 }}
+            animate={{
+              pathLength: 1,
+              opacity: [0.3, 0.6, 0.3],
+              pathOffset: [0, 1, 0],
+            }}
+            transition={{
+              // eslint-disable-next-line react-hooks/purity
+              duration: 20 + Math.random() * 10,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: 'linear',
+            }}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 export default function Home() {
-  const [isClient, setIsClient] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [typedText, setTypedText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const keyboardRef = useRef<Keyboard3DHandle>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentIndexRef = useRef(0);
+  const isTypingRef = useRef(true);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -19,10 +115,125 @@ export default function Home() {
     setIsLoggedIn(!!user);
   }, []);
 
+  // Cursor blinking animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowCursor((prev) => !prev);
+    }, 530);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Automated typing effect
+  useEffect(() => {
+    if (!isClient) return;
+
+    currentIndexRef.current = 0;
+    isTypingRef.current = true;
+
+    const typeNextChar = () => {
+      if (
+        !isTypingRef.current ||
+        currentIndexRef.current >= TARGET_TEXT.length
+      ) {
+        // Reset after a delay when complete
+        if (currentIndexRef.current >= TARGET_TEXT.length) {
+          setTimeout(() => {
+            setTypedText('');
+            currentIndexRef.current = 0;
+            isTypingRef.current = true;
+            typeNextChar();
+          }, 2000);
+        }
+        return;
+      }
+
+      const char = TARGET_TEXT[currentIndexRef.current];
+      const keyCode = charToKeyCode(char);
+
+      // Trigger keyboard animation
+      if (keyCode && keyboardRef.current) {
+        keyboardRef.current.triggerKeyPress(keyCode);
+      }
+
+      // Update displayed text
+      setTypedText(TARGET_TEXT.slice(0, currentIndexRef.current + 1));
+      currentIndexRef.current++;
+
+      // Schedule next character (randomized timing for natural feel)
+      const delay = 80 + Math.random() * 120; // 80-200ms
+      typingTimeoutRef.current = setTimeout(typeNextChar, delay);
+    };
+
+    // Start typing immediately
+    typeNextChar();
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      isTypingRef.current = false;
+    };
+  }, [isClient]);
+
   if (!isClient) return null;
 
+  const renderTypedText = () => {
+    const chars = typedText.split('');
+    const targetChars = TARGET_TEXT.split('');
+
+    return (
+      <div className='whitespace-pre'>
+        {targetChars.map((char, index) => {
+          const isTyped = index < chars.length;
+          const isCorrect = isTyped && chars[index] === char;
+          const isCurrent = index === chars.length;
+
+          let colorClass = 'text-slate-500/30';
+          if (isTyped) {
+            colorClass = isCorrect ? 'text-cyan-400' : 'text-red-400';
+          }
+
+          return (
+            <span
+              key={index}
+              className={`${colorClass} ${isTyped ? (isCorrect ? 'text-glow' : 'text-glow-red') : ''}`}
+            >
+              {isTyped ? chars[index] : char}
+              {isCurrent && showCursor && (
+                <span className='inline-block w-0.5 h-[1.2em] bg-cyan-400 ml-0.5 animate-pulse align-middle' />
+              )}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <div className='flex flex-col h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-foreground'>
+    <div
+      ref={containerRef}
+      className='relative flex flex-col h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground overflow-hidden'
+    >
+      {/* Animated Background Paths */}
+      {/* <div className='absolute inset-0 z-0'>
+        <FloatingPaths position={1} />
+        <FloatingPaths position={-1} />
+      </div> */}
+      <Boxes />
+
+      {/* Code Grid Background */}
+      <div className='absolute inset-0 z-0 opacity-10'>
+        <div
+          className='w-full h-full'
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }}
+        />
+      </div>
       {/* Navigation */}
       <nav className='sticky top-4 z-50 flex justify-center px-6'>
         <div className='bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full px-8 py-3 flex items-center gap-8'>
@@ -78,39 +289,53 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <main className='flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 sm:py-3 z-10 min-h-0 overflow-hidden'>
-        <div className='max-w-4xl mx-auto text-center space-y-2 sm:space-y-3'>
-          {/* Title with dev syntax */}
-          <div className='space-y-1 sm:space-y-2'>
-            <h1 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-mono font-bold tracking-tight leading-tight'>
-              <span className='text-slate-400'>{`// `}</span>
-              <span className='text-cyan-400'>Algorithm</span>
-              <br />
-              <span className='text-slate-400'>{`// `}</span>
-              <span className='text-purple-400'>Speed</span>
-              <span className='text-slate-400'>{` Typing`}</span>
-            </h1>
-            <p className='text-[10px] sm:text-xs md:text-sm lg:text-base text-slate-400 font-mono max-w-2xl mx-auto px-2'>
-              {`[ Type complex algorithms, race against peers, dominate the leaderboard ]`}
+      {/* Hero Section - Code Editor Style */}
+      <main className='relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 sm:py-3 min-h-0 overflow-hidden'>
+        <div className='max-w-5xl mx-auto w-full'>
+          {/* Code Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className='font-mono text-center'
+          >
+            <div className='text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight'>
+              <div className='min-h-[2em]'>{renderTypedText()}</div>
+            </div>
+          </motion.div>
+
+          {/* Terminal-style Description */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className='text-center'
+          >
+            <p className='sm:text-xs md:text-sm lg:text-base text-slate-400 font-mono max-w-2xl mx-auto px-2'>
+              {`[ Type algorithms fast, dominate the leaderboard ]`}
             </p>
-          </div>
+          </motion.div>
 
           {/* CTA Button */}
-          <div className='space-y-1 sm:space-y-2'>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className='flex justify-center space-y-1 sm:space-y-2 mt-5'
+          >
             <Link
               href='/type'
-              className='inline-block px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 bg-linear-to-r from-cyan-500 to-blue-500 text-white font-mono font-bold rounded-lg hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 text-[10px] sm:text-xs'
+              className='inline-block px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 bg-slate-800/80 border border-slate-600/50 text-slate-200 font-mono font-bold rounded-sm hover:bg-slate-700/80 hover:border-slate-500/70 transition-all duration-200 text-xs sm:text-sm'
             >
               {`$ start typing...`}
             </Link>
-          </div>
+          </motion.div>
         </div>
       </main>
 
       {/* 3D Keyboard - Fixed to Bottom */}
-      <div className='shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px]'>
-        <Keyboard3D />
+      <div className='relative z-10 shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px]'>
+        <Keyboard3D ref={keyboardRef} />
       </div>
     </div>
   );

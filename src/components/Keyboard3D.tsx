@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 import SceneManager from '@/keyboardUtils/three/SceneManager';
 
 // Preload fonts before rendering
@@ -15,9 +15,21 @@ const preloadFonts = async () => {
   }
 };
 
-export default function Keyboard3D() {
+export interface Keyboard3DHandle {
+  triggerKeyPress: (keyCode: string) => void;
+}
+
+const Keyboard3D = forwardRef<Keyboard3DHandle>((props, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneManagerRef = useRef<SceneManager | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    triggerKeyPress: (keyCode: string) => {
+      if (sceneManagerRef.current) {
+        sceneManagerRef.current.triggerKeyPress(keyCode);
+      }
+    },
+  }));
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -43,4 +55,8 @@ export default function Keyboard3D() {
   }, []);
 
   return <div ref={containerRef} className='w-full h-full overflow-visible' />;
-}
+});
+
+Keyboard3D.displayName = 'Keyboard3D';
+
+export default Keyboard3D;

@@ -256,6 +256,23 @@ export default class SceneManager {
     this.renderer.render(this.scene, this.camera);
   }
 
+  // Trigger a key press animation programmatically
+  triggerKeyPress(keyCode: string) {
+    if (!this.keyManager) return;
+
+    const key = this.keyManager.getKey(keyCode);
+    if (key) {
+      key.setState(3); // KEYSTATES.MOVING_DOWN
+
+      // Auto-release after a short delay
+      setTimeout(() => {
+        if (key) {
+          key.setState(2); // KEYSTATES.MOVING_UP
+        }
+      }, 150);
+    }
+  }
+
   destroy() {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
