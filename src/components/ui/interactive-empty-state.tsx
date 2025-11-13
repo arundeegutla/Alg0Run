@@ -59,7 +59,8 @@ const BUTTON_VARIANTS = {
   animate: { y: 0, opacity: 1, transition: { duration: 0.4, delay: 0.3 } },
 };
 
-export const cn = (...classes) => classes.filter(Boolean).join(' ');
+export const cn = (...classes: (string | undefined | null | false)[]) =>
+  classes.filter(Boolean).join(' ');
 
 interface IconContainerProps {
   children: ReactNode;
@@ -128,16 +129,19 @@ MultiIconDisplay.displayName = 'MultiIconDisplay';
 interface BackgroundProps {
   theme?: string;
 }
-const Background = ({ theme }: BackgroundProps) => (
-  <div
-    aria-hidden='true'
-    className='absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity duration-500'
-    style={{
-      backgroundImage: `radial-gradient(circle at 2px 2px, #fff 1px, transparent 1px)`,
-      backgroundSize: '24px 24px',
-    }}
-  />
-);
+const Background = ({ theme }: BackgroundProps) => {
+  const color = theme === 'dark' ? '#000' : '#fff';
+  return (
+    <div
+      aria-hidden='true'
+      className='absolute inset-0 opacity-0 group-hover:opacity-[0.02] transition-opacity duration-500'
+      style={{
+        backgroundImage: `radial-gradient(circle at 2px 2px, ${color} 1px, transparent 1px)`,
+        backgroundSize: '24px 24px',
+      }}
+    />
+  );
+};
 
 export interface EmptyStateAction {
   label: string;
@@ -156,7 +160,7 @@ export interface EmptyStateProps {
   theme?: 'light' | 'dark' | 'neutral';
   isIconAnimated?: boolean;
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
