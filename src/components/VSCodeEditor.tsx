@@ -15,7 +15,6 @@ import {
   VscRefresh,
   VscZoomIn,
   VscZoomOut,
-  VscSearch,
 } from 'react-icons/vsc';
 
 import { SiPython, SiCplusplus } from 'react-icons/si';
@@ -30,6 +29,10 @@ import AlgoInfoTab from './AlgoInfoTab';
 import { motion } from 'framer-motion';
 import { EmptyState } from './ui/interactive-empty-state';
 import { FolderOpen, Code2, Rocket } from 'lucide-react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/firebase/clientApp';
+import api from '@/firebase/api';
+import { Profile, PlayDetails } from '@/firebase/models';
 
 interface VSCodeEditorProps {
   algo: Algo | null;
@@ -57,6 +60,7 @@ export default function VSCodeEditor({
   const [isFormatting, setIsFormatting] = useState(false);
   const [fontSize, setFontSize] = useState(20);
   const [activeTab, setActiveTab] = useState<'code' | 'info'>('code');
+  const [user] = useAuthState(auth);
 
   // Format code with Prettier (only for TypeScript/JS)
   const [targetCode, setTargetCode] = useState(() => {
@@ -142,6 +146,26 @@ export default function VSCodeEditor({
     }
   }, [currIndex]);
 
+  // Send completion to backend if user is signed in (only once per completion)
+  const [complete, setComplete] = useState(false);
+  const sendCompletion = useCallback(
+    async (playDetails: PlayDetails) => {
+      if (complete) return;
+      setComplete(true);
+      if (user && algo) {
+        try {
+          const token = await user.getIdToken();
+          const profileResp = await api.getProfileByToken(token);
+          const profile = profileResp.data.profile as Profile;
+          await api.createPlay(algo.id, profile.id, playDetails);
+        } catch (err) {
+          console.error('Failed to send completion:', err);
+        }
+      }
+    },
+    [user, algo, complete]
+  );
+
   // Stats calculation
   const computeAndUpdateStats = useCallback(() => {
     // If no algo or not started, emit zeros
@@ -205,6 +229,11 @@ export default function VSCodeEditor({
       Math.sqrt(Math.max(res.time, 0.001));
     res.score = Math.round(res.score);
 
+    // Send completion to backend if finished and not already sent
+    if (phase === PhaseType.Ended && !complete) {
+      sendCompletion(res);
+    }
+
     onStatsUpdate({
       wpm,
       accuracy: progress === 0 ? 0 : accuracyPct,
@@ -221,6 +250,8 @@ export default function VSCodeEditor({
     charsState,
     language,
     onStatsUpdate,
+    sendCompletion,
+    complete,
   ]);
 
   // Refresh stats every second
@@ -274,6 +305,7 @@ export default function VSCodeEditor({
   const handleReset = () => {
     resetTyping();
     hasAutoSwitchedToInfo.current = false;
+    setComplete(false);
     editorRef.current?.focus();
   };
 
@@ -660,12 +692,12 @@ export default function VSCodeEditor({
                   <EmptyState
                     title='No Algorithm Selected'
                     icons={[
+                      <Rocket key='p2' className='h-7 w-7 text-[#22d3ee]' />,
+                      <Code2 key='p3' className='h-7 w-7 text-[#fbbf24]' />,
                       <FolderOpen
                         key='p1'
                         className='h-7 w-7 text-[#6366f1]'
                       />,
-                      <Rocket key='p2' className='h-7 w-7 text-[#22d3ee]' />,
-                      <Code2 key='p3' className='h-7 w-7 text-[#fbbf24]' />,
                     ]}
                     theme='dark'
                     variant='subtle'

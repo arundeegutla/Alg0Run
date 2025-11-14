@@ -198,21 +198,21 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
       const variants = {
         default: {
           light:
-            'bg-white border-dashed border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50/50',
-          dark: 'bg-neutral-900 border-dashed border-2 border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800/0',
+            'bg-white border-dashed border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50/0',
+          dark: 'bg-neutral-900/0 border-dashed border-2 border-neutral-700 hover:border-neutral-600 hover:bg-purple-800/0',
           neutral:
-            'bg-stone-50 border-dashed border-2 border-stone-300 hover:border-stone-400 hover:bg-stone-100/50',
+            'bg-stone-50 border-dashed border-2 border-stone-300 hover:border-stone-400 hover:bg-stone-100/0',
         },
         subtle: {
           light: 'bg-white border border-transparent hover:bg-gray-50/30',
-          dark: 'bg-neutral-900 border border-transparent hover:bg-neutral-800/30',
+          dark: 'bg-neutral-900/0 border border-transparent hover:bg-neutral-800/0',
           neutral:
             'bg-stone-50 border border-transparent hover:bg-stone-100/30',
         },
         error: {
           light:
             'bg-white border border-red-200 bg-red-50/50 hover:bg-red-50/80',
-          dark: 'bg-neutral-900 border border-red-800 bg-red-950/50 hover:bg-red-950/80',
+          dark: 'bg-neutral-900/0 border border-red-800 bg-red-950/50 hover:bg-red-950/80',
           neutral:
             'bg-stone-50 border border-red-300 bg-red-50/50 hover:bg-red-50/80',
         },

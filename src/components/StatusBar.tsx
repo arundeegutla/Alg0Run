@@ -40,26 +40,6 @@ export default function StatusBar({
 
   return (
     <div className='h-6 bg-[#007acc] text-white flex items-center justify-between px-2 text-xs border-t border-[#007acc]'>
-      {/* Left Section */}
-      <div className='flex items-center gap-4'>
-        {/* Branch/Mode indicator */}
-        <div className='flex items-center gap-1 hover:bg-[#005a9e] px-2 py-0.5 rounded cursor-pointer'>
-          <VscGithubInverted size={14} />
-          <span>main</span>
-        </div>
-
-        {/* Status indicators */}
-        <div className='flex items-center gap-1 hover:bg-[#005a9e] px-2 py-0.5 rounded cursor-pointer'>
-          <VscInfo size={14} />
-          <span>0</span>
-        </div>
-
-        <div className='flex items-center gap-1 hover:bg-[#005a9e] px-2 py-0.5 rounded cursor-pointer'>
-          <VscWarning size={14} />
-          <span>0</span>
-        </div>
-      </div>
-
       {/* Center Section - Stats */}
       <div className='flex items-center gap-6'>
         {algoName && (
@@ -106,11 +86,6 @@ export default function StatusBar({
           <VscGithubInverted size={14} />
           <span>GitHub</span>
         </a>
-
-        {/* Notifications */}
-        <div className='flex items-center gap-1 hover:bg-[#005a9e] px-2 py-0.5 rounded cursor-pointer'>
-          <VscBell size={14} />
-        </div>
       </div>
     </div>
   );

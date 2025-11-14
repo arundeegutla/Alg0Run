@@ -32,7 +32,7 @@ export default function TypePage() {
   }, [setAlgorithms]);
 
   return (
-    <div className='flex h-screen w-screen flex-col bg-[#1e1e1e] text-[#cccccc]'>
+    <div className='flex h-screen w-full flex-col bg-[#1e1e1e] text-[#cccccc]'>
       {/* Main Content Area */}
       <div className='flex flex-1 overflow-hidden'>
         {/* Primary Sidebar - Explorer */}
@@ -41,7 +41,6 @@ export default function TypePage() {
             algorithms={algorithms}
             selectedAlgo={selectedAlgo}
             onSelectAlgo={setSelectedAlgo}
-            onClose={() => setShowPrimarySidebar(false)}
           />
         )}
 
