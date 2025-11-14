@@ -34,12 +34,21 @@ export default async function handler(
 
     switch (language) {
       case 'java':
-        formattedCode = await prettier.format(code, {
-          parser: 'java',
-          plugins: [prettierPluginJava],
-          tabWidth: 2,
-          printWidth: 80,
-        });
+        try {
+          formattedCode = await prettier.format(code, {
+            parser: 'java',
+            plugins: [prettierPluginJava],
+            tabWidth: 2,
+            printWidth: 80,
+            useTabs: false,
+            bracketSameLine: true,
+          });
+        } catch (javaFormatError) {
+          const lines = code.split(/\r?\n/);
+          formattedCode = lines
+            .map((line) => line.replace(/\s+$/, ''))
+            .join('\n');
+        }
         break;
 
       case 'cpp':
