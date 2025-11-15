@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import type { Keyboard3DHandle } from '@/components/Keyboard3D';
 import { Boxes } from '@/components/ui/background-boxes';
-import { Component } from '@/components/ui/animated-hero-with-web-gl-glitter';
+import { cn } from '@/lib/utils';
 
 const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
@@ -50,54 +50,6 @@ const charToKeyCode = (char: string): string | null => {
   return charMap[char.toUpperCase()] || null;
 };
 
-function FloatingPaths({ position }: { position: number }) {
-  const paths = Array.from({ length: 36 }, (_, i) => ({
-    id: i,
-    d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${
-      380 - i * 5 * position
-    } -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${
-      152 - i * 5 * position
-    } ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${
-      684 - i * 5 * position
-    } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
-    color: `rgba(15,23,42,${0.1 + i * 0.03})`,
-    width: 0.5 + i * 0.03,
-  }));
-
-  return (
-    <div className='absolute inset-0 pointer-events-none'>
-      <svg
-        className='w-full h-full text-white/20'
-        viewBox='0 0 696 316'
-        fill='none'
-      >
-        <title>Background Paths</title>
-        {paths.map((path) => (
-          <motion.path
-            key={path.id}
-            d={path.d}
-            stroke='currentColor'
-            strokeWidth={path.width}
-            strokeOpacity={0.1 + path.id * 0.03}
-            initial={{ pathLength: 0.3, opacity: 0.6 }}
-            animate={{
-              pathLength: 1,
-              opacity: [0.3, 0.6, 0.3],
-              pathOffset: [0, 1, 0],
-            }}
-            transition={{
-              // eslint-disable-next-line react-hooks/purity
-              duration: 20 + Math.random() * 10,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: 'linear',
-            }}
-          />
-        ))}
-      </svg>
-    </div>
-  );
-}
-
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [typedText, setTypedText] = useState('');
@@ -107,13 +59,7 @@ export default function Home() {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(0);
   const isTypingRef = useRef(true);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    const user = localStorage.getItem('alg0_user');
-    setIsLoggedIn(!!user);
-  }, []);
+  const isClient = typeof window !== 'undefined';
 
   // Cursor blinking animation
   useEffect(() => {
@@ -214,6 +160,8 @@ export default function Home() {
       ref={containerRef}
       className='relative flex flex-col h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground overflow-hidden'
     >
+      <div className='absolute inset-0 w-full h-full bg-slate-900 z-20 mask-[radial-gradient(transparent,white)] pointer-events-none' />
+
       {/* Animated Background Paths */}
       {/* <div className='absolute inset-0 z-0'>
         <FloatingPaths position={1} />
@@ -221,21 +169,8 @@ export default function Home() {
       </div> */}
       <Boxes />
 
-      {/* Code Grid Background */}
-      <div className='absolute inset-0 z-0 opacity-10'>
-        <div
-          className='w-full h-full'
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-          }}
-        />
-      </div>
       {/* Navigation */}
-      <nav className='sticky top-4 z-50 flex justify-center px-6'>
+      <nav className='relative top-4 z-50 flex justify-center px-6 '>
         <div className='bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full px-8 py-3 flex items-center gap-8'>
           <Link
             href='/'
@@ -290,7 +225,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section - Code Editor Style */}
-      <main className='relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 sm:py-3 min-h-0 overflow-hidden'>
+      <main className='z-20 relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 sm:py-3 min-h-0 overflow-hidden'>
         <div className='max-w-5xl mx-auto w-full'>
           {/* Code Content */}
           <motion.div
@@ -334,7 +269,7 @@ export default function Home() {
       </main>
 
       {/* 3D Keyboard - Fixed to Bottom */}
-      <div className='relative z-10 shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px]'>
+      <div className='relative z-20 shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px]'>
         <Keyboard3D ref={keyboardRef} />
       </div>
     </div>

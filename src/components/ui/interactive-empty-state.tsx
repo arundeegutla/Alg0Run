@@ -241,7 +241,7 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
       const colors = {
         title: {
           light: 'text-gray-900',
-          dark: 'text-neutral-100',
+          dark: 'text-neutral-100/40',
           neutral: 'text-stone-900',
         },
         description: {

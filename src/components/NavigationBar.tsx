@@ -1,23 +1,26 @@
 'use client'; // This is a client component 👈🏽
 
 import { usePathname } from 'next/navigation';
-import { FaLaptopCode } from 'react-icons/fa';
 // Icons
 import { MdLeaderboard } from 'react-icons/md';
 // Auth
 import {
   VscBracketDot,
   VscBracketError,
+  VscChip,
   VscExtensions,
   VscFiles,
   VscSearch,
+  VscTerminalBash,
+  VscAccount,
 } from 'react-icons/vsc';
 
 const navigation = [
   { name: 'Home', href: '/', icon: VscBracketDot },
   { name: 'Explorer', href: '/type', icon: VscFiles },
   { name: 'Leaderboard', href: '/leaderboard', icon: MdLeaderboard },
-  { name: 'Extensions', href: '/extensions', icon: VscExtensions },
+  { name: 'race', href: '/race', icon: VscTerminalBash },
+  { name: 'Account', href: '/account', icon: VscAccount },
 ];
 
 export default function NavBar() {

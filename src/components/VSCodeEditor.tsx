@@ -7,6 +7,8 @@ import React, {
   useState,
   useCallback,
 } from 'react';
+import { FaMousePointer, FaKeyboard } from 'react-icons/fa';
+import { MdKeyboardCommandKey, MdKeyboardDoubleArrowUp } from 'react-icons/md';
 import { Algo } from '~/firebase/models';
 import {
   VscLayoutSidebarLeft,
@@ -56,11 +58,29 @@ export default function VSCodeEditor({
   onTogglePrimarySidebar,
   onToggleSecondarySidebar,
 }: VSCodeEditorProps) {
-  const rawCode = algo?.code[language] || '';
+  // Compute available languages for the current algo
+  const availableLanguages = useMemo(() => {
+    if (!algo || !algo.code) return [];
+    return (['python', 'cpp', 'java'] as const).filter(
+      (lang) => !!algo.code[lang]
+    );
+  }, [algo]);
+
+  // If the current language is not available, switch to the first available
+  useEffect(() => {
+    if (!algo || !algo.code) return;
+    if (!availableLanguages.includes(language)) {
+      if (availableLanguages.length > 0) {
+        onLanguageChange(availableLanguages[0]);
+      }
+    }
+  }, [algo, language, availableLanguages, onLanguageChange]);
+  const rawCode = algo?.code?.[language] || '';
   const [isFormatting, setIsFormatting] = useState(false);
   const [fontSize, setFontSize] = useState(20);
   const [activeTab, setActiveTab] = useState<'code' | 'info'>('code');
   const [user] = useAuthState(auth);
+  const [editorFocused, setEditorFocused] = useState(true);
 
   // Format code with Prettier (only for TypeScript/JS)
   const [targetCode, setTargetCode] = useState(() => {
@@ -125,6 +145,16 @@ export default function VSCodeEditor({
     hasAutoSwitchedToInfo.current = false;
     editorRef.current?.focus();
   }, [targetCode, resetTyping]);
+
+  // Focus editor when switching back to code tab
+  useEffect(() => {
+    if (activeTab === 'code') {
+      // Timeout ensures focus after render
+      setTimeout(() => {
+        editorRef.current?.focus();
+      }, 0);
+    }
+  }, [activeTab]);
 
   // Auto-scroll to keep cursor visible
   useEffect(() => {
@@ -254,8 +284,9 @@ export default function VSCodeEditor({
     complete,
   ]);
 
-  // Refresh stats every second
+  // Refresh stats every second, but pause when editor is not focused
   useEffect(() => {
+    if (!editorFocused) return;
     // Run once immediately
     computeAndUpdateStats();
 
@@ -263,7 +294,7 @@ export default function VSCodeEditor({
       computeAndUpdateStats();
     }, 1000);
     return () => clearInterval(id);
-  }, [computeAndUpdateStats]);
+  }, [computeAndUpdateStats, editorFocused]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     let key = e.key;
@@ -276,7 +307,18 @@ export default function VSCodeEditor({
       return;
     }
     if (key === 'Backspace') {
-      deleteTyping(false);
+      // Enhanced: Skip over consecutive whitespace when backspacing
+      let i = currIndex;
+      let skipped = false;
+      while (i >= 0 && targetCode[i] && targetCode[i].trim() === '') {
+        deleteTyping(false);
+        i--;
+        skipped = true;
+      }
+      // If not on whitespace, do normal backspace
+      if (!skipped) {
+        deleteTyping(false);
+      }
       return;
     }
 
@@ -344,6 +386,29 @@ export default function VSCodeEditor({
     }
   };
 
+  useEffect(() => {
+    function onKeyDown(e: {
+      metaKey: unknown;
+      ctrlKey: unknown;
+      shiftKey: unknown;
+      key: string;
+      preventDefault: () => void;
+    }) {
+      const isMac =
+        typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
+      if (
+        ((isMac && e.metaKey) || (!isMac && e.ctrlKey)) &&
+        e.shiftKey &&
+        (e.key === 'K' || e.key === 'k')
+      ) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('algorun-shuffle-algo'));
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   // Calculate indentation guides (tab lines) - only for actual tab characters
   const indentationGuides = useMemo(() => {
     if (!targetCode) return [];
@@ -380,58 +445,36 @@ export default function VSCodeEditor({
           <VscLayoutSidebarRight size={16} />
         </button>
 
-        <div className='flex items-center gap-1 mr-4'>
-          <button
-            onClick={handleDecreaseFontSize}
-            className='p-1 hover:bg-[#505050] rounded'
-            title='Decrease Font Size'
-          >
-            <VscZoomOut size={16} />
-          </button>
-          <span className='text-[#cccccc] text-xs min-w-8 text-center'>
-            {fontSize}px
-          </span>
-          <button
-            onClick={handleIncreaseFontSize}
-            className='p-1 hover:bg-[#505050] rounded'
-            title='Increase Font Size'
-          >
-            <VscZoomIn size={16} />
-          </button>
-        </div>
-
         <div className='ml-auto text-[#cccccc] text-xs'>
-          {algo ? algo.name : 'No Algorithm Selected'}
+          {algo?.name ?? 'No Algorithm Selected'}
         </div>
       </div>
 
       {/* Tab Bar */}
       <div className='h-9 bg-[#2d2d2d] border-b border-[#3e3e42] flex items-center'>
         {algo && (
-          <div className='flex items-center h-full'>
+          <div className='flex items-center h-full w-full'>
             <div
-              className={`flex items-center gap-2 px-4 h-full border-r border-[#3e3e42] text-sm ${
+              onClick={() => setActiveTab('code')}
+              className={`cursor-pointer flex items-center gap-2 px-4 h-full border-r border-[#3e3e42] text-sm ${
                 activeTab === 'code'
                   ? 'bg-[#1e1e1e] text-[#cccccc]'
                   : 'bg-[#2d2d2d] text-[#858585] hover:bg-[#2a2d2e]'
               }`}
             >
-              <button
-                onClick={() => setActiveTab('code')}
-                className='flex items-center gap-2'
-              >
+              <div className='flex items-center gap-2'>
                 {getLanguageIcon(language)}
                 <span>
-                  {algo.name}.
+                  {algo?.name ?? 'Algorithm'}.
                   {language === 'cpp'
                     ? 'cpp'
                     : language === 'python'
                       ? 'py'
                       : 'java'}
                 </span>
-              </button>
+              </div>
               {activeTab === 'code' && (
-                <button
+                <div
                   className='ml-2 hover:bg-[#505050] rounded p-0.5'
                   onClick={(e) => {
                     e.stopPropagation();
@@ -440,12 +483,12 @@ export default function VSCodeEditor({
                   title='Reset'
                 >
                   <VscClose size={14} />
-                </button>
+                </div>
               )}
             </div>
             <button
               onClick={() => setActiveTab('info')}
-              className={`flex items-center gap-2 px-4 h-full border-r border-[#3e3e42] text-sm ${
+              className={`cursor-pointer flex items-center gap-2 px-4 h-full border-r border-[#3e3e42] text-sm ${
                 activeTab === 'info'
                   ? 'bg-[#1e1e1e] text-[#cccccc]'
                   : 'bg-[#2d2d2d] text-[#858585] hover:bg-[#2a2d2e]'
@@ -454,39 +497,76 @@ export default function VSCodeEditor({
               <span>📚</span>
               <span>Info</span>
             </button>
-
-            {/* Language selector */}
-            <div className='flex items-center gap-1 ml-4'>
-              {(['python', 'cpp', 'java'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => onLanguageChange(lang)}
-                  className={`cursor-pointer px-3 py-1 text-xs rounded ${
-                    language === lang
-                      ? 'bg-[#37373d] text-[#cccccc]'
-                      : 'text-[#858585] hover:bg-[#2a2d2e]'
-                  }`}
-                >
-                  {lang === 'cpp'
-                    ? 'C++'
-                    : lang.charAt(0).toUpperCase() + lang.slice(1)}
-                </button>
-              ))}
-            </div>
-
-            {activeTab === 'code' && (
-              <button
-                onClick={handleReset}
-                className='ml-auto mr-4 px-3 py-1 bg-[#0e639c] hover:bg-[#1177bb] text-white text-xs rounded flex items-center gap-1'
-                title='Reset Progress'
-              >
-                <VscRefresh size={14} />
-                Reset
-              </button>
-            )}
           </div>
         )}
       </div>
+
+      {/* Editor Controls Bar */}
+      {algo && activeTab === 'code' && (
+        <div className='flex items-center justify-between border-b border-[#3C3C3C] bg-[#252526] px-4 py-1'>
+          <div className='flex items-center space-x-2'>
+            <button
+              onClick={handleReset}
+              disabled={isFormatting}
+              className='h-8 px-3 py-1 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded flex items-center gap-1 border border-transparent disabled:opacity-60'
+              title='Reset Progress'
+            >
+              {isFormatting ? (
+                <span className='animate-spin'>
+                  <VscRefresh size={14} />
+                </span>
+              ) : (
+                <VscRefresh size={14} />
+              )}
+              {isFormatting ? 'Formatting...' : 'Reset'}
+            </button>
+            <button
+              onClick={handleDecreaseFontSize}
+              className='h-8 px-2 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded'
+              title='Decrease Font Size'
+            >
+              <VscZoomOut size={14} />
+            </button>
+            <span className='text-[#cccccc] text-xs min-w-8 text-center'>
+              {fontSize}px
+            </span>
+            <button
+              onClick={handleIncreaseFontSize}
+              className='h-8 px-2 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded'
+              title='Increase Font Size'
+            >
+              <VscZoomIn size={14} />
+            </button>
+          </div>
+          <div className='flex items-center space-x-2'>
+            <label
+              htmlFor='language-select'
+              className='text-xs text-[#cccccc] mr-2'
+            >
+              Language:
+            </label>
+            <select
+              id='language-select'
+              value={language}
+              onChange={(e) =>
+                onLanguageChange(e.target.value as 'python' | 'cpp' | 'java')
+              }
+              className='bg-[#1e1e1e] text-[#cccccc] border border-[#3e3e42] rounded px-2 py-1 text-xs focus:outline-none'
+              style={{ minWidth: 90 }}
+            >
+              {availableLanguages.map((lang) => (
+                <option key={lang} value={lang}>
+                  {lang === 'python'
+                    ? 'Python'
+                    : lang === 'cpp'
+                      ? 'C++'
+                      : 'Java'}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
 
       {/* Editor Content */}
       <div className='flex-1 relative overflow-hidden'>
@@ -523,8 +603,41 @@ export default function VSCodeEditor({
                     ref={editorRef}
                     tabIndex={0}
                     onKeyDown={handleKeyDown}
+                    onFocus={() => setEditorFocused(true)}
+                    onBlur={() => setEditorFocused(false)}
                     className='absolute inset-0 overflow-auto focus:outline-none'
                   >
+                    {/* Overlay when not focused: blurry, hover to focus */}
+                    {!editorFocused && (
+                      <div
+                        className='z-20 flex flex-col items-center justify-center bg-black/40 select-none backdrop-blur-sm transition-all duration-200'
+                        style={{
+                          pointerEvents: 'auto',
+                          cursor: 'pointer',
+                          position: 'fixed',
+                          top: editorRef.current
+                            ? editorRef.current.getBoundingClientRect().top
+                            : 0,
+                          left: editorRef.current
+                            ? editorRef.current.getBoundingClientRect().left
+                            : 0,
+                          width: editorRef.current
+                            ? editorRef.current.getBoundingClientRect().width
+                            : '100%',
+                          height: editorRef.current
+                            ? editorRef.current.getBoundingClientRect().height
+                            : '100%',
+                        }}
+                        onMouseEnter={() => {
+                          editorRef.current?.focus();
+                        }}
+                      >
+                        <FaMousePointer className='mb-2 text-2xl text-[#4ec9b0]' />
+                        <span className='text-[#cccccc] text-base font-mono bg-[#222c] px-3 py-1 rounded shadow'>
+                          Hover to focus
+                        </span>
+                      </div>
+                    )}
                     <div className='relative'>
                       {/* Indentation guides (tab lines) - only for actual tab characters */}
                       {indentationGuides.length > 0 && (
@@ -653,7 +766,7 @@ export default function VSCodeEditor({
                                       left: '-2px',
                                       top: '-3px',
                                       width: 'calc(1ch + 4px)',
-                                      height: 'calc(100% + 6px)',
+                                      height: `${fontSize * 1.5}px`,
                                       background: 'rgba(78, 201, 176, 0.35)',
                                       border:
                                         '1px solid rgba(255, 255, 255, 0.35)',
@@ -683,7 +796,12 @@ export default function VSCodeEditor({
                 </div>
               </div>
             ) : (
-              <div className='h-full flex items-center justify-center bg-[#18181b]'>
+              <div className='h-full flex flex-col items-center justify-center bg-[#18181b]'>
+                <div className='font-mono text-4xl font-bold transition -mb-3'>
+                  <span className='text-slate-400/50'>{`{ `}</span>
+                  <span className='text-slate-300/50'>alg0run</span>
+                  <span className='text-slate-400/50'>{` }`}</span>
+                </div>
                 <motion.div
                   initial={{ y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -702,9 +820,37 @@ export default function VSCodeEditor({
                     theme='dark'
                     variant='subtle'
                     size='lg'
-                    className='font-mono text-[#e0e0e0]'
+                    className='font-mono text-[#000908]'
                   />
                 </motion.div>
+                <div className='-mt-8 flex flex-col items-center gap-2'>
+                  <div className='text-neutral-100/40 text-sm flex items-center gap-2'>
+                    <span>Shuffle Algorithm</span>
+                    <span className='flex items-center gap-1'>
+                      <span
+                        className='rounded bg-[#23232b] px-2 py-1 text-xs font-mono border border-[#444] flex items-center justify-center'
+                        style={{ boxShadow: '0 1px 2px #0002' }}
+                      >
+                        <MdKeyboardCommandKey size={16} />
+                      </span>
+                      <span
+                        className='rounded bg-[#23232b] px-2 py-1 text-xs font-mono border border-[#444] flex items-center justify-center'
+                        style={{ boxShadow: '0 1px 2px #0002' }}
+                      >
+                        <MdKeyboardDoubleArrowUp size={16} />
+                      </span>
+                      <span
+                        className='rounded bg-[#23232b] px-2 py-1 text-xs font-mono border border-[#444] flex items-center justify-center'
+                        style={{ boxShadow: '0 1px 2px #0002' }}
+                      >
+                        K
+                      </span>
+                    </span>
+                  </div>
+                  <div className='text-[#444] text-xs'>
+                    (Ctrl+Shift+K on Windows/Linux)
+                  </div>
+                </div>
               </div>
             )}
           </>
