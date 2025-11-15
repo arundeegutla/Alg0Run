@@ -54,7 +54,12 @@ const Keyboard3D = forwardRef<Keyboard3DHandle>((props, ref) => {
     };
   }, []);
 
-  return <div ref={containerRef} className='w-full h-full overflow-visible' />;
+  return (
+    <div
+      ref={containerRef}
+      className='w-full h-full overflow-visible mx-auto'
+    />
+  );
 });
 
 Keyboard3D.displayName = 'Keyboard3D';

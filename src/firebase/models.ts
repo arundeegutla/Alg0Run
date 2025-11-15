@@ -18,15 +18,16 @@ export type ProfileBasic = {
 
 export type Algo = {
   id: string;
-  name: string;
+  name?: string;
   code: {
-    python: string;
-    java: string;
-    cpp: string;
+    python?: string;
+    java?: string;
+    cpp?: string;
   };
-  time_complexity: string;
-  description: string;
-  usage: string;
+  time_complexity?: string;
+  description?: string;
+  usage?: string;
+  category?: string;
 };
 
 export type Play = {

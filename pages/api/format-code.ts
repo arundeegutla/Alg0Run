@@ -52,13 +52,14 @@ export default async function handler(
         break;
 
       case 'cpp':
-      case 'python':
-        // Prettier doesn't support C++ or Python well, so just clean whitespace
+      case 'python': {
+        // Prettier doesn't support C++ or Python well, so just clean whitespace and convert tabs to spaces
         const lines = code.split(/\r?\n/);
         formattedCode = lines
-          .map((line) => line.replace(/\s+$/, ''))
+          .map((line) => line.replace(/\t/g, '  ').replace(/\s+$/, ''))
           .join('\n');
         break;
+      }
 
       case 'typescript':
       case 'javascript':
