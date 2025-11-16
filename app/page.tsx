@@ -207,16 +207,7 @@ export default function Home() {
                 {`[ logout ]`}
               </button>
             ) : (
-              <button
-                onClick={() => {
-                  const username = prompt('Enter username:');
-                  if (username) {
-                    localStorage.setItem('alg0_user', username);
-                    setIsLoggedIn(true);
-                  }
-                }}
-                className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
-              >
+              <button className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'>
                 {`[ login ]`}
               </button>
             )}
