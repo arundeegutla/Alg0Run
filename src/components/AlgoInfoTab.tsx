@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { Algo, PlayBasic } from '~/firebase/models';
+import { Algo, PlayBasic } from '@/server/firebase/models';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { SiPython, SiCplusplus } from 'react-icons/si';
 import { FaJava } from 'react-icons/fa';
-import { auth } from '@/firebase/clientApp';
+import { auth } from '@/server/firebase/clientApp';
 
 interface AlgoInfoTabProps {
   algo: Algo | null;

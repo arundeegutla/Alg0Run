@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Algo } from '~/firebase/models';
+import { Algo } from '@/server/firebase/models';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 import { MdKeyboardCommandKey, MdKeyboardDoubleArrowUp } from 'react-icons/md';
 

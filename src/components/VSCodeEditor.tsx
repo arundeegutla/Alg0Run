@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { FaMousePointer, FaKeyboard } from 'react-icons/fa';
 import { MdKeyboardCommandKey, MdKeyboardDoubleArrowUp } from 'react-icons/md';
-import { Algo } from '~/firebase/models';
+import { Algo } from '@/server/firebase/models';
 import {
   VscLayoutSidebarLeft,
   VscLayoutSidebarRight,
@@ -32,9 +32,9 @@ import { motion } from 'framer-motion';
 import { EmptyState } from './ui/interactive-empty-state';
 import { FolderOpen, Code2, Rocket } from 'lucide-react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/firebase/clientApp';
-import api from '@/firebase/api';
-import { Profile, PlayDetails } from '@/firebase/models';
+import { auth } from '@/server/firebase/clientApp';
+import api from '@/server/firebase/api';
+import { Profile, PlayDetails } from '@/server/firebase/models';
 
 interface VSCodeEditorProps {
   algo: Algo | null;
