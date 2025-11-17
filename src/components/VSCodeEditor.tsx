@@ -7,13 +7,15 @@ import React, {
   useState,
   useCallback,
 } from 'react';
-import useTypingGame, { CharStateType } from 'react-typing-game-hook';
+import useTypingGame, {
+  CharStateType,
+  PhaseType,
+} from 'react-typing-game-hook';
 import AlgoInfoTab from './AlgoInfoTab';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { trpc } from '@/server/trpc/client';
 import { Algo, PlayDetails, Profile } from '@/server/trpc/types';
-
 import { formatCodeAction } from './actions';
 import MenuBar from './VSCodeEditor/MenuBar';
 import TabBar from './VSCodeEditor/TabBar';
@@ -43,32 +45,6 @@ export default function VSCodeEditor({
   onTogglePrimarySidebar,
   onToggleSecondarySidebar,
 }: VSCodeEditorProps) {
-  const rawCode = algo?.code?.[language] || '';
-  const [isFormatting, setIsFormatting] = useState(false);
-  const [fontSize, setFontSize] = useState(20);
-  const [activeTab, setActiveTab] = useState<'code' | 'info'>('code');
-  const [user] = useAuthState(auth);
-  const [editorFocused, setEditorFocused] = useState(true);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const cursorRef = useRef<HTMLSpanElement>(null);
-  const hasAutoSwitchedToInfo = useRef(false);
-  const [complete, setComplete] = useState(false);
-  const createPlayMutation = trpc.algo.createPlay.useMutation();
-  const [targetCode, setTargetCode] = useState(() => {
-    if (!rawCode) return '';
-    if (language === 'cpp' || language === 'java' || language === 'python') {
-      const lines = rawCode.split(/\r?\n/);
-      return lines.map((line) => line.replace(/\s+$/, '')).join('\n');
-    }
-    return rawCode;
-  });
-  const {
-    states: { charsState, length, currIndex, errorChar, phase },
-    actions: { insertTyping, resetTyping, deleteTyping, getDuration },
-  } = useTypingGame(targetCode, {
-    skipCurrentWordOnSpace: false,
-  });
-
   const availableLanguages = useMemo(() => {
     if (!algo || !algo.code) return [];
     return (['python', 'cpp', 'java'] as const).filter(
@@ -76,6 +52,7 @@ export default function VSCodeEditor({
     );
   }, [algo]);
 
+  // If the current language is not available, switch to the first available
   useEffect(() => {
     if (!algo || !algo.code) return;
     if (!availableLanguages.includes(language)) {
@@ -84,6 +61,29 @@ export default function VSCodeEditor({
       }
     }
   }, [algo, language, availableLanguages, onLanguageChange]);
+  const rawCode = algo?.code?.[language] || '';
+  const [isFormatting, setIsFormatting] = useState(false);
+  const [fontSize, setFontSize] = useState(20);
+  const [activeTab, setActiveTab] = useState<'code' | 'info'>('code');
+  const [user] = useAuthState(auth);
+  const [editorFocused, setEditorFocused] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
+  const [stats, setStats] = useState<{
+    wpm: number;
+    accuracy: number;
+    time: number;
+    progress: number;
+  }>({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
+
+  // Format code with Prettier (only for TypeScript/JS)
+  const [targetCode, setTargetCode] = useState(() => {
+    if (!rawCode) return '';
+    if (language === 'cpp' || language === 'java' || language === 'python') {
+      const lines = rawCode.split(/\r?\n/);
+      return lines.map((line) => line.replace(/\s+$/, '')).join('\n');
+    }
+    return rawCode;
+  });
 
   const formatCode = useCallback(
     async (rawCode: string) => {
@@ -113,20 +113,33 @@ export default function VSCodeEditor({
   }, [rawCode, language, formatCode]);
 
   useEffect(() => {
-    resetTyping();
-    setActiveTab('code');
-    hasAutoSwitchedToInfo.current = false;
-    editorRef.current?.focus();
-  }, [targetCode, resetTyping]);
+    onStatsUpdate(stats);
+  }, [stats, onStatsUpdate]);
 
+  const {
+    states: { charsState, length, currIndex, errorChar, phase },
+    actions: { insertTyping, resetTyping, deleteTyping, getDuration },
+  } = useTypingGame(targetCode, {
+    skipCurrentWordOnSpace: false,
+  });
+
+  const editorRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLSpanElement>(null);
+  const hasAutoSwitchedToInfo = useRef(false);
+
+  // Reset hook when algo or language (text) changes
+
+  // Focus editor when switching back to code tab
   useEffect(() => {
     if (activeTab === 'code') {
+      // Timeout ensures focus after render
       setTimeout(() => {
         editorRef.current?.focus();
       }, 0);
     }
   }, [activeTab]);
 
+  // Auto-scroll to keep cursor visible
   useEffect(() => {
     if (cursorRef.current && editorRef.current) {
       const cursorElement = cursorRef.current;
@@ -135,14 +148,20 @@ export default function VSCodeEditor({
       const cursorRect = cursorElement.getBoundingClientRect();
       const editorRect = editorElement.getBoundingClientRect();
 
+      // Check if cursor is below the visible area
       if (cursorRect.bottom > editorRect.bottom - 50) {
         cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else if (cursorRect.top < editorRect.top + 50) {
+      }
+      // Check if cursor is above the visible area
+      else if (cursorRect.top < editorRect.top + 50) {
         cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   }, [currIndex]);
 
+  const createPlayMutation = trpc.algo.createPlay.useMutation();
+
+  const [complete, setComplete] = useState(false);
   const sendCompletion = useCallback(
     async (playDetails: PlayDetails) => {
       if (complete) return;
@@ -150,6 +169,8 @@ export default function VSCodeEditor({
       if (user && algo) {
         try {
           const token = await user.getIdToken();
+          // Use tRPC to get profile by token
+          // Use tRPC query imperatively
           const { refetch } = trpc.profile.getProfileByToken.useQuery(
             { idToken: token },
             { enabled: false }
@@ -170,14 +191,18 @@ export default function VSCodeEditor({
     [user, algo, complete, createPlayMutation]
   );
 
-  // Compute and update stats
-  const computeAndUpdateStats = useCallback(() => {
+  // Stats calculation
+  const computeStats = useCallback(() => {
+    // Switch to info tab when race completes (only once)
+    if (phase === PhaseType.Ended && !hasAutoSwitchedToInfo.current) {
+      hasAutoSwitchedToInfo.current = true;
+      setTimeout(() => setActiveTab('info'), 1000);
+    }
+
     const durationMs = getDuration();
     const timeSec = durationMs / 1000;
     const totalLength = length;
     const typedCount = currIndex >= 0 ? currIndex + 1 : 0;
-
-    // Accuracy based on current state of typed characters (not cumulative errors)
     let currentCorrect = 0;
     for (let i = 0; i < typedCount; i++) {
       if (charsState[i] === CharStateType.Correct) {
@@ -186,72 +211,119 @@ export default function VSCodeEditor({
     }
     const rawAccuracy = typedCount > 0 ? currentCorrect / typedCount : 0;
     const accuracyPct = Math.max(rawAccuracy * 100, 0);
-
-    // WPM using provided formula (adapted to typed characters)
     const wpmRaw = (60 * 1000 * typedCount) / (4.7 * (durationMs || 1));
     const wpm =
       Number.isFinite(wpmRaw) && !isNaN(wpmRaw) ? Math.round(wpmRaw) : 0;
-
     const progress = totalLength > 0 ? (typedCount / totalLength) * 100 : 0;
 
-    // Optional score calculation (not surfaced in UI yet)
-    const mult = {
-      python: 0.7,
-      java: 1,
-      cpp: 1.3,
-    }[language];
-
-    const res = {
-      language,
-      code_length: totalLength,
-      accuracy: Math.max((typedCount - errorChar) / (typedCount || 1), 0),
-      wpm: wpmRaw,
-      time: timeSec,
-      date_completed: Date.now(),
-      score: 0,
-    };
-
-    res.score =
-      (0.01 *
-        (mult || 1) *
-        Math.pow(res.code_length, 1.3) *
-        Math.pow(res.accuracy, 3) *
-        res.wpm) /
-      Math.sqrt(Math.max(res.time, 0.001));
-    res.score = Math.round(res.score);
-
-    // Update stats in parent
-    onStatsUpdate({
+    setStats({
       wpm,
-      accuracy: accuracyPct,
+      accuracy: progress === 0 ? 0 : accuracyPct,
       time: timeSec,
-      progress,
+      progress: Number.isFinite(progress) && !isNaN(progress) ? progress : 0,
     });
-  }, [
-    getDuration,
-    length,
-    currIndex,
-    charsState,
-    errorChar,
-    language,
-    onStatsUpdate,
-  ]);
+  }, [length, currIndex, charsState, errorChar, language, phase, getDuration]);
+
+  // Call sendCompletion only when phase is Ended and only once per session
+  useEffect(() => {
+    if (phase === PhaseType.Ended && !complete) {
+      setIsTyping(false);
+      const mult = {
+        python: 0.7,
+        java: 1,
+        cpp: 1.3,
+      }[language];
+      const playDetails = {
+        language,
+        code_length: length,
+        accuracy: stats.accuracy / 100,
+        wpm: stats.wpm,
+        time: stats.time,
+        date_completed: Date.now(),
+        score: 0,
+      };
+      playDetails.score =
+        (0.01 *
+          (mult || 1) *
+          Math.pow(playDetails.code_length, 1.3) *
+          Math.pow(playDetails.accuracy, 3) *
+          playDetails.wpm) /
+        Math.sqrt(Math.max(playDetails.time, 0.001));
+      playDetails.score = Math.round(playDetails.score);
+      sendCompletion(playDetails);
+    }
+  }, [phase, complete, sendCompletion, length, language, stats]);
 
   useEffect(() => {
-    if (!editorFocused) return;
-    computeAndUpdateStats();
+    if (!editorFocused || !isTyping) return;
+    computeStats();
     const id = setInterval(() => {
-      computeAndUpdateStats();
+      computeStats();
     }, 1000);
     return () => clearInterval(id);
-  }, [computeAndUpdateStats, editorFocused]);
+  }, [computeStats, editorFocused, isTyping]);
 
-  const handleReset = () => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    let key = e.key;
+    if (key.length === 1 || key === 'Backspace' || key === 'Escape') {
+      e.preventDefault();
+    }
+    if (key === 'Escape') {
+      resetTyping();
+      return;
+    }
+    if (key === 'Backspace') {
+      let i = currIndex;
+      let skipped = false;
+      while (i >= 0 && targetCode[i] && targetCode[i].trim() === '') {
+        deleteTyping(false);
+        i--;
+        skipped = true;
+      }
+      if (!skipped) {
+        deleteTyping(false);
+      }
+      return;
+    }
+
+    if (key === 'Tab') key = '\t';
+    if (key === 'Enter') key = '\n';
+    if (key.length === 1) {
+      if (
+        targetCode[currIndex + 1] === '\n' &&
+        targetCode[currIndex + 1] !== key
+      ) {
+        return;
+      }
+
+      insertTyping(key);
+      setIsTyping(true);
+
+      if (key === '\n' && currIndex + 2 < length) {
+        let i = currIndex + 1;
+        while (targetCode[i + 1] && targetCode[i + 1].trim() === '') {
+          insertTyping(targetCode[i + 1]);
+          i += 1;
+        }
+      }
+    }
+  };
+
+  const handleReset = useCallback(() => {
     resetTyping();
     hasAutoSwitchedToInfo.current = false;
     setComplete(false);
+    setIsTyping(false);
+    setStats({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
     editorRef.current?.focus();
-  };
+  }, [resetTyping]);
+
+  useEffect(() => {
+    handleReset();
+    setActiveTab('code');
+    hasAutoSwitchedToInfo.current = false;
+    editorRef.current?.focus();
+  }, [targetCode, handleReset]);
 
   const handleIncreaseFontSize = () => {
     setFontSize((prev) => Math.min(prev + 2, 32));
@@ -259,6 +331,19 @@ export default function VSCodeEditor({
 
   const handleDecreaseFontSize = () => {
     setFontSize((prev) => Math.max(prev - 2, 10));
+  };
+
+  const getSyntaxLanguage = (lang: 'python' | 'cpp' | 'java'): string => {
+    switch (lang) {
+      case 'python':
+        return 'python';
+      case 'cpp':
+        return 'cpp';
+      case 'java':
+        return 'java';
+      default:
+        return 'text';
+    }
   };
 
   useEffect(() => {
@@ -286,12 +371,14 @@ export default function VSCodeEditor({
 
   return (
     <div className='flex flex-col h-full'>
+      {/* Menu Bar */}
       <MenuBar
         algo={algo}
         onTogglePrimarySidebar={onTogglePrimarySidebar}
         onToggleSecondarySidebar={onToggleSecondarySidebar}
       />
 
+      {/* Tab Bar */}
       <TabBar
         algo={algo}
         language={language}
@@ -303,13 +390,13 @@ export default function VSCodeEditor({
       {/* Editor Controls Bar */}
       {algo && activeTab === 'code' && (
         <EditorControlsBar
+          handleReset={handleReset}
           isFormatting={isFormatting}
+          handleIncreaseFontSize={handleIncreaseFontSize}
+          handleDecreaseFontSize={handleDecreaseFontSize}
           fontSize={fontSize}
           language={language}
           availableLanguages={availableLanguages}
-          handleReset={handleReset}
-          handleIncreaseFontSize={handleIncreaseFontSize}
-          handleDecreaseFontSize={handleDecreaseFontSize}
           onLanguageChange={onLanguageChange}
         />
       )}
@@ -330,15 +417,14 @@ export default function VSCodeEditor({
                 targetCode={targetCode}
                 fontSize={fontSize}
                 editorRef={editorRef}
+                handleKeyDown={handleKeyDown}
+                setEditorFocused={setEditorFocused}
                 editorFocused={editorFocused}
+                getSyntaxLanguage={getSyntaxLanguage}
                 language={language}
                 currIndex={currIndex}
                 charsState={charsState}
                 cursorRef={cursorRef}
-                setEditorFocused={setEditorFocused}
-                deleteTyping={deleteTyping}
-                insertTyping={insertTyping}
-                resetTyping={resetTyping}
               />
             ) : (
               <NullAlgo />

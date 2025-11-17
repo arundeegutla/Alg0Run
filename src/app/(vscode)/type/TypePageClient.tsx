@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import VSCodeEditor from '~/components/VSCodeEditor';
 import PrimarySidebar from '~/components/PrimarySidebar';
@@ -237,7 +238,7 @@ export default function TypePageClient({ algorithms }: TypePageClientProps) {
             algo={selectedAlgo}
             language={currentLanguage}
             onLanguageChange={setCurrentLanguage}
-            onStatsUpdate={setStats}
+            onStatsUpdate={(stats) => setStats(stats)}
             onTogglePrimarySidebar={() =>
               setShowPrimarySidebar(!showPrimarySidebar)
             }

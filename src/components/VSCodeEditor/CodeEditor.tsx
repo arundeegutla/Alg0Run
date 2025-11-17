@@ -7,16 +7,15 @@ import { CharStateType } from 'react-typing-game-hook';
 interface CodeEditorProps {
   fontSize: number;
   targetCode: string;
-  editorRef: React.RefObject<HTMLDivElement | null>;
+  editorRef: React.RefObject<HTMLDivElement>;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   setEditorFocused: React.Dispatch<React.SetStateAction<boolean>>;
   editorFocused: boolean;
+  getSyntaxLanguage: (lang: 'python' | 'cpp' | 'java') => string;
   language: 'python' | 'cpp' | 'java';
   currIndex: number;
-  charsState: (0 | 1 | 2)[];
-  cursorRef: React.RefObject<HTMLSpanElement | null>;
-  resetTyping: () => void;
-  insertTyping: (char: string) => void;
-  deleteTyping: (skipWhitespace: boolean) => void;
+  charsState: (0 | 2 | 1)[];
+  cursorRef: React.RefObject<HTMLSpanElement>;
 }
 
 export default function CodeEditor({
@@ -29,9 +28,8 @@ export default function CodeEditor({
   currIndex,
   charsState,
   cursorRef,
-  resetTyping,
-  insertTyping,
-  deleteTyping,
+  handleKeyDown,
+  getSyntaxLanguage,
 }: CodeEditorProps) {
   // Store bounding rect for overlay positioning
   const [editorRect, setEditorRect] = React.useState<{
@@ -53,114 +51,7 @@ export default function CodeEditor({
       });
     }
   }, [editorFocused, editorRef]);
-  // Optimized handleKeyDown for performance, defined as a normal function to avoid update depth issues
-  function handleKey(e: React.KeyboardEvent<HTMLDivElement>) {
-    let { key } = e;
-    // Only prevent default for handled keys
-    if (
-      key.length === 1 ||
-      key === 'Backspace' ||
-      key === 'Escape' ||
-      key === 'Tab' ||
-      key === 'Enter'
-    ) {
-      e.preventDefault();
-    } else {
-      return;
-    }
 
-    // Fast path: Escape resets
-    if (key === 'Escape') {
-      resetTyping();
-      return;
-    }
-
-    // Fast path: Backspace
-    if (key === 'Backspace') {
-      let i = currIndex;
-      // Skip whitespace backwards
-      while (i >= 0 && targetCode[i] && targetCode[i].trim() === '') {
-        deleteTyping(false);
-        i--;
-      }
-      if (i === currIndex) {
-        // No whitespace skipped, delete current
-        deleteTyping(false);
-      }
-      return;
-    }
-
-    // Normalize key for Tab/Enter
-    if (key === 'Tab') key = '\t';
-    else if (key === 'Enter') key = '\n';
-
-    // Only process single character keys
-    if (key.length === 1) {
-      // Prevent typing if next char is newline and not matching
-      const nextChar = targetCode[currIndex + 1];
-      if (nextChar === '\n' && nextChar !== key) {
-        return;
-      }
-
-      insertTyping(key);
-
-      // If Enter, auto-insert following whitespace
-      if (key === '\n' && currIndex + 2 < targetCode.length) {
-        let i = currIndex + 1;
-        while (targetCode[i + 1] && targetCode[i + 1].trim() === '') {
-          insertTyping(targetCode[i + 1]);
-          i++;
-        }
-      }
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    let { key } = e;
-
-    if (key === 'Escape') {
-      resetTyping();
-      return;
-    }
-    if (key === 'Backspace') {
-      deleteTyping(false);
-      return;
-    }
-
-    if (key === 'Tab') key = '\t';
-    if (key === 'Enter') key = '\n';
-    if (key.length === 1) {
-      if (
-        targetCode[currIndex + 1] === '\n' &&
-        targetCode[currIndex + 1] !== key
-      ) {
-        return;
-      }
-
-      insertTyping(key);
-
-      if (key === '\n' && currIndex + 2 < length) {
-        let i = currIndex + 1;
-        while (targetCode[i + 1].trim() === '') {
-          insertTyping(' ');
-          i += 1;
-        }
-      }
-    }
-  };
-
-  const getSyntaxLanguage = (lang: 'python' | 'cpp' | 'java'): string => {
-    switch (lang) {
-      case 'python':
-        return 'python';
-      case 'cpp':
-        return 'cpp';
-      case 'java':
-        return 'java';
-      default:
-        return 'text';
-    }
-  };
   return (
     <div className='h-full flex'>
       {/* Line Numbers */}
@@ -210,38 +101,8 @@ export default function CodeEditor({
             </div>
           )}
           <div className='relative'>
+            {/* Grayed-out code background for untyped code, syntax highlight for typed code */}
             <div className='absolute inset-0'>
-              <div
-                className='absolute inset-0 p-4'
-                style={{
-                  opacity: 0.3,
-                  filter: 'grayscale(1)',
-                  pointerEvents: 'none',
-                }}
-              >
-                <SyntaxHighlighter
-                  language={getSyntaxLanguage(language)}
-                  style={oneDark}
-                  customStyle={{
-                    margin: 0,
-                    padding: 0,
-                    background: 'transparent',
-                    fontSize: `${fontSize}px`,
-                    lineHeight: `${fontSize * 1.5}px`,
-                    fontFamily: 'monospace',
-                  }}
-                  codeTagProps={{
-                    style: {
-                      fontFamily: 'monospace',
-                      fontSize: `${fontSize}px`,
-                      lineHeight: `${fontSize * 1.5}px`,
-                    },
-                  }}
-                >
-                  {targetCode}
-                </SyntaxHighlighter>
-              </div>
-
               <div
                 className='absolute inset-0 p-4'
                 style={{ pointerEvents: 'none' }}
@@ -270,6 +131,7 @@ export default function CodeEditor({
               </div>
             </div>
 
+            {/* Typed overlay (no pointer events so scroll is shared) with visible cursor */}
             <div
               className='typing-test pointer-events-none absolute inset-0 p-4 top-0 left-0 font-mono whitespace-pre'
               style={{
@@ -282,19 +144,25 @@ export default function CodeEditor({
                 const isIncorrect = state === CharStateType.Incorrect;
                 const isCurrent = currIndex + 1 === index;
 
+                // Show errors with red background, cursor underline
+                // Make text transparent so syntax-highlighted code shows through
                 const bgColor = isIncorrect
                   ? 'rgba(239, 68, 68, 0.3)'
                   : 'transparent';
 
+                const color =
+                  state === CharStateType.Incomplete
+                    ? 'rgb(99 99 99)'
+                    : 'transparent';
                 return (
                   <span
                     key={char + index}
                     style={{
                       backgroundColor: bgColor,
-                      color: 'transparent',
+                      color,
                       position: 'relative',
+                      fontFamily: 'monospace',
                     }}
-                    className={isCurrent ? 'curr-letter' : ''}
                   >
                     {char === '\n' ? ' ' : ''}
                     {char}

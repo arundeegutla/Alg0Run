@@ -1,4 +1,4 @@
-import React, { memo, useId, forwardRef, ReactNode } from 'react';
+import React, { memo, forwardRef, ReactNode } from 'react';
 import { motion, LazyMotion, domAnimation } from 'framer-motion';
 
 const ICON_VARIANTS = {
@@ -179,11 +179,6 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
     }: EmptyStateProps,
     ref
   ) => {
-    // Use a single useId for both title and description for hydration stability
-    const baseId = useId();
-    const titleId = baseId + '-title';
-    const descriptionId = baseId + '-desc';
-
     const baseClasses =
       'group transition-all duration-300 rounded-xl relative overflow-hidden text-center flex flex-col items-center justify-center';
 
@@ -309,12 +304,9 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
             )}
 
             <motion.div variants={CONTENT_VARIANTS} className='space-y-2 mb-6'>
-              <h2 id={titleId} className={getTextClasses('title', size, theme)}>
-                {title}
-              </h2>
+              <h2 className={getTextClasses('title', size, theme)}>{title}</h2>
               {description && (
                 <p
-                  id={descriptionId}
                   className={cn(
                     getTextClasses('description', size, theme).replace(
                       'font-semibold',

@@ -6,9 +6,6 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import type { Keyboard3DHandle } from '@/components/Keyboard3D';
 import { Boxes } from '@/components/ui/background-boxes';
-import { cn } from '@/lib/utils';
-import { tr } from 'zod/v4/locales';
-import { trpc } from '@/server/trpc/client';
 const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
 });
@@ -55,13 +52,11 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
   const keyboardRef = useRef<Keyboard3DHandle>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(0);
   const isTypingRef = useRef(true);
   const isClient = typeof window !== 'undefined';
-  const { data } = trpc.test.hello.useQuery({ text: 'fklasjdf' });
 
   // Cursor blinking animation
   useEffect(() => {
@@ -158,10 +153,7 @@ export default function Home() {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className='relative flex flex-col h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground overflow-hidden'
-    >
+    <div className='relative flex flex-col h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground overflow-hidden'>
       <div className='absolute inset-0 w-full h-full bg-slate-900 z-20 mask-[radial-gradient(transparent,white)] pointer-events-none' />
 
       {/* Animated Background Paths */}

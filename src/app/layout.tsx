@@ -1,9 +1,10 @@
-import type React from 'react';
+import React, { lazy, Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import './fonts.css';
 import { TRPCProvider } from '~/server/trpc/client';
+const Loading = lazy(() => import('../components/Loading'));
 
 const _geist = Geist({ subsets: ['latin'] });
 const _geistMono = Geist_Mono({ subsets: ['latin'] });
@@ -39,7 +40,9 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={`font-sans antialiased`}>
-        <TRPCProvider>{children}</TRPCProvider>
+        <TRPCProvider>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </TRPCProvider>
       </body>
     </html>
   );
