@@ -7,7 +7,8 @@ import { CharStateType } from 'react-typing-game-hook';
 interface CodeEditorProps {
   fontSize: number;
   targetCode: string;
-  editorRef: React.RefObject<HTMLDivElement>;
+  editorRef: React.RefObject<HTMLDivElement | null>;
+  cursorRef: React.RefObject<HTMLSpanElement | null>;
   handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   setEditorFocused: React.Dispatch<React.SetStateAction<boolean>>;
   editorFocused: boolean;
@@ -15,7 +16,6 @@ interface CodeEditorProps {
   language: 'python' | 'cpp' | 'java';
   currIndex: number;
   charsState: (0 | 2 | 1)[];
-  cursorRef: React.RefObject<HTMLSpanElement>;
 }
 
 export default function CodeEditor({
@@ -41,8 +41,8 @@ export default function CodeEditor({
 
   // Update bounding rect when not focused
   React.useLayoutEffect(() => {
-    if (!editorFocused && editorRef.current) {
-      const rect = editorRef.current.getBoundingClientRect();
+    if (!editorFocused && editorRef!.current) {
+      const rect = editorRef!.current.getBoundingClientRect();
       setEditorRect({
         top: rect.top,
         left: rect.left,
@@ -70,7 +70,7 @@ export default function CodeEditor({
       <div className='flex-1 relative'>
         {/* Unified scroll container */}
         <div
-          ref={editorRef}
+          ref={editorRef as React.RefObject<HTMLDivElement>}
           tabIndex={0}
           onKeyDown={handleKeyDown}
           onFocus={() => setEditorFocused(true)}
@@ -91,7 +91,7 @@ export default function CodeEditor({
                 height: editorRect ? editorRect.height : '100%',
               }}
               onMouseEnter={() => {
-                editorRef.current?.focus();
+                editorRef!.current?.focus();
               }}
             >
               <FaMousePointer className='mb-2 text-2xl text-[#4ec9b0]' />
@@ -168,7 +168,7 @@ export default function CodeEditor({
                     {char}
                     {isCurrent && (
                       <span
-                        ref={cursorRef}
+                        ref={cursorRef as React.RefObject<HTMLSpanElement>}
                         className='vsc-editor-cursor'
                         style={{
                           position: 'absolute',

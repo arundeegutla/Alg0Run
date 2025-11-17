@@ -117,7 +117,7 @@ export default function VSCodeEditor({
   }, [stats, onStatsUpdate]);
 
   const {
-    states: { charsState, length, currIndex, errorChar, phase },
+    states: { charsState, length, currIndex, phase },
     actions: { insertTyping, resetTyping, deleteTyping, getDuration },
   } = useTypingGame(targetCode, {
     skipCurrentWordOnSpace: false,
@@ -222,7 +222,7 @@ export default function VSCodeEditor({
       time: timeSec,
       progress: Number.isFinite(progress) && !isNaN(progress) ? progress : 0,
     });
-  }, [length, currIndex, charsState, errorChar, language, phase, getDuration]);
+  }, [length, currIndex, charsState, phase, getDuration]);
 
   // Call sendCompletion only when phase is Ended and only once per session
   useEffect(() => {
