@@ -1,3 +1,4 @@
+'use server';
 import * as prettier from 'prettier/standalone';
 import * as prettierPluginTypescript from 'prettier/parser-typescript';
 import * as prettierPluginBabel from 'prettier/parser-babel';
