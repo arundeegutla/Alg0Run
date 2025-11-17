@@ -16,7 +16,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { trpc } from '@/server/trpc/client';
 import { Algo, PlayDetails, Profile } from '@/server/trpc/types';
-import { formatCodeAction } from './actions';
+import { formatCodeAction } from '../app/(vscode)/type/actions';
 import MenuBar from './VSCodeEditor/MenuBar';
 import TabBar from './VSCodeEditor/TabBar';
 import EditorControlsBar from './VSCodeEditor/EditorControlsBar';
