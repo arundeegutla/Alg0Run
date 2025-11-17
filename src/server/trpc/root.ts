@@ -1,5 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from '~/server/trpc/context';
-import { algosRouter } from '~/server/trpc/routers/algo';
+import { algoRouter } from '~/server/trpc/routers/algo';
 import { leaderboardRouter } from '~/server/trpc/routers/leaderboard';
 import { profileRouter } from '~/server/trpc/routers/profile';
 import { testRouter } from '~/server/trpc/routers/test';
@@ -10,7 +10,7 @@ import { testRouter } from '~/server/trpc/routers/test';
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  algo: algosRouter,
+  algo: algoRouter,
   leaderboard: leaderboardRouter,
   profile: profileRouter,
   test: testRouter,

@@ -157,8 +157,6 @@ export default function Home() {
     );
   };
 
-  return <>{data?.greeting}</>;
-
   return (
     <div
       ref={containerRef}

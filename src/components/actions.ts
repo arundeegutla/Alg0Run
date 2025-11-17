@@ -1,32 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import * as prettier from 'prettier/standalone';
 import * as prettierPluginTypescript from 'prettier/parser-typescript';
 import * as prettierPluginBabel from 'prettier/parser-babel';
 import prettierPluginEstree from 'prettier/plugins/estree';
 import prettierPluginJava from 'prettier-plugin-java';
 
-type FormatRequest = {
+export type FormatRequest = {
   code: string;
   language: 'python' | 'cpp' | 'java' | 'typescript' | 'javascript';
 };
 
-type FormatResponse = {
+export type FormatResponse = {
   formattedCode?: string;
   error?: string;
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<FormatResponse>
-) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { code, language } = req.body as FormatRequest;
-
+export async function formatCodeAction({
+  code,
+  language,
+}: FormatRequest): Promise<FormatResponse> {
   if (!code || !language) {
-    return res.status(400).json({ error: 'Missing code or language' });
+    return { error: 'Missing code or language' };
   }
 
   try {
@@ -50,7 +43,6 @@ export default async function handler(
             .join('\n');
         }
         break;
-
       case 'cpp':
       case 'python': {
         // Prettier doesn't support C++ or Python well, so just clean whitespace and convert tabs to spaces
@@ -60,7 +52,6 @@ export default async function handler(
           .join('\n');
         break;
       }
-
       case 'typescript':
       case 'javascript':
         formattedCode = await prettier.format(code, {
@@ -77,16 +68,15 @@ export default async function handler(
           tabWidth: 2,
         });
         break;
-
       default:
-        return res.status(400).json({ error: 'Unsupported language' });
+        return { error: 'Unsupported language' };
     }
 
-    return res.status(200).json({ formattedCode });
+    return { formattedCode };
   } catch (error) {
     console.error('Format error:', error);
-    return res.status(500).json({
+    return {
       error: error instanceof Error ? error.message : 'Failed to format code',
-    });
+    };
   }
 }

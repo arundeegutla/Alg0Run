@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Algo } from '@/server/firebase/models';
+
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 import { MdKeyboardCommandKey, MdKeyboardDoubleArrowUp } from 'react-icons/md';
+import { Algo } from '@/server/trpc/types';
 
 interface PrimarySidebarProps {
   algorithms: Algo[];
@@ -104,6 +105,19 @@ export default function PrimarySidebar({
             {Object.entries(categories).map(([category, algos]) => {
               if (algos.length === 0) return null;
               const isExpanded = expandedCategories.has(category);
+              // Sort algos by their code length (sum of all code strings' lengths)
+              const getCodeLength = (algo: Algo) => {
+                if (!algo.code) return 0;
+                return ['python', 'java', 'cpp']
+                  .map(
+                    (lang) =>
+                      (algo.code?.[lang as keyof typeof algo.code] || '').length
+                  )
+                  .reduce((a, b) => a + b, 0);
+              };
+              const sortedAlgos = [...algos].sort(
+                (a, b) => getCodeLength(a) - getCodeLength(b)
+              );
               return (
                 <div key={category} className='mb-1'>
                   <button
@@ -124,7 +138,7 @@ export default function PrimarySidebar({
                   </button>
                   {isExpanded && (
                     <div className='ml-4'>
-                      {algos.map((algo) => (
+                      {sortedAlgos.map((algo) => (
                         <button
                           key={algo.id}
                           onClick={() => onSelectAlgo(algo)}

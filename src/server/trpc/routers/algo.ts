@@ -1,30 +1,27 @@
 import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db } from '../util/db';
-import { TRPCError } from '@trpc/server';
+import { AlgoSchema, PlayDetailsSchema } from '../types';
 
-export const algosRouter = createTRPCRouter({
+export const algoRouter = createTRPCRouter({
   getAlgo: authedProcedure
     .input(z.object({ algoId: z.string() }))
     .query(async ({ input }) => {
       const doc = await db.collection('Algos').doc(input.algoId).get();
       if (!doc.exists) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: "Algo doesn't exist",
-        });
+        return { algo: undefined, error: "Algo doesn't exist" };
       }
       const res = doc.data() || {};
       res.id = doc.id;
-      return { algo: res, error: '' };
+      return { algo: AlgoSchema.parse(res), error: '' };
     }),
 
   getAllAlgos: authedProcedure.query(async () => {
     const querySnapshot = await db.collection('Algos').get();
     const results = querySnapshot.docs.map((doc) => {
-      const res = doc.data();
+      const res = doc.data() || {};
       res.id = doc.id;
-      return res;
+      return AlgoSchema.parse(res);
     });
     return { results, error: '' };
   }),
@@ -34,49 +31,35 @@ export const algosRouter = createTRPCRouter({
       z.object({
         algoId: z.string(),
         profileId: z.string(),
-        playDetails: z.any(), // Should match PlayDetails type
+        playDetails: PlayDetailsSchema,
       })
     )
     .mutation(async ({ input }) => {
-      // Get Algo
+      // Check if algo exists
       const algoDoc = await db.collection('Algos').doc(input.algoId).get();
       if (!algoDoc.exists) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Algo does not exist',
-        });
+        return { error: 'Algo does not exist' };
       }
 
-      // Get Profile
+      // Check if profile exists
       const profileDoc = await db
         .collection('Profiles')
         .doc(input.profileId)
         .get();
       if (!profileDoc.exists) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Profile does not exist',
-        });
+        return { error: 'Profile does not exist' };
       }
-      const profile = profileDoc.data();
-      if (!profile) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Profile does not exist',
-        });
-      }
+      const profile = profileDoc.data() || {};
+      profile.id = profileDoc.id;
 
-      // Get Plays
+      // Get all plays for this profile
       const playsSnapshot = await db
         .collection('Plays')
         .where('profileId', '==', input.profileId)
         .get();
-      const plays = playsSnapshot.docs.map(
-        (doc) =>
-          doc.data() as { algoId: string; playDetails: { score: number } }
-      );
+      const plays = playsSnapshot.docs.map((doc) => doc.data());
 
-      // Create Play
+      // Create new play
       const playId = db.collection('Plays').doc().id;
       try {
         await db.collection('Plays').doc(playId).set({
@@ -86,29 +69,26 @@ export const algosRouter = createTRPCRouter({
           playDetails: input.playDetails,
         });
       } catch {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create play',
-        });
+        return { error: 'Failed to create play' };
       }
 
-      // Update score if needed
+      // Update score if this is the highest for this algo
       const currentAlgoScores = plays
         .filter((p) => p.algoId === input.algoId)
-        .map((p) => p.playDetails.score);
+        .map((p) => p.playDetails?.score ?? 0);
       const highestCurrentScore = Math.max(...currentAlgoScores, 0);
+
       if (input.playDetails.score > highestCurrentScore) {
         const newTotalScore =
-          (profile.totalScore ?? 0) -
+          (profile.totalScore || 0) -
           highestCurrentScore +
           input.playDetails.score;
         await db
           .collection('Profiles')
           .doc(input.profileId)
-          .update({
-            totalScore: Math.round(newTotalScore * 10) / 10.0,
-          });
+          .update({ totalScore: Math.round(newTotalScore * 10) / 10.0 });
       }
+
       return { playId, error: '' };
     }),
 });

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db } from '../util/db';
-import { TRPCError } from '@trpc/server';
+import { ProfileBasicSchema, PlayBasicSchema } from '../types';
 
 export const leaderboardRouter = createTRPCRouter({
   getUserLeaderboard: authedProcedure.query(async () => {
@@ -10,7 +10,8 @@ export const leaderboardRouter = createTRPCRouter({
       .select('username', 'totalScore', 'photoURL')
       .get();
     const results = querySnapshot.docs.map((doc) => {
-      return { ...doc.data(), ...{ id: doc.id } };
+      const res = { ...doc.data(), id: doc.id };
+      return ProfileBasicSchema.parse(res);
     });
     return { results, error: '' };
   }),
@@ -21,10 +22,7 @@ export const leaderboardRouter = createTRPCRouter({
       // Check if algo exists
       const algoDoc = await db.collection('Algos').doc(input.algoId).get();
       if (!algoDoc.exists) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: "Algo doesn't exist",
-        });
+        return { error: "Algo doesn't exist" };
       }
 
       // Get all plays for this algo
@@ -33,16 +31,12 @@ export const leaderboardRouter = createTRPCRouter({
         .where('algoId', '==', input.algoId)
         .select('profileId', 'username', 'playDetails')
         .get();
-      const plays = playsSnapshot.docs.map(
-        (doc) =>
-          doc.data() as { profileId: string; playDetails: { score: number } }
+      const plays = playsSnapshot.docs.map((doc) =>
+        PlayBasicSchema.parse(doc.data())
       );
 
-      // Find top score per profile
-      const topScores = new Map<
-        string,
-        { profileId: string; playDetails: { score: number }; username?: string }
-      >();
+      // Find top play per profile
+      const topScores = new Map();
       plays.forEach((p) => {
         if (
           !topScores.has(p.profileId) ||
@@ -53,6 +47,9 @@ export const leaderboardRouter = createTRPCRouter({
         }
       });
 
-      return { results: Array.from(topScores.values()), error: '' };
+      return {
+        results: Array.from(topScores.values()),
+        error: '',
+      };
     }),
 });

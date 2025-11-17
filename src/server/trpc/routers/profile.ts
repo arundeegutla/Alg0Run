@@ -1,93 +1,63 @@
 import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db, auth } from '../util/db';
+import { ProfileSchema, PlaySchema } from '../types';
 import { firestore } from 'firebase-admin';
 
 export const profileRouter = createTRPCRouter({
-  isFirstTimeUser: authedProcedure
+  verifyToken: authedProcedure
     .input(z.object({ idToken: z.string() }))
     .query(async ({ input }) => {
-      let tokenResult;
       try {
-        tokenResult = await auth.verifyIdToken(input.idToken);
+        const decodedToken = await auth.verifyIdToken(input.idToken);
+        return { decodedToken, error: '' };
       } catch {
-        return { result: true };
+        return { decodedToken: undefined, error: 'Invalid token' };
       }
-      const userId = tokenResult.uid;
-      const profileSnapshot = await db
-        .collection('Profiles')
-        .where('userId', '==', userId)
-        .get();
-      if (profileSnapshot.empty) {
-        return { result: true, userId };
-      }
-      return { result: false };
     }),
 
-  createProfile: authedProcedure
-    .input(
-      z.object({
-        idToken: z.string(),
-        username: z.string(),
-        photoURL: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      // Check if first time user
-      let tokenResult;
-      try {
-        tokenResult = await auth.verifyIdToken(input.idToken);
-      } catch {
-        return { error: 'Invalid token' };
-      }
-      const userId = tokenResult.uid;
-      const profileSnapshot = await db
+  getProfileByUserId: authedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      const querySnapshot = await db
         .collection('Profiles')
-        .where('userId', '==', userId)
+        .where('userId', '==', input.userId)
         .get();
-      if (!profileSnapshot.empty) {
-        return { error: 'Profile already exists for user' };
+      if (querySnapshot.empty) {
+        return { profile: undefined, error: 'Profile not found' };
       }
-      const profileId = db.collection('Profiles').doc().id;
-      try {
-        await db.collection('Profiles').doc(profileId).set({
-          username: input.username,
-          totalScore: 0,
-          userId,
-          photoURL: input.photoURL,
-          friends: [],
-        });
-        return { profileId, error: '' };
-      } catch {
-        return { error: 'Failed to create profile' };
-      }
+      const res = querySnapshot.docs[0].data();
+      res.id = querySnapshot.docs[0].id;
+      return { profile: ProfileSchema.parse(res), error: '' };
     }),
 
   getProfileByToken: authedProcedure
     .input(z.object({ idToken: z.string() }))
     .query(async ({ input }) => {
-      let tokenResult;
       try {
-        tokenResult = await auth.verifyIdToken(input.idToken);
+        const decodedToken = await auth.verifyIdToken(input.idToken);
+        const userId = decodedToken.uid;
+        const querySnapshot = await db
+          .collection('Profiles')
+          .where('userId', '==', userId)
+          .get();
+        if (querySnapshot.empty) {
+          return { error: 'Profile does not exist for this user.' };
+        }
+        const profileDoc = querySnapshot.docs[0];
+        const profile = profileDoc.data() || {};
+        profile.id = profileDoc.id;
+        const playsSnapshot = await db
+          .collection('Plays')
+          .where('profileId', '==', profile.id)
+          .get();
+        const plays = playsSnapshot.docs.map((doc) =>
+          PlaySchema.parse(doc.data())
+        );
+        return { profile: ProfileSchema.parse(profile), plays, error: '' };
       } catch {
         return { error: 'Invalid token' };
       }
-      const userId = tokenResult.uid;
-      const profileSnapshot = await db
-        .collection('Profiles')
-        .where('userId', '==', userId)
-        .get();
-      if (profileSnapshot.empty) {
-        return { error: 'Profile does not exist for this user.' };
-      }
-      const profile = profileSnapshot.docs[0].data();
-      const profileId = profileSnapshot.docs[0].id;
-      const playsSnapshot = await db
-        .collection('Plays')
-        .where('profileId', '==', profileId)
-        .get();
-      const plays = playsSnapshot.docs.map((doc) => doc.data());
-      return { profile: { ...profile, id: profileId }, plays, error: '' };
     }),
 
   getProfile: authedProcedure
@@ -95,34 +65,53 @@ export const profileRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const doc = await db.collection('Profiles').doc(input.profileId).get();
       if (!doc.exists) {
-        return { error: 'Profile with this ID does not exist.' };
+        return { profile: undefined, error: 'Profile not found' };
       }
-      const profile = doc.data();
-      const playsSnapshot = await db
+      const res = doc.data() || {};
+      res.id = doc.id;
+      return { profile: ProfileSchema.parse(res), error: '' };
+    }),
+
+  getPlays: authedProcedure
+    .input(z.object({ profileId: z.string() }))
+    .query(async ({ input }) => {
+      const querySnapshot = await db
         .collection('Plays')
         .where('profileId', '==', input.profileId)
         .get();
-      const plays = playsSnapshot.docs.map((doc) => doc.data());
-      return { profile: { ...profile, id: doc.id }, plays, error: '' };
+      const plays = querySnapshot.docs.map((doc) =>
+        PlaySchema.parse(doc.data())
+      );
+      return { plays, error: '' };
+    }),
+
+  createProfile: authedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        username: z.string(),
+        photoURL: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const profileId = db.collection('Profiles').doc().id;
+      try {
+        await db.collection('Profiles').doc(profileId).set({
+          username: input.username,
+          totalScore: 0,
+          userId: input.userId,
+          photoURL: input.photoURL,
+          friends: [],
+        });
+        return { profileId, error: '' };
+      } catch {
+        return { profileId: undefined, error: 'Failed to create profile' };
+      }
     }),
 
   addFriend: authedProcedure
     .input(z.object({ profileId: z.string(), friendId: z.string() }))
     .mutation(async ({ input }) => {
-      const profileDoc = await db
-        .collection('Profiles')
-        .doc(input.profileId)
-        .get();
-      if (!profileDoc.exists) {
-        return { error: 'Profile does not exist' };
-      }
-      const friendDoc = await db
-        .collection('Profiles')
-        .doc(input.friendId)
-        .get();
-      if (!friendDoc.exists) {
-        return { error: 'Friend does not exist' };
-      }
       try {
         await db
           .collection('Profiles')
@@ -139,20 +128,6 @@ export const profileRouter = createTRPCRouter({
   removeFriend: authedProcedure
     .input(z.object({ profileId: z.string(), friendId: z.string() }))
     .mutation(async ({ input }) => {
-      const profileDoc = await db
-        .collection('Profiles')
-        .doc(input.profileId)
-        .get();
-      if (!profileDoc.exists) {
-        return { error: 'Profile does not exist' };
-      }
-      const friendDoc = await db
-        .collection('Profiles')
-        .doc(input.friendId)
-        .get();
-      if (!friendDoc.exists) {
-        return { error: 'Friend does not exist' };
-      }
       try {
         await db
           .collection('Profiles')
@@ -163,6 +138,20 @@ export const profileRouter = createTRPCRouter({
         return { error: '' };
       } catch {
         return { error: 'Failed to remove friend' };
+      }
+    }),
+
+  setScore: authedProcedure
+    .input(z.object({ profileId: z.string(), newTotalScore: z.number() }))
+    .mutation(async ({ input }) => {
+      try {
+        await db
+          .collection('Profiles')
+          .doc(input.profileId)
+          .update({ totalScore: input.newTotalScore });
+        return { error: '' };
+      } catch {
+        return { error: 'Failed to set score' };
       }
     }),
 });

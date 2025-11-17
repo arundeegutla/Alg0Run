@@ -179,8 +179,10 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
     }: EmptyStateProps,
     ref
   ) => {
-    const titleId = useId();
-    const descriptionId = useId();
+    // Use a single useId for both title and description for hydration stability
+    const baseId = useId();
+    const titleId = baseId + '-title';
+    const descriptionId = baseId + '-desc';
 
     const baseClasses =
       'group transition-all duration-300 rounded-xl relative overflow-hidden text-center flex flex-col items-center justify-center';
@@ -287,8 +289,6 @@ export const EmptyState = forwardRef<HTMLElement, EmptyStateProps>(
         <motion.section
           ref={ref}
           role='region'
-          aria-labelledby={titleId}
-          aria-describedby={descriptionId}
           className={cn(
             baseClasses,
             sizeClasses[size],
