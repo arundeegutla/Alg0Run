@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
-import SceneManager from '@/keyboardUtils/three/SceneManager';
+import SceneManager from '@/components/keyboardUtils/three/SceneManager';
 
 // Preload fonts before rendering
 const preloadFonts = async () => {

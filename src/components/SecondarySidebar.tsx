@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Algo } from '~/firebase/models';
 import { VscChromeClose, VscGraphLine } from 'react-icons/vsc';
 import dynamic from 'next/dynamic';
+import { Algo } from '@/server/trpc/types';
 const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
 });

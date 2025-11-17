@@ -2,16 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { Algo, PlayBasic } from '~/firebase/models';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { SiPython, SiCplusplus } from 'react-icons/si';
 import { FaJava } from 'react-icons/fa';
-import { auth } from '@/firebase/clientApp';
+import { auth } from '@/server/firebase/clientApp';
+import { Algo, PlayBasic } from '@/server/trpc/types';
 
 interface AlgoInfoTabProps {
   algo: Algo | null;
-  fontSize: number;
 }
 
 // Helper function to convert time complexity notation to LaTeX
