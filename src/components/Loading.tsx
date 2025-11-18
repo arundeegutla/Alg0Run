@@ -93,7 +93,7 @@ export default function Loading() {
 
   return (
     <div
-      className={`bg-[#0a0a12] text-slate-200 dark:bg-[#0a0a12] dark:text-slate-200 min-h-[100vh] flex items-center justify-center`}
+      className={`w-full bg-[#0a0a12] text-slate-200 dark:bg-[#0a0a12] dark:text-slate-200 min-h-[100vh] flex items-center justify-center`}
     >
       <div className={`${styles.text} `}>
         <span className={styles.loadingWord}>{renderTypedText()}</span>

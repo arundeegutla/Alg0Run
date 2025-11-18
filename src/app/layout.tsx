@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import './fonts.css';
 import { TRPCProvider } from '~/server/trpc/client';
+import { AuthProvider } from '@/contexts/AuthContext';
 const Loading = lazy(() => import('../components/Loading'));
 
 const _geist = Geist({ subsets: ['latin'] });
@@ -40,9 +41,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={`font-sans antialiased`}>
-        <TRPCProvider>
-          <Suspense fallback={<Loading />}>{children}</Suspense>
-        </TRPCProvider>
+        <AuthProvider>
+          <TRPCProvider>
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+          </TRPCProvider>
+        </AuthProvider>
       </body>
     </html>
   );

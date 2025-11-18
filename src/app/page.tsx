@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import type { Keyboard3DHandle } from '@/components/Keyboard3D';
 import { Boxes } from '@/components/ui/background-boxes';
+import PixelBlast from '@/components/PixelBlast';
 const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
 });
@@ -49,7 +50,6 @@ const charToKeyCode = (char: string): string | null => {
 };
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
   const keyboardRef = useRef<Keyboard3DHandle>(null);
@@ -153,18 +153,26 @@ export default function Home() {
   };
 
   return (
-    <div className='relative flex flex-col h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground overflow-hidden'>
-      <div className='absolute inset-0 w-full h-full bg-slate-900 z-20 mask-[radial-gradient(transparent,white)] pointer-events-none' />
+    <div className='relative flex flex-col h-screen bg-black text-foreground overflow-hidden justify-between'>
+      {/* <div className='absolute inset-0 w-full h-full bg-slate-900 z-20 mask-[radial-gradient(transparent,white)] pointer-events-none' /> */}
 
       {/* Animated Background Paths */}
       {/* <div className='absolute inset-0 z-0'>
         <FloatingPaths position={1} />
         <FloatingPaths position={-1} />
       </div> */}
+      {/* <PixelBlast
+        liquid={true}
+        edgeFade={0}
+        pixelSize={5}
+        patternDensity={0}
+        speed={0.3}
+        className='absolute top-0 left-0 w-screen h-screen'
+      /> */}
       <Boxes />
 
       {/* Navigation */}
-      <nav className='relative top-4 z-50 flex justify-center px-6 '>
+      <nav className='relative top-4 z-50 flex justify-center px-6 w-fit mx-auto'>
         <div className='bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-full px-8 py-3 flex items-center gap-8'>
           <Link
             href='/'
@@ -190,27 +198,18 @@ export default function Home() {
             >
               {`[ type ]`}
             </Link>
-            {isLoggedIn ? (
-              <button
-                onClick={() => {
-                  localStorage.removeItem('alg0_user');
-                  setIsLoggedIn(false);
-                }}
-                className='text-slate-300 hover:text-red-400 transition font-mono text-sm'
-              >
-                {`[ logout ]`}
-              </button>
-            ) : (
-              <button className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'>
-                {`[ login ]`}
-              </button>
-            )}
+            <Link
+              href='/auth'
+              className='text-slate-300 hover:text-cyan-400 transition font-mono text-sm'
+            >
+              {`[ login ]`}
+            </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section - Code Editor Style */}
-      <main className='z-20 relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 sm:py-3 min-h-0 overflow-hidden'>
+      <main className='z-20 relative flex flex-col items-center justify-center sm:px-6 mt-20 my-2 sm:py-3 min-h-0 overflow-hidden w-fit h-fit mx-auto'>
         <div className='max-w-5xl mx-auto w-full'>
           {/* Code Content */}
           <motion.div
@@ -245,7 +244,7 @@ export default function Home() {
           >
             <Link
               href='/type'
-              className='inline-block px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 bg-slate-800/80 border border-slate-600/50 text-slate-200 font-mono font-bold rounded-sm hover:bg-slate-700/80 hover:border-slate-500/70 transition-all duration-200 text-xs sm:text-sm'
+              className='inline-block px-4 sm:px-6 md:px-8 my-2 sm:py-2.5 md:py-3 bg-slate-800/80 border border-slate-600/50 text-slate-200 font-mono font-bold rounded-sm hover:bg-slate-700/80 hover:border-slate-500/70 transition-all duration-200 text-xs sm:text-sm'
             >
               {`$ start typing...`}
             </Link>

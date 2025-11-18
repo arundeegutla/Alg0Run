@@ -20,7 +20,7 @@ const navigation = [
   { name: 'Explorer', href: '/type', icon: VscFiles },
   { name: 'Leaderboard', href: '/leaderboard', icon: MdLeaderboard },
   { name: 'race', href: '/race', icon: VscTerminalBash },
-  { name: 'Account', href: '/account', icon: VscAccount },
+  { name: 'Profile', href: '/profile', icon: VscAccount },
 ];
 
 export default function NavBar() {

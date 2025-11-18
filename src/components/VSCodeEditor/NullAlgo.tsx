@@ -31,7 +31,7 @@ export default function NullAlgo() {
       </motion.div>
       <div className='-mt-8 flex flex-col items-center gap-2'>
         <div className='text-neutral-100/40 text-sm flex items-center gap-2'>
-          <span>Shuffle Algorithm</span>
+          <span>Random Algorithm</span>
           <span className='flex items-center gap-1'>
             <span
               className='rounded bg-[#23232b] px-2 py-1 text-xs font-mono border border-[#444] flex items-center justify-center'
@@ -53,8 +53,22 @@ export default function NullAlgo() {
             </span>
           </span>
         </div>
-        <div className='text-[#444] text-xs'>
-          (Ctrl+Shift+K on Windows/Linux)
+        <div className='text-neutral-100/40 text-sm flex items-center gap-2'>
+          <span>Search Algorithm</span>
+          <span className='flex items-center gap-1'>
+            <span
+              className='rounded bg-[#23232b] px-2 py-1 text-xs font-mono border border-[#444] flex items-center justify-center'
+              style={{ boxShadow: '0 1px 2px #0002' }}
+            >
+              <MdKeyboardCommandKey size={16} />
+            </span>
+            <span
+              className='rounded bg-[#23232b] px-2 py-1 text-xs font-mono border border-[#444] flex items-center justify-center'
+              style={{ boxShadow: '0 1px 2px #0002' }}
+            >
+              {'/'}
+            </span>
+          </span>
         </div>
       </div>
     </div>

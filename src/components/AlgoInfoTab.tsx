@@ -127,18 +127,6 @@ export default function AlgoInfoTab({ algo }: AlgoInfoTabProps) {
             </p>
           </div>
 
-          {/* Usage */}
-          {algo.usage && (
-            <div className='space-y-3'>
-              <h2 className='text-2xl font-semibold text-[#569cd6] border-b border-[#3e3e42] pb-2 font-mono'>
-                Usage
-              </h2>
-              <p className='text-[#cccccc] leading-relaxed text-base font-sans'>
-                {algo.usage}
-              </p>
-            </div>
-          )}
-
           {/* Leaderboard Below Main Content */}
           <div className='w-full bg-[#1e1e1e] border-[#3e3e42] px-0 py-6 rounded-b-lg'>
             <h2 className='text-2xl font-semibold text-[#569cd6] border-[#3e3e42] pb-2 mb-4 font-mono'>

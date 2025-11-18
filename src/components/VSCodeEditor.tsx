@@ -196,7 +196,7 @@ export default function VSCodeEditor({
     // Switch to info tab when race completes (only once)
     if (phase === PhaseType.Ended && !hasAutoSwitchedToInfo.current) {
       hasAutoSwitchedToInfo.current = true;
-      setTimeout(() => setActiveTab('info'), 1000);
+      setActiveTab('info');
     }
 
     const durationMs = getDuration();
@@ -310,26 +310,28 @@ export default function VSCodeEditor({
   };
 
   const handleReset = useCallback(() => {
+    editorRef.current?.focus();
+    setActiveTab('code');
     resetTyping();
     hasAutoSwitchedToInfo.current = false;
     setComplete(false);
     setIsTyping(false);
     setStats({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
-    editorRef.current?.focus();
   }, [resetTyping]);
 
   useEffect(() => {
     handleReset();
-    setActiveTab('code');
     hasAutoSwitchedToInfo.current = false;
     editorRef.current?.focus();
   }, [targetCode, handleReset]);
 
   const handleIncreaseFontSize = () => {
+    editorRef.current?.focus();
     setFontSize((prev) => Math.min(prev + 2, 32));
   };
 
   const handleDecreaseFontSize = () => {
+    editorRef.current?.focus();
     setFontSize((prev) => Math.max(prev - 2, 10));
   };
 
@@ -363,6 +365,11 @@ export default function VSCodeEditor({
       ) {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent('algorun-shuffle-algo'));
+      }
+
+      if ((isMac ? e.metaKey : e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('algorun-focus-search'));
       }
     }
     window.addEventListener('keydown', onKeyDown);

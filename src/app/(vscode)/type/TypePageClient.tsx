@@ -165,7 +165,7 @@ export default function TypePageClient({ algorithms }: TypePageClientProps) {
             }}
           >
             <PrimarySidebar
-              algorithms={algorithms}
+              allAlgos={algorithms}
               selectedAlgo={selectedAlgo}
               onSelectAlgo={setSelectedAlgo}
               hackpackMode={hackpackMode}
