@@ -41,11 +41,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={`font-sans antialiased`}>
-        <AuthProvider>
-          <TRPCProvider>
+        <TRPCProvider>
+          <AuthProvider>
             <Suspense fallback={<Loading />}>{children}</Suspense>
-          </TRPCProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </TRPCProvider>
       </body>
     </html>
   );

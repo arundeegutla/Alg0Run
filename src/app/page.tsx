@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import type { Keyboard3DHandle } from '@/components/Keyboard3D';
 import { Boxes } from '@/components/ui/background-boxes';
-import PixelBlast from '@/components/PixelBlast';
 const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
   ssr: false,
 });

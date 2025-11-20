@@ -7,7 +7,6 @@ export const googleSignIn = async () => {
 };
 
 export const codeforcesSignIn = () => {
-  // Redirect to Codeforces OpenID endpoint
   window.location.href = '/api/auth/codeforces/login';
 };
 

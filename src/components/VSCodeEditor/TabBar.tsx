@@ -1,3 +1,4 @@
+import { Language } from '@/server/trpc/types';
 import React from 'react';
 import { FaJava } from 'react-icons/fa';
 import { SiPython, SiCplusplus } from 'react-icons/si';
@@ -5,7 +6,7 @@ import { VscClose } from 'react-icons/vsc';
 
 interface TabBarProps {
   algo: { name?: string } | null;
-  language: 'python' | 'cpp' | 'java';
+  language: Language;
   activeTab: 'code' | 'info';
   setActiveTab: (tab: 'code' | 'info') => void;
   handleReset: () => void;

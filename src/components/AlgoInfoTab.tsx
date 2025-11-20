@@ -8,6 +8,7 @@ import { SiPython, SiCplusplus } from 'react-icons/si';
 import { FaJava } from 'react-icons/fa';
 import { auth } from '@/server/firebase/clientApp';
 import { Algo, PlayBasic } from '@/server/trpc/types';
+import { trpc } from '@/server/trpc/client';
 
 interface AlgoInfoTabProps {
   algo: Algo | null;
@@ -33,41 +34,34 @@ const convertToLatex = (complexity: string): string => {
 };
 
 export default function AlgoInfoTab({ algo }: AlgoInfoTabProps) {
-  const [leaderboard, setLeaderboard] = useState<PlayBasic[]>([]);
-  const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState<'score' | 'wpm' | 'accuracy'>('score');
   const [languageFilter, setLanguageFilter] = useState<string>('all');
-  const [user, authLoading, error] = useAuthState(auth);
+  const [user] = useAuthState(auth);
 
+  // Use trpc to fetch leaderboard, refetch on algo change or tab mount
+  const getAlgoLeaderboard = trpc.leaderboard.getAlgoLeaderboard.useQuery(
+    { algoId: algo?.id ?? '' },
+    {
+      enabled: !!algo && !!user,
+      retry: false,
+    }
+  );
+
+  // Refetch leaderboard every time algo changes (e.g., tab switch)
   useEffect(() => {
-    if (algo && user) {
-      fetchLeaderboard(algo.id);
-    } else {
-      setLeaderboard([]);
+    if (getAlgoLeaderboard.refetch && !!algo && !!user) {
+      getAlgoLeaderboard.refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [algo, user]);
+  }, [algo?.id, user]);
 
-  const fetchLeaderboard = async (algoId: string) => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/leaderboard/algo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ algoId }),
-      });
-      const data = await response.json();
-      if (data.results) {
-        setLeaderboard(data.results);
-      }
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = getAlgoLeaderboard.isLoading;
+
+  // Derive leaderboard from query data
+  const leaderboard: PlayBasic[] =
+    getAlgoLeaderboard.data && getAlgoLeaderboard.data.results
+      ? getAlgoLeaderboard.data.results
+      : [];
 
   const getLanguageIcon = (language: string) => {
     switch (language) {

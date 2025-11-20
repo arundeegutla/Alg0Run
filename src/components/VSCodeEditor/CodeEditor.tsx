@@ -4,6 +4,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CharStateType } from 'react-typing-game-hook';
 import Noise from '../Noise';
+import { Language } from '@/server/trpc/types';
 
 interface CodeEditorProps {
   fontSize: number;
@@ -13,8 +14,8 @@ interface CodeEditorProps {
   handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   setEditorFocused: React.Dispatch<React.SetStateAction<boolean>>;
   editorFocused: boolean;
-  getSyntaxLanguage: (lang: 'python' | 'cpp' | 'java') => string;
-  language: 'python' | 'cpp' | 'java';
+  getSyntaxLanguage: (lang: Language) => string;
+  language: Language;
   currIndex: number;
   charsState: (0 | 2 | 1)[];
 }

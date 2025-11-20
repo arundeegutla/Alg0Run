@@ -15,8 +15,11 @@ import AlgoInfoTab from './AlgoInfoTab';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { trpc } from '@/server/trpc/client';
-import { Algo, PlayDetails, Profile } from '@/server/trpc/types';
-import { formatCodeAction } from '../app/(vscode)/type/actions';
+import { Algo, Language, PlayDetails } from '@/server/trpc/types';
+import {
+  formatCodeAction,
+  createPlayCompletion,
+} from '../app/(vscode)/type/actions';
 import MenuBar from './VSCodeEditor/MenuBar';
 import TabBar from './VSCodeEditor/TabBar';
 import EditorControlsBar from './VSCodeEditor/EditorControlsBar';
@@ -25,8 +28,8 @@ import CodeEditor from './VSCodeEditor/CodeEditor';
 
 interface VSCodeEditorProps {
   algo: Algo | null;
-  language: 'python' | 'cpp' | 'java';
-  onLanguageChange: (lang: 'python' | 'cpp' | 'java') => void;
+  language: Language;
+  onLanguageChange: (lang: Language) => void;
   onStatsUpdate: (stats: {
     wpm: number;
     accuracy: number;
@@ -159,14 +162,6 @@ export default function VSCodeEditor({
     }
   }, [currIndex]);
 
-  const createPlayMutation = trpc.algo.createPlay.useMutation();
-  // Move useQuery to top level with enabled: false
-  const tokenRef = useRef<string | null>(null);
-  const getProfileByTokenQuery = trpc.profile.getProfileByToken.useQuery(
-    { idToken: tokenRef.current || '' },
-    { enabled: false }
-  );
-
   const [complete, setComplete] = useState(false);
   const sendCompletion = useCallback(
     async (playDetails: PlayDetails) => {
@@ -174,9 +169,7 @@ export default function VSCodeEditor({
       setComplete(true);
       if (user && algo) {
         try {
-          const token = await user.getIdToken();
-          tokenRef.current = token;
-          await createPlayMutation.mutateAsync({
+          await createPlayCompletion({
             algoId: algo.id,
             playDetails,
           });
@@ -185,7 +178,7 @@ export default function VSCodeEditor({
         }
       }
     },
-    [user, algo, complete, createPlayMutation]
+    [user, algo, complete]
   );
 
   // Stats calculation
@@ -332,14 +325,12 @@ export default function VSCodeEditor({
     setFontSize((prev) => Math.max(prev - 2, 10));
   };
 
-  const getSyntaxLanguage = (lang: 'python' | 'cpp' | 'java'): string => {
+  const getSyntaxLanguage = (lang: Language): string => {
     switch (lang) {
       case 'python':
-        return 'python';
       case 'cpp':
-        return 'cpp';
       case 'java':
-        return 'java';
+        return lang;
       default:
         return 'text';
     }

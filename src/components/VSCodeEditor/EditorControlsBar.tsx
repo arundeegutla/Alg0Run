@@ -1,3 +1,4 @@
+import { Language } from '@/server/trpc/types';
 import React from 'react';
 import { VscRefresh, VscZoomIn, VscZoomOut } from 'react-icons/vsc';
 
@@ -7,9 +8,9 @@ interface EditorControlsBarProps {
   handleIncreaseFontSize: () => void;
   handleDecreaseFontSize: () => void;
   fontSize: number;
-  language: 'python' | 'cpp' | 'java';
-  availableLanguages: readonly ('python' | 'cpp' | 'java')[];
-  onLanguageChange: (lang: 'python' | 'cpp' | 'java') => void;
+  language: Language;
+  availableLanguages: readonly Language[];
+  onLanguageChange: (lang: Language) => void;
 }
 
 export default function EditorControlsBar({
@@ -78,9 +79,7 @@ export default function EditorControlsBar({
         <select
           id='language-select'
           value={language}
-          onChange={(e) =>
-            onLanguageChange(e.target.value as 'python' | 'cpp' | 'java')
-          }
+          onChange={(e) => onLanguageChange(e.target.value as Language)}
           className='bg-[#1e1e1e] text-[#cccccc] border border-[#3e3e42] rounded px-2 py-1 text-xs focus:outline-none'
           style={{ minWidth: 90 }}
         >
