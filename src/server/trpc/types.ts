@@ -3,21 +3,13 @@ import { z } from 'zod';
 export const LanguageSchema = z.enum(['python', 'cpp', 'java']);
 export type Language = z.infer<typeof LanguageSchema>;
 
-export const SessionDataSchema = z.object({
-  isLoggedIn: z.boolean(),
-  access_token: z.string().optional(),
+export const CodeForcesOAuthSessionSchema = z.object({
   code_verifier: z.string().optional(),
   state: z.string().optional(),
-  userInfo: z
-    .object({
-      sub: z.string(),
-      handle: z.string(),
-      avatar: z.string(),
-      rating: z.number(),
-    })
-    .optional(),
 });
-export type SessionData = z.infer<typeof SessionDataSchema>;
+export type CodeForcesOAuthSession = z.infer<
+  typeof CodeForcesOAuthSessionSchema
+>;
 
 export const ProfileSchema = z.object({
   id: z.string(),

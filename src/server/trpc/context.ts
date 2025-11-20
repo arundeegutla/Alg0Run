@@ -3,14 +3,15 @@ import superjson from 'superjson';
 import { ZodError } from 'zod';
 import { admin } from './util/db';
 
-export async function createTRPCContext(opts: {
-  headers: Headers;
-  session_token: string | null;
-}) {
+export async function createTRPCContext(opts: { headers: Headers }) {
   const { headers } = opts;
 
+  console.log(
+    'Creating TRPC context with headers:',
+    Object.fromEntries(headers.entries())
+  );
+
   const authHeader = headers.get('authorization');
-  console.log('Authorization Header:', authHeader);
   let user: admin.auth.DecodedIdToken | null = null;
 
   if (authHeader?.startsWith('Bearer ')) {
@@ -47,7 +48,6 @@ export const createCallerFactory = t.createCallerFactory;
 export const createTRPCRouter = t.router;
 
 const authedMiddleware = t.middleware(async ({ ctx, next }) => {
-  console.log('User in authedMiddleware:', ctx.user);
   if (!ctx.user) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }

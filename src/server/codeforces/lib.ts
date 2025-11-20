@@ -1,7 +1,7 @@
 import { IronSession, SessionOptions, getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import * as openidClient from 'openid-client';
-import { SessionData } from '../trpc/types';
+import { CodeForcesOAuthSession } from '../trpc/types';
 
 export const clientConfig = {
   url: process.env.NEXT_codeforces_issuer,
@@ -17,35 +17,23 @@ export const clientConfig = {
   code_challenge_method: 'S256',
 };
 
-export const defaultSession: SessionData = {
-  isLoggedIn: false,
-  access_token: undefined,
-  code_verifier: undefined,
-  state: undefined,
-  userInfo: undefined,
-};
-
 export const sessionOptions: SessionOptions = {
   password: 'complex_password_at_least_32_characters_long',
   cookieName: 'next_js_session',
   cookieOptions: {
-    // secure only works in `https` environments
-    // if your localhost is not on `https`, then use: `secure: process.env.NODE_ENV === "production"`
     secure: process.env.NODE_ENV === 'production',
   },
   ttl: 60 * 60 * 24 * 7,
 };
 
-export async function getSession(): Promise<IronSession<SessionData>> {
+export async function getSession(): Promise<
+  IronSession<CodeForcesOAuthSession>
+> {
   const cookiesList = await cookies();
-  const session = await getIronSession<SessionData>(
+  const session = await getIronSession<CodeForcesOAuthSession>(
     cookiesList,
     sessionOptions
   );
-  if (!session.isLoggedIn) {
-    session.access_token = defaultSession.access_token;
-    session.userInfo = defaultSession.userInfo;
-  }
   return session;
 }
 
