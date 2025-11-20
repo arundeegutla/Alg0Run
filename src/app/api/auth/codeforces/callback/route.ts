@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getConfig, getSession, clientConfig } from '@/server/codeforces/lib';
 import { headers } from 'next/headers';
 import * as client from 'openid-client';
-import { admin } from '@/server/trpc/util/db'; // <-- add this
+import { admin } from '@/server/trpc/util/db';
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
   console.log('Session in callback:', session);
 
   const openIdClientConfig = await getConfig();
-  const headerList = await headers(); // no need for await
+  const headerList = await headers();
 
   const host =
     headerList.get('x-forwarded-host') || headerList.get('host') || 'localhost';
@@ -29,20 +29,14 @@ export async function GET(req: NextRequest) {
     }
   );
 
-  const { access_token } = tokenSet;
   const claims = tokenSet.claims()!;
 
   console.log('Codeforces Claims:', claims);
 
   const handle = claims.handle as string;
   const avatar = claims.avatar as string;
-  const rating = claims.rating as number;
 
-  // -------- Firebase user + custom token ----------
-
-  // Use a deterministic uid for Codeforces users
   const uid = `codeforces:${handle}`;
-
   try {
     await admin.auth().getUser(uid);
   } catch (err: unknown) {
@@ -62,25 +56,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Optional: pass some Codeforces info as custom claims
-  const customToken = await admin.auth().createCustomToken(uid, {
-    codeforcesHandle: handle,
-    codeforcesRating: rating,
-  });
+  const customToken = await admin.auth().createCustomToken(uid);
 
-  // -------- Keep your existing session if you still want it ----------
-  session.isLoggedIn = true;
-  session.access_token = access_token;
-  session.userInfo = {
-    sub: claims.sub,
-    handle,
-    avatar,
-    rating,
-  };
-
-  await session.save();
-
-  // -------- Redirect back to client with Firebase custom token --------
   const redirectUrl = new URL(
     clientConfig.post_login_route,
     `${protocol}://${host}`

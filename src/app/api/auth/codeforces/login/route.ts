@@ -1,8 +1,6 @@
 import { getSession, clientConfig, getConfig } from '@/server/codeforces/lib';
 import * as client from 'openid-client';
 
-// Hardcoded Codeforces OIDC server metadata
-
 export async function GET() {
   const session = await getSession();
   const code_verifier = client.randomPKCECodeVerifier();
