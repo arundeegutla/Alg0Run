@@ -60,62 +60,48 @@ export const profileRouter = createTRPCRouter({
       }
     }),
 
-  getProfile: authedProcedure
-    .input(z.object({ profileId: z.string() }))
-    .query(async ({ input }) => {
-      const doc = await db.collection('Profiles').doc(input.profileId).get();
-      if (!doc.exists) {
-        return { profile: undefined, error: 'Profile not found' };
-      }
-      const res = doc.data() || {};
-      res.id = doc.id;
-      return { profile: ProfileSchema.parse(res), error: '' };
-    }),
+  getProfile: authedProcedure.query(async ({ ctx }) => {
+    const doc = await db.collection('Profiles').doc(ctx.user.uid).get();
+    if (!doc.exists) {
+      return { profile: undefined, error: 'Profile not found' };
+    }
+    const res = doc.data() || {};
+    res.id = doc.id;
+    return { profile: ProfileSchema.parse(res), error: '' };
+  }),
 
-  getPlays: authedProcedure
-    .input(z.object({ profileId: z.string() }))
-    .query(async ({ input }) => {
-      const querySnapshot = await db
-        .collection('Plays')
-        .where('profileId', '==', input.profileId)
-        .get();
-      const plays = querySnapshot.docs.map((doc) =>
-        PlaySchema.parse(doc.data())
-      );
-      return { plays, error: '' };
-    }),
+  getPlays: authedProcedure.query(async ({ ctx }) => {
+    const querySnapshot = await db
+      .collection('Plays')
+      .where('profileId', '==', ctx.user.uid)
+      .get();
+    const plays = querySnapshot.docs.map((doc) => PlaySchema.parse(doc.data()));
+    return { plays, error: '' };
+  }),
 
-  createProfile: authedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        username: z.string(),
-        photoURL: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const profileId = db.collection('Profiles').doc().id;
-      try {
-        await db.collection('Profiles').doc(profileId).set({
-          username: input.username,
-          totalScore: 0,
-          userId: input.userId,
-          photoURL: input.photoURL,
-          friends: [],
-        });
-        return { profileId, error: '' };
-      } catch {
-        return { profileId: undefined, error: 'Failed to create profile' };
-      }
-    }),
+  createProfile: authedProcedure.mutation(async ({ ctx }) => {
+    const profileId = db.collection('Profiles').doc().id;
+    try {
+      await db.collection('Profiles').doc(profileId).set({
+        username: ctx.user.username,
+        totalScore: 0,
+        userId: ctx.user.uid,
+        photoURL: ctx.user.photoURL,
+        friends: [],
+      });
+      return { profileId, error: '' };
+    } catch {
+      return { profileId: undefined, error: 'Failed to create profile' };
+    }
+  }),
 
   addFriend: authedProcedure
-    .input(z.object({ profileId: z.string(), friendId: z.string() }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ friendId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
       try {
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({
             friends: firestore.FieldValue.arrayUnion(input.friendId),
           });
@@ -126,12 +112,12 @@ export const profileRouter = createTRPCRouter({
     }),
 
   removeFriend: authedProcedure
-    .input(z.object({ profileId: z.string(), friendId: z.string() }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ friendId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
       try {
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({
             friends: firestore.FieldValue.arrayRemove(input.friendId),
           });
@@ -142,12 +128,12 @@ export const profileRouter = createTRPCRouter({
     }),
 
   setScore: authedProcedure
-    .input(z.object({ profileId: z.string(), newTotalScore: z.number() }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ newTotalScore: z.number() }))
+    .mutation(async ({ ctx, input }) => {
       try {
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({ totalScore: input.newTotalScore });
         return { error: '' };
       } catch {

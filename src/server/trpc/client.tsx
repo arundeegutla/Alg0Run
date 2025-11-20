@@ -8,8 +8,10 @@ import { useState } from 'react';
 import { makeQueryClient } from './query-client';
 import { type AppRouter } from '~/server/trpc/root';
 import superjson from 'superjson';
-export const trpc = createTRPCReact<AppRouter>();
+import { auth } from '@/server/firebase/clientApp';
+
 let clientQueryClientSingleton: QueryClient;
+export const trpc = createTRPCReact<AppRouter>();
 function getQueryClient() {
   if (typeof window === 'undefined') {
     // Server: always make a new query client
@@ -42,6 +44,14 @@ export function TRPCProvider(
         httpBatchLink({
           transformer: superjson,
           url: getUrl(),
+          async headers() {
+            const user = auth.currentUser;
+            const token = user ? await user.getIdToken() : null;
+
+            return {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            };
+          },
         }),
       ],
     })

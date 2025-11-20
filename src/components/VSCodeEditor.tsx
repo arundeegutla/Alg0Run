@@ -160,6 +160,12 @@ export default function VSCodeEditor({
   }, [currIndex]);
 
   const createPlayMutation = trpc.algo.createPlay.useMutation();
+  // Move useQuery to top level with enabled: false
+  const tokenRef = useRef<string | null>(null);
+  const getProfileByTokenQuery = trpc.profile.getProfileByToken.useQuery(
+    { idToken: tokenRef.current || '' },
+    { enabled: false }
+  );
 
   const [complete, setComplete] = useState(false);
   const sendCompletion = useCallback(
@@ -169,18 +175,9 @@ export default function VSCodeEditor({
       if (user && algo) {
         try {
           const token = await user.getIdToken();
-          // Use tRPC to get profile by token
-          // Use tRPC query imperatively
-          const { refetch } = trpc.profile.getProfileByToken.useQuery(
-            { idToken: token },
-            { enabled: false }
-          );
-          const { data: profileResp } = await refetch();
-          const profile = profileResp?.profile as Profile;
-          if (!profile) return;
+          tokenRef.current = token;
           await createPlayMutation.mutateAsync({
             algoId: algo.id,
-            profileId: profile.id,
             playDetails,
           });
         } catch (err) {

@@ -1,34 +1,35 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Loading.module.css';
-const TARGET_TEXT = `Loading...`;
 
-export default function Loading() {
+import { IconType } from 'react-icons';
+
+interface LoadingProps {
+  text?: string;
+  icon?: IconType;
+}
+
+export default function Loading({
+  text = 'Loading...',
+  icon: Icon,
+}: LoadingProps) {
   const [typedText, setTypedText] = useState('');
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentIndexRef = useRef(0);
-  const [showCursor, setShowCursor] = useState(true);
+  // const [showCursor, setShowCursor] = useState(true); // Unused
   const isTypingRef = useRef(true);
   const isClient = typeof window !== 'undefined';
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShowCursor((prev) => !prev);
-    }, 530);
-    return () => clearInterval(interval);
-  }, []);
+  // Blinking cursor effect was unused, so removed to fix lint error
 
   useEffect(() => {
     currentIndexRef.current = 0;
     isTypingRef.current = true;
 
     const typeNextChar = () => {
-      if (
-        !isTypingRef.current ||
-        currentIndexRef.current >= TARGET_TEXT.length
-      ) {
+      if (!isTypingRef.current || currentIndexRef.current >= text.length) {
         // Reset after a delay when complete
-        if (currentIndexRef.current >= TARGET_TEXT.length) {
+        if (currentIndexRef.current >= text.length) {
           setTimeout(() => {
             setTypedText('');
             currentIndexRef.current = 0;
@@ -40,7 +41,7 @@ export default function Loading() {
       }
 
       // Update displayed text
-      setTypedText(TARGET_TEXT.slice(0, currentIndexRef.current + 1));
+      setTypedText(text.slice(0, currentIndexRef.current + 1));
       currentIndexRef.current++;
 
       // Schedule next character (randomized timing for natural feel)
@@ -57,18 +58,18 @@ export default function Loading() {
       }
       isTypingRef.current = false;
     };
-  }, [isClient]);
+  }, [isClient, text]);
 
   const renderTypedText = () => {
     const chars = typedText.split('');
-    const targetChars = TARGET_TEXT.split('');
+    const targetChars = text.split('');
 
     return (
       <div className='whitespace-pre'>
         {targetChars.map((char, index) => {
           const isTyped = index < chars.length;
           const isCorrect = isTyped && chars[index] === char;
-          const isCurrent = index === chars.length;
+          // const isCurrent = index === chars.length; // Unused
 
           let colorClass = 'text-slate-500/30';
           if (isTyped) {
@@ -81,9 +82,6 @@ export default function Loading() {
               className={`${colorClass} ${isTyped ? (isCorrect ? 'text-glow' : 'text-glow-red') : ''}`}
             >
               {isTyped ? chars[index] : char}
-              {/* {isCurrent && showCursor && (
-                <span className='inline-block w-0.5 h-[1.2em] bg-cyan-400 ml-0.5 animate-pulse align-middle' />
-              )} */}
             </span>
           );
         })}
@@ -93,9 +91,14 @@ export default function Loading() {
 
   return (
     <div
-      className={`w-full bg-[#0a0a12] text-slate-200 dark:bg-[#0a0a12] dark:text-slate-200 min-h-[100vh] flex items-center justify-center`}
+      className={`w-full bg-[#0a0a12] text-slate-200 dark:bg-[#0a0a12] dark:text-slate-200 min-h-screen flex items-center justify-center`}
     >
-      <div className={`${styles.text} `}>
+      <div className={`${styles.text} flex items-center`}>
+        {Icon && (
+          <span className='mr-3 flex items-center'>
+            <Icon size={32} />
+          </span>
+        )}
         <span className={styles.loadingWord}>{renderTypedText()}</span>
         <span className={styles.cursor} />
       </div>

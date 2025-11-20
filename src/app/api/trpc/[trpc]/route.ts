@@ -5,10 +5,20 @@ import { appRouter } from '@/server/trpc/root';
 import { env } from 'process';
 import { createTRPCContext } from '@/server/trpc/context';
 
+const getFirebaseTokenFromHeader = (headers: Headers): string | null => {
+  const authHeader =
+    headers.get('authorization') || headers.get('Authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring('Bearer '.length);
+  }
+  return null;
+};
+
 const createContext = async (req: NextRequest) => {
+  const session_token = getFirebaseTokenFromHeader(req.headers);
   return createTRPCContext({
     headers: req.headers,
-    session_token: null,
+    session_token,
   });
 };
 

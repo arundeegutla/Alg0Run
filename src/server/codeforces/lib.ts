@@ -13,7 +13,7 @@ export const clientConfig = {
   post_logout_redirect_uri: `https://alg0run.netlify.app/`,
   response_type: 'code',
   grant_type: 'authorization_code',
-  post_login_route: `${process.env.CODEFORCES_REDIRECT_URI}`,
+  post_login_route: `http://localhost:3000/auth/`,
   code_challenge_method: 'S256',
 };
 

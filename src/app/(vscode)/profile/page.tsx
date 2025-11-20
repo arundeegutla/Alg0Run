@@ -5,32 +5,25 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Loading from '@/components/Loading';
 import Image from 'next/image';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/server/firebase/clientApp';
+
 export default function ProfilePage() {
   const router = useRouter();
-  const {
-    codeforcesLoggedIn: isLoggedIn,
-    codeforcesUserInfo: user,
-    codeforcesLoading: loading,
-    logoutCodeforces,
-  } = useAuth();
+  const { googleUser, googleLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoggedIn && !loading) {
+    if (!googleUser && !googleLoading) {
       router.push('/auth');
     }
-  }, [isLoggedIn, loading, router]);
+  }, [googleUser, googleLoading, router]);
 
-  if (loading) {
+  if (googleLoading || !googleUser) {
     return <Loading />;
   }
 
-  if (!user) {
-    return <Loading />;
-  }
-
-  const handle = user.handle;
-  const avatar = user.avatar;
-  const rating = user.rating;
+  const displayName = googleUser.displayName || googleUser.email || 'User';
+  const avatar = googleUser.photoURL;
 
   return (
     <div className='flex flex-col items-center justify-center h-full w-full'>
@@ -43,16 +36,11 @@ export default function ProfilePage() {
           height={96}
         />
       )}
-      <h1 className='text-2xl font-bold mb-2'>
-        Hello {handle ? handle : 'User'}
-      </h1>
-      {typeof rating === 'number' && (
-        <div className='text-gray-400'>
-          Rating: <span className='font-semibold'>{rating}</span>
-        </div>
-      )}
+      <h1 className='text-2xl font-bold mb-2'>Hello {displayName}</h1>
       <button
-        onClick={logoutCodeforces}
+        onClick={async () => {
+          await signOut(auth);
+        }}
         className='mt-6 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded shadow font-semibold transition-colors duration-150'
       >
         Logout

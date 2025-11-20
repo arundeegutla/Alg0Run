@@ -1,37 +1,52 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import PixelBlast from '@/components/PixelBlast';
 import { FcGoogle } from 'react-icons/fc';
 import { SiCodeforces } from 'react-icons/si';
 import { unifiedSignIn } from '@/lib/unifiedAuthProvider';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { auth } from '@/server/firebase/clientApp';
+import { signInWithCustomToken } from 'firebase/auth';
+import Loading from '@/components/Loading';
 
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { googleUser, googleLoading } = useAuth();
+  const router = useRouter();
+  const search = useSearchParams();
+  const token = search.get('token');
 
-  // Handle Codeforces callback (username in query string)
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const cfUser = params.get('codeforces_user');
-    const err = params.get('error');
-    if (cfUser) {
-      // You should set session here (e.g., localStorage, cookie, or backend call)
-      localStorage.setItem(
-        'alg0_user',
-        JSON.stringify({ provider: 'codeforces', username: cfUser })
-      );
-      window.location.href = '/';
-    } else if (err) {
-      setError(decodeURIComponent(err));
+  useEffect(() => {
+    if (!token) return;
+    (async () => {
+      try {
+        await signInWithCustomToken(auth, token);
+        router.replace('/type');
+      } catch (e) {
+        console.error(
+          'Failed to sign in with Codeforces Firebase custom token',
+          e
+        );
+        setError('Failed to sign in with Codeforces.');
+      }
+    })();
+  }, [token, router]);
+
+  // Redirect to /type if already logged in (Google)
+  useEffect(() => {
+    if (!googleLoading && googleUser) {
+      window.location.href = '/type';
     }
-  }, []);
+  }, [googleUser, googleLoading]);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
     try {
       await unifiedSignIn.google();
-      window.location.href = '/';
+      window.location.href = '/profile';
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Google sign-in failed');
@@ -53,6 +68,16 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
+
+  if (token) {
+    if (error) {
+      return <div>Error: {error}</div>;
+    }
+    return <Loading text='Signing in with Codeforces...' icon={SiCodeforces} />;
+  }
+  if (googleLoading) {
+    return null;
+  }
 
   return (
     <div className='min-h-screen w-full flex flex-row bg-[#0a0a12]'>

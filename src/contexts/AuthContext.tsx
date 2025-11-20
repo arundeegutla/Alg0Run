@@ -1,27 +1,32 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
 
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import useSession from '@/hooks/useSession';
 import { auth } from '@/server/firebase/clientApp';
-import { SessionData } from '@/server/trpc/types';
+import { trpc } from '@/server/trpc/client';
+
 
 interface AuthContextType {
   googleUser: FirebaseUser | null;
   googleLoading: boolean;
-  codeforcesLoading: boolean;
-  logoutCodeforces: () => Promise<void>;
-  codeforcesLoggedIn: boolean;
-  codeforcesUserInfo: SessionData['userInfo'];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Google Auth state
   const [googleUser, setGoogleUser] = useState<FirebaseUser | null>(null);
   const [googleLoading, setGoogleLoading] = useState(true);
+
+  // tRPC hooks
+  const createProfileMutation = trpc.profile.createProfile.useMutation();
+  // Use useQuery with enabled: false for getProfileByToken
+  const [profileToken, setProfileToken] = useState('');
+  const { refetch: refetchProfileByToken } = trpc.profile.getProfileByToken.useQuery(
+    { idToken: profileToken },
+    { enabled: false }
+  );
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -31,30 +36,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  // Codeforces Auth state
-  const { session: codeforcesSession, loading: codeforcesLoading } =
-    useSession();
-
-  // Codeforces logout function
-  const logoutCodeforces = async () => {
-    try {
-      // Call the logout API route, which will redirect to Codeforces logout
-      window.location.href = '/api/auth/codeforces/logout';
-    } catch (error) {
-      // Optionally handle error
-      console.error('Failed to logout from Codeforces:', error);
-    }
-  };
+  // Check and create Profile if missing
+  useEffect(() => {
+    const ensureProfile = async () => {
+      if (!googleUser) return;
+      try {
+        const idToken = await googleUser.getIdToken();
+        setProfileToken(idToken);
+        // Wait for state to update before refetch
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        const res = await refetchProfileByToken();
+        if (!res.data || res.data.error || !res.data.profile) {
+          // Create profile if not found
+          await createProfileMutation.mutateAsync();
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    ensureProfile();
+    // Only run when googleUser changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [googleUser]);
 
   return (
     <AuthContext.Provider
       value={{
         googleUser,
         googleLoading,
-        codeforcesLoggedIn: codeforcesSession?.isLoggedIn ?? false,
-        codeforcesLoading,
-        codeforcesUserInfo: codeforcesSession?.userInfo,
-        logoutCodeforces,
       }}
     >
       {children}
