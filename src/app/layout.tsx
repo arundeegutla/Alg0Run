@@ -14,8 +14,7 @@ const baseUrl = 'https://alg0run.netlify.app/';
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = 'Alg0Run';
-  const description =
-    'Alg0Run - type coding algorithms in a fun and competitive way!';
+  const description = 'Alg0Run - type coding algorithms in a fun way!';
 
   return {
     metadataBase: new URL(baseUrl),
@@ -27,8 +26,8 @@ export async function generateMetadata(): Promise<Metadata> {
       url: baseUrl,
       images: [
         {
-          url: `${baseUrl}/og_new.png?v=2`,
-          secureUrl: `${baseUrl}/og_new.png?v=2`,
+          url: `/og_new.png?v=2`,
+          secureUrl: `/og_new.png?v=2`,
           height: 1080,
           width: 1920,
           alt: 'New preview image for Alg0Run',
