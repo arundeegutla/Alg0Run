@@ -1,13 +1,12 @@
 'use server';
 import * as prettier from 'prettier/standalone';
-import * as prettierPluginTypescript from 'prettier/parser-typescript';
-import * as prettierPluginBabel from 'prettier/parser-babel';
-import prettierPluginEstree from 'prettier/plugins/estree';
 import prettierPluginJava from 'prettier-plugin-java';
+import { trpc } from '@/server/trpc/server';
+import { Language, PlayDetails } from '@/server/trpc/types';
 
 export type FormatRequest = {
   code: string;
-  language: 'python' | 'cpp' | 'java' | 'typescript' | 'javascript';
+  language: Language;
 };
 
 export type FormatResponse = {
@@ -37,7 +36,7 @@ export async function formatCodeAction({
             useTabs: false,
             bracketSameLine: true,
           });
-        } catch (javaFormatError) {
+        } catch {
           const lines = code.split(/\r?\n/);
           formattedCode = lines
             .map((line) => line.replace(/\s+$/, ''))
@@ -53,22 +52,6 @@ export async function formatCodeAction({
           .join('\n');
         break;
       }
-      case 'typescript':
-      case 'javascript':
-        formattedCode = await prettier.format(code, {
-          parser: 'babel',
-          plugins: [
-            prettierPluginTypescript,
-            prettierPluginBabel,
-            prettierPluginEstree,
-          ],
-          semi: true,
-          singleQuote: true,
-          trailingComma: 'es5',
-          printWidth: 80,
-          tabWidth: 2,
-        });
-        break;
       default:
         return { error: 'Unsupported language' };
     }
@@ -78,6 +61,25 @@ export async function formatCodeAction({
     console.error('Format error:', error);
     return {
       error: error instanceof Error ? error.message : 'Failed to format code',
+    };
+  }
+}
+
+export async function createPlayCompletion({
+  algoId,
+  playDetails,
+}: {
+  algoId: string;
+  playDetails: PlayDetails;
+}) {
+  try {
+    await trpc.algo.createPlay({ algoId, playDetails });
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to send completion:', err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : String(err),
     };
   }
 }

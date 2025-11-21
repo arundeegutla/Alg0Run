@@ -3,12 +3,21 @@ import { z } from 'zod';
 export const LanguageSchema = z.enum(['python', 'cpp', 'java']);
 export type Language = z.infer<typeof LanguageSchema>;
 
+export const CodeForcesOAuthSessionSchema = z.object({
+  code_verifier: z.string().optional(),
+  state: z.string().optional(),
+});
+export type CodeForcesOAuthSession = z.infer<
+  typeof CodeForcesOAuthSessionSchema
+>;
+
 export const ProfileSchema = z.object({
   id: z.string(),
   userId: z.string(),
   username: z.string(),
   photoURL: z.string(),
   totalScore: z.number(),
+  provider: z.enum(['google', 'codeforces']),
   friends: z.array(z.string()),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -17,7 +26,7 @@ export const ProfileBasicSchema = z.object({
   id: z.string(),
   username: z.string(),
   photoURL: z.string(),
-  totalScore: z.number(),
+  provider: z.enum(['google', 'codeforces']),
 });
 export type ProfileBasic = z.infer<typeof ProfileBasicSchema>;
 

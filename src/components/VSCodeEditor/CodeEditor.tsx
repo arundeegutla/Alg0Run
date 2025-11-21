@@ -3,6 +3,8 @@ import { FaMousePointer } from 'react-icons/fa';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CharStateType } from 'react-typing-game-hook';
+import Noise from '../Noise';
+import { Language } from '@/server/trpc/types';
 
 interface CodeEditorProps {
   fontSize: number;
@@ -12,8 +14,8 @@ interface CodeEditorProps {
   handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   setEditorFocused: React.Dispatch<React.SetStateAction<boolean>>;
   editorFocused: boolean;
-  getSyntaxLanguage: (lang: 'python' | 'cpp' | 'java') => string;
-  language: 'python' | 'cpp' | 'java';
+  getSyntaxLanguage: (lang: Language) => string;
+  language: Language;
   currIndex: number;
   charsState: (0 | 2 | 1)[];
 }
@@ -31,29 +33,8 @@ export default function CodeEditor({
   handleKeyDown,
   getSyntaxLanguage,
 }: CodeEditorProps) {
-  // Store bounding rect for overlay positioning
-  const [editorRect, setEditorRect] = React.useState<{
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  } | null>(null);
-
-  // Update bounding rect when not focused
-  React.useLayoutEffect(() => {
-    if (!editorFocused && editorRef!.current) {
-      const rect = editorRef!.current.getBoundingClientRect();
-      setEditorRect({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-      });
-    }
-  }, [editorFocused, editorRef]);
-
   return (
-    <div className='h-full flex'>
+    <div className='h-full flex relative'>
       {/* Line Numbers */}
       <div
         className='w-12 bg-[#1e1e1e] border-r border-[#3e3e42] py-4 text-right pr-2 text-[#858585] font-mono select-none overflow-hidden'
@@ -77,29 +58,6 @@ export default function CodeEditor({
           onBlur={() => setEditorFocused(false)}
           className='absolute inset-0 overflow-auto focus:outline-none'
         >
-          {/* Overlay when not focused: blurry, hover to focus */}
-          {!editorFocused && (
-            <div
-              className='z-20 flex flex-col items-center justify-center bg-black/40 select-none backdrop-blur-sm transition-all duration-200'
-              style={{
-                pointerEvents: 'auto',
-                cursor: 'pointer',
-                position: 'fixed',
-                top: editorRect ? editorRect.top : 0,
-                left: editorRect ? editorRect.left : 0,
-                width: editorRect ? editorRect.width : '100%',
-                height: editorRect ? editorRect.height : '100%',
-              }}
-              onMouseEnter={() => {
-                editorRef!.current?.focus();
-              }}
-            >
-              <FaMousePointer className='mb-2 text-2xl text-[#4ec9b0]' />
-              <span className='text-[#cccccc] text-base font-mono bg-[#222c] px-3 py-1 rounded shadow'>
-                Hover to focus
-              </span>
-            </div>
-          )}
           <div className='relative'>
             {/* Grayed-out code background for untyped code, syntax highlight for typed code */}
             <div className='absolute inset-0'>
@@ -201,6 +159,32 @@ export default function CodeEditor({
           </div>
         </div>
       </div>
+
+      {/* Overlay when not focused: blurry, hover to focus */}
+      {!editorFocused && (
+        <div
+          className='z-20 absolute w-full h-full flex flex-col items-center justify-center bg-black/40 select-none backdrop-blur-3xl transition-all duration-200'
+          style={{
+            pointerEvents: 'auto',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={() => {
+            editorRef!.current?.focus();
+          }}
+        >
+          <Noise
+            patternSize={250}
+            patternScaleX={1}
+            patternScaleY={1}
+            patternRefreshInterval={4}
+            patternAlpha={15}
+          />
+          <FaMousePointer className='mb-2 text-2xl text-[#4ec9b0]' />
+          <span className='text-[#cccccc] text-base font-mono bg-[#222c] px-3 py-1 rounded shadow'>
+            Hover to focus
+          </span>
+        </div>
+      )}
     </div>
   );
 }

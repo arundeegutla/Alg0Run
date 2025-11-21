@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db, auth } from '../util/db';
-import { ProfileSchema, PlaySchema } from '../types';
+import { ProfileSchema, PlaySchema, ProfileBasicSchema } from '../types';
 import { firestore } from 'firebase-admin';
+import { TRPCError } from '@trpc/server';
 
 export const profileRouter = createTRPCRouter({
   verifyToken: authedProcedure
@@ -10,43 +11,77 @@ export const profileRouter = createTRPCRouter({
     .query(async ({ input }) => {
       try {
         const decodedToken = await auth.verifyIdToken(input.idToken);
-        return { decodedToken, error: '' };
+        return { decodedToken };
       } catch {
-        return { decodedToken: undefined, error: 'Invalid token' };
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid token' });
       }
     }),
 
   getProfileByUserId: authedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input }) => {
-      const querySnapshot = await db
-        .collection('Profiles')
-        .where('userId', '==', input.userId)
-        .get();
-      if (querySnapshot.empty) {
-        return { profile: undefined, error: 'Profile not found' };
+      const doc = await db.collection('Profiles').doc(input.userId).get();
+      if (!doc.exists) {
+        console.log('Profile not found for userId', input.userId);
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Profile not found',
+        });
       }
-      const res = querySnapshot.docs[0].data();
-      res.id = querySnapshot.docs[0].id;
-      return { profile: ProfileSchema.parse(res), error: '' };
+      const res = doc.data() || {};
+      res.id = doc.id;
+      const playsSnapshot = await db
+        .collection('Plays')
+        .where('profileId', '==', res.id)
+        .get();
+      const plays = playsSnapshot.docs.map((doc) =>
+        PlaySchema.parse(doc.data())
+      );
+      return { profile: ProfileSchema.parse(res), plays };
+    }),
+
+  getBasicProfileByUserId: authedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      const doc = await db.collection('Profiles').doc(input.userId).get();
+      console.log('Fetched profile doc for userId', input.userId, doc.exists);
+      if (!doc.exists) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Profile not found',
+        });
+      }
+      const data = doc.data() || {};
+      const basicProfile = {
+        id: doc.id,
+        username: data.username,
+        photoURL: data.photoURL,
+        provider: data.provider,
+      };
+      return { profile: ProfileBasicSchema.parse(basicProfile) };
     }),
 
   getProfileByToken: authedProcedure
     .input(z.object({ idToken: z.string() }))
     .query(async ({ input }) => {
+      if (!input.idToken) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'No token provided',
+        });
+      }
       try {
         const decodedToken = await auth.verifyIdToken(input.idToken);
         const userId = decodedToken.uid;
-        const querySnapshot = await db
-          .collection('Profiles')
-          .where('userId', '==', userId)
-          .get();
-        if (querySnapshot.empty) {
-          return { error: 'Profile does not exist for this user.' };
+        const doc = await db.collection('Profiles').doc(userId).get();
+        if (!doc.exists) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Profile does not exist for this user.',
+          });
         }
-        const profileDoc = querySnapshot.docs[0];
-        const profile = profileDoc.data() || {};
-        profile.id = profileDoc.id;
+        const profile = doc.data() || {};
+        profile.id = doc.id;
         const playsSnapshot = await db
           .collection('Plays')
           .where('profileId', '==', profile.id)
@@ -54,104 +89,110 @@ export const profileRouter = createTRPCRouter({
         const plays = playsSnapshot.docs.map((doc) =>
           PlaySchema.parse(doc.data())
         );
-        return { profile: ProfileSchema.parse(profile), plays, error: '' };
-      } catch {
-        return { error: 'Invalid token' };
+        return { profile: ProfileSchema.parse(profile), plays };
+      } catch (err) {
+        throw err;
       }
     }),
 
-  getProfile: authedProcedure
-    .input(z.object({ profileId: z.string() }))
-    .query(async ({ input }) => {
-      const doc = await db.collection('Profiles').doc(input.profileId).get();
-      if (!doc.exists) {
-        return { profile: undefined, error: 'Profile not found' };
-      }
-      const res = doc.data() || {};
-      res.id = doc.id;
-      return { profile: ProfileSchema.parse(res), error: '' };
-    }),
+  getProfile: authedProcedure.query(async ({ ctx }) => {
+    const doc = await db.collection('Profiles').doc(ctx.user.uid).get();
+    if (!doc.exists) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    }
+    const res = doc.data() || {};
+    res.id = doc.id;
+    return { profile: ProfileSchema.parse(res) };
+  }),
 
-  getPlays: authedProcedure
-    .input(z.object({ profileId: z.string() }))
-    .query(async ({ input }) => {
-      const querySnapshot = await db
-        .collection('Plays')
-        .where('profileId', '==', input.profileId)
-        .get();
-      const plays = querySnapshot.docs.map((doc) =>
-        PlaySchema.parse(doc.data())
-      );
-      return { plays, error: '' };
-    }),
+  getPlays: authedProcedure.query(async ({ ctx }) => {
+    const querySnapshot = await db
+      .collection('Plays')
+      .where('profileId', '==', ctx.user.uid)
+      .get();
+    const plays = querySnapshot.docs.map((doc) => PlaySchema.parse(doc.data()));
+    return { plays };
+  }),
 
-  createProfile: authedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        username: z.string(),
-        photoURL: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const profileId = db.collection('Profiles').doc().id;
-      try {
-        await db.collection('Profiles').doc(profileId).set({
-          username: input.username,
+  createProfile: authedProcedure.mutation(async ({ ctx }) => {
+    try {
+      console.log('Creating profile for user:', ctx);
+      await db
+        .collection('Profiles')
+        .doc(ctx.user.uid)
+        .set({
+          username: ctx.user.name,
           totalScore: 0,
-          userId: input.userId,
-          photoURL: input.photoURL,
+          userId: ctx.user.uid,
+          photoURL: ctx.user.picture,
+          provider:
+            ctx.user.firebase.sign_in_provider === 'google.com'
+              ? 'google'
+              : 'codeforces',
           friends: [],
         });
-        return { profileId, error: '' };
-      } catch {
-        return { profileId: undefined, error: 'Failed to create profile' };
-      }
-    }),
+      return {};
+    } catch (err) {
+      console.error('Error creating profile:', err);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to create profile',
+      });
+    }
+  }),
 
   addFriend: authedProcedure
-    .input(z.object({ profileId: z.string(), friendId: z.string() }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ friendId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
       try {
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({
             friends: firestore.FieldValue.arrayUnion(input.friendId),
           });
-        return { error: '' };
+        return {};
       } catch {
-        return { error: 'Failed to add friend' };
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add friend',
+        });
       }
     }),
 
   removeFriend: authedProcedure
-    .input(z.object({ profileId: z.string(), friendId: z.string() }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ friendId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
       try {
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({
             friends: firestore.FieldValue.arrayRemove(input.friendId),
           });
-        return { error: '' };
+        return {};
       } catch {
-        return { error: 'Failed to remove friend' };
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to remove friend',
+        });
       }
     }),
 
   setScore: authedProcedure
-    .input(z.object({ profileId: z.string(), newTotalScore: z.number() }))
-    .mutation(async ({ input }) => {
+    .input(z.object({ newTotalScore: z.number() }))
+    .mutation(async ({ ctx, input }) => {
       try {
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({ totalScore: input.newTotalScore });
-        return { error: '' };
+        return {};
       } catch {
-        return { error: 'Failed to set score' };
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to set score',
+        });
       }
     }),
 });

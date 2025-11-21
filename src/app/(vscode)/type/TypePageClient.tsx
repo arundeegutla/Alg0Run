@@ -5,7 +5,7 @@ import VSCodeEditor from '~/components/VSCodeEditor';
 import PrimarySidebar from '~/components/PrimarySidebar';
 import SecondarySidebar from '~/components/SecondarySidebar';
 import StatusBar from '~/components/StatusBar';
-import { Algo } from '@/server/trpc/types';
+import { Algo, Language } from '@/server/trpc/types';
 
 interface TypePageClientProps {
   algorithms: Algo[];
@@ -13,9 +13,7 @@ interface TypePageClientProps {
 
 export default function TypePageClient({ algorithms }: TypePageClientProps) {
   const [selectedAlgo, setSelectedAlgo] = useState<Algo | null>(null);
-  const [currentLanguage, setCurrentLanguage] = useState<
-    'python' | 'cpp' | 'java'
-  >('python');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>('python');
   const [stats, setStats] = useState({
     wpm: 0,
     accuracy: 0,
@@ -26,9 +24,7 @@ export default function TypePageClient({ algorithms }: TypePageClientProps) {
   const [hackpackMode, setHackpackMode] = useState(false);
   const [showHackpackModal, setShowHackpackModal] = useState(false);
   const [customCode, setCustomCode] = useState('');
-  const [customCodeLang, setCustomCodeLang] = useState<
-    'python' | 'cpp' | 'java'
-  >('python');
+  const [customCodeLang, setCustomCodeLang] = useState<Language>('python');
   const primaryDefaultWidth = 'fit-content';
   const [showPrimarySidebar, setShowPrimarySidebar] = useState(true);
   const [showSecondarySidebar, setShowSecondarySidebar] = useState(true);
@@ -165,7 +161,7 @@ export default function TypePageClient({ algorithms }: TypePageClientProps) {
             }}
           >
             <PrimarySidebar
-              algorithms={algorithms}
+              allAlgos={algorithms}
               selectedAlgo={selectedAlgo}
               onSelectAlgo={setSelectedAlgo}
               hackpackMode={hackpackMode}

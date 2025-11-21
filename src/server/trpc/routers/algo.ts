@@ -1,78 +1,85 @@
 import { z } from 'zod';
-import { createTRPCRouter, authedProcedure } from '../context';
+import { createTRPCRouter, authedProcedure, publicProcedure } from '../context';
+import { TRPCError } from '@trpc/server';
 import { db } from '../util/db';
 import { AlgoSchema, PlayDetailsSchema } from '../types';
 
 export const algoRouter = createTRPCRouter({
-  getAlgo: authedProcedure
+  getAlgo: publicProcedure
     .input(z.object({ algoId: z.string() }))
     .query(async ({ input }) => {
       const doc = await db.collection('Algos').doc(input.algoId).get();
       if (!doc.exists) {
-        return { algo: undefined, error: "Algo doesn't exist" };
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: "Algo doesn't exist",
+        });
       }
       const res = doc.data() || {};
       res.id = doc.id;
-      return { algo: AlgoSchema.parse(res), error: '' };
+      return { algo: AlgoSchema.parse(res) };
     }),
 
-  getAllAlgos: authedProcedure.query(async () => {
+  getAllAlgos: publicProcedure.query(async () => {
     const querySnapshot = await db.collection('Algos').get();
     const results = querySnapshot.docs.map((doc) => {
       const res = doc.data() || {};
       res.id = doc.id;
       return AlgoSchema.parse(res);
     });
-    return { results, error: '' };
+    return { results };
   }),
 
   createPlay: authedProcedure
     .input(
       z.object({
         algoId: z.string(),
-        profileId: z.string(),
         playDetails: PlayDetailsSchema,
       })
     )
-    .mutation(async ({ input }) => {
-      // Check if algo exists
+    .mutation(async ({ ctx, input }) => {
       const algoDoc = await db.collection('Algos').doc(input.algoId).get();
       if (!algoDoc.exists) {
-        return { error: 'Algo does not exist' };
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Algo does not exist',
+        });
       }
 
-      // Check if profile exists
       const profileDoc = await db
         .collection('Profiles')
-        .doc(input.profileId)
+        .doc(ctx.user.uid)
         .get();
       if (!profileDoc.exists) {
-        return { error: 'Profile does not exist' };
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Profile does not exist',
+        });
       }
       const profile = profileDoc.data() || {};
       profile.id = profileDoc.id;
 
-      // Get all plays for this profile
       const playsSnapshot = await db
         .collection('Plays')
-        .where('profileId', '==', input.profileId)
+        .where('profileId', '==', ctx.user.uid)
         .get();
       const plays = playsSnapshot.docs.map((doc) => doc.data());
 
-      // Create new play
       const playId = db.collection('Plays').doc().id;
       try {
         await db.collection('Plays').doc(playId).set({
           algoId: input.algoId,
-          profileId: input.profileId,
+          profileId: ctx.user.uid,
           username: profile.username,
           playDetails: input.playDetails,
         });
       } catch {
-        return { error: 'Failed to create play' };
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to create play',
+        });
       }
 
-      // Update score if this is the highest for this algo
       const currentAlgoScores = plays
         .filter((p) => p.algoId === input.algoId)
         .map((p) => p.playDetails?.score ?? 0);
@@ -85,10 +92,9 @@ export const algoRouter = createTRPCRouter({
           input.playDetails.score;
         await db
           .collection('Profiles')
-          .doc(input.profileId)
+          .doc(ctx.user.uid)
           .update({ totalScore: Math.round(newTotalScore * 10) / 10.0 });
       }
-
-      return { playId, error: '' };
+      return { playId };
     }),
 });

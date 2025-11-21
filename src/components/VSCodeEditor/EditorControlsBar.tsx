@@ -1,3 +1,4 @@
+import { Language } from '@/server/trpc/types';
 import React from 'react';
 import { VscRefresh, VscZoomIn, VscZoomOut } from 'react-icons/vsc';
 
@@ -7,9 +8,9 @@ interface EditorControlsBarProps {
   handleIncreaseFontSize: () => void;
   handleDecreaseFontSize: () => void;
   fontSize: number;
-  language: 'python' | 'cpp' | 'java';
-  availableLanguages: readonly ('python' | 'cpp' | 'java')[];
-  onLanguageChange: (lang: 'python' | 'cpp' | 'java') => void;
+  language: Language;
+  availableLanguages: readonly Language[];
+  onLanguageChange: (lang: Language) => void;
 }
 
 export default function EditorControlsBar({
@@ -26,9 +27,12 @@ export default function EditorControlsBar({
     <div className='flex items-center justify-between border-b border-[#3C3C3C] bg-[#252526] px-4 py-1'>
       <div className='flex items-center space-x-2'>
         <button
-          onClick={handleReset}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleReset();
+          }}
           disabled={isFormatting}
-          className='h-8 px-3 py-1 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded flex items-center gap-1 border border-transparent disabled:opacity-60'
+          className='h-8 px-3 py-1 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded flex items-center gap-1 border border-transparent disabled:opacity-60 '
           title='Reset Progress'
         >
           {isFormatting ? (
@@ -41,7 +45,11 @@ export default function EditorControlsBar({
           {isFormatting ? 'Formatting...' : 'Reset'}
         </button>
         <button
-          onClick={handleDecreaseFontSize}
+          // onClick={handleDecreaseFontSize}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleDecreaseFontSize();
+          }}
           className='h-8 px-2 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded'
           title='Decrease Font Size'
         >
@@ -51,7 +59,10 @@ export default function EditorControlsBar({
           {fontSize}px
         </span>
         <button
-          onClick={handleIncreaseFontSize}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleIncreaseFontSize();
+          }}
           className='h-8 px-2 text-xs text-[#CCCCCC] hover:bg-[#3C3C3C] hover:text-white rounded'
           title='Increase Font Size'
         >
@@ -68,9 +79,7 @@ export default function EditorControlsBar({
         <select
           id='language-select'
           value={language}
-          onChange={(e) =>
-            onLanguageChange(e.target.value as 'python' | 'cpp' | 'java')
-          }
+          onChange={(e) => onLanguageChange(e.target.value as Language)}
           className='bg-[#1e1e1e] text-[#cccccc] border border-[#3e3e42] rounded px-2 py-1 text-xs focus:outline-none'
           style={{ minWidth: 90 }}
         >

@@ -8,7 +8,6 @@ import { createTRPCContext } from '@/server/trpc/context';
 const createContext = async (req: NextRequest) => {
   return createTRPCContext({
     headers: req.headers,
-    session_token: null,
   });
 };
 
