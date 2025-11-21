@@ -9,11 +9,11 @@ export const clientConfig = {
   client_id: process.env.NODE_codeforces_client_id,
   client_secret: process.env.NODE_codeforces_client_secret,
   scope: process.env.NEXT_PUBLIC_SCOPE,
-  redirect_uri: `http://localhost:3000/api/auth/codeforces/callback`,
-  post_logout_redirect_uri: `https://alg0run.netlify.app/`,
+  redirect_uri: process.env.NEXT_CODEFORCES_CALLBACK_URL,
+  post_logout_redirect_uri: process.env.NEXT_DOMAIN_URL,
   response_type: 'code',
   grant_type: 'authorization_code',
-  post_login_route: `http://localhost:3000/auth/`,
+  post_login_route: process.env.NEXT_CODEFORCES_POST_LOGIN_ROUTE,
   code_challenge_method: 'S256',
 };
 
