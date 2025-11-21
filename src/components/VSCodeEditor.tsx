@@ -189,7 +189,7 @@ export default function VSCodeEditor({
     // Switch to info tab when race completes (only once)
     if (phase === PhaseType.Ended && !hasAutoSwitchedToInfo.current) {
       hasAutoSwitchedToInfo.current = true;
-      setActiveTab('info');
+      router.push('?tab=info');
     }
 
     const durationMs = getDuration();
@@ -215,7 +215,7 @@ export default function VSCodeEditor({
       time: timeSec,
       progress: Number.isFinite(progress) && !isNaN(progress) ? progress : 0,
     });
-  }, [length, currIndex, charsState, phase, getDuration]);
+  }, [length, currIndex, charsState, phase, getDuration, router]);
 
   // Call sendCompletion only when phase is Ended and only once per session
   useEffect(() => {
