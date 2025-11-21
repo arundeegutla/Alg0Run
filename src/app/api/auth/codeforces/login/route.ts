@@ -7,7 +7,7 @@ export async function GET() {
   const code_challenge = await client.calculatePKCECodeChallenge(code_verifier);
   const openIdClientConfig = await getConfig();
   const parameters: Record<string, string> = {
-    redirect_uri: clientConfig.redirect_uri,
+    redirect_uri: clientConfig.redirect_uri!,
     scope: clientConfig.scope!,
     code_challenge,
     code_challenge_method: clientConfig.code_challenge_method,
