@@ -5,6 +5,7 @@ import { trpc } from '@/server/trpc/client';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { LeaderBoard } from '@/components/AlgoLeaderboard';
+import BlurredLeaderboard from '@/components/BlurredLeaderboard';
 
 export default function LeaderboardPage() {
   const [user] = useAuthState(auth);
@@ -79,7 +80,9 @@ export default function LeaderboardPage() {
           <p className='mb-6 text-[#858585] text-sm font-mono'>
             See the top algorithm typists and your ranking!
           </p>
-          {getProfiles.isLoading ? (
+          {!user ? (
+            <BlurredLeaderboard />
+          ) : getProfiles.isLoading ? (
             <div className='flex justify-center items-center h-32'>
               <span className='text-[#569cd6] animate-pulse'>Loading...</span>
             </div>
