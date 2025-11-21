@@ -13,7 +13,6 @@ export function useUserProfiles(profileIds: string[]) {
       queryKey: ['profile', id],
       queryFn: async () => {
         if (userProfileCache.has(id)) {
-          console.log('returning cached profile', id);
           return userProfileCache.get(id);
         }
         const result = await trpcContext.profile.getBasicProfileByUserId.fetch({

@@ -5,22 +5,22 @@ import React, { useState, useEffect } from 'react';
 import { VscChevronDown, VscChevronRight, VscFile } from 'react-icons/vsc';
 import { MdKeyboardCommandKey, MdKeyboardDoubleArrowUp } from 'react-icons/md';
 import { Algo } from '@/server/trpc/types';
+import { useAlgo } from '@/contexts/AlgoContext';
 
 interface PrimarySidebarProps {
   allAlgos: Algo[];
-  selectedAlgo: Algo | null;
-  onSelectAlgo: (algo: Algo) => void;
-  // Hackpack mode props
   hackpackMode?: boolean;
   onHackpackClick?: () => void;
+  selectedAlgo: Algo | null;
+  onSelectAlgo: (algo: Algo) => void;
 }
 
 export default function PrimarySidebar({
   allAlgos,
-  selectedAlgo,
-  onSelectAlgo,
   hackpackMode = false,
   onHackpackClick,
+  selectedAlgo,
+  onSelectAlgo = () => {},
 }: PrimarySidebarProps) {
   // Utility to get a random element from an array
   function getRandomElement<T>(arr: T[]): T | undefined {

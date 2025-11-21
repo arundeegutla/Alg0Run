@@ -57,13 +57,6 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   // Determine if we're viewing current user or another user
   const isViewingCurrentUser = !slug || slug[0] === googleUser?.uid;
 
-  console.log(
-    'Viewing profile for id:',
-    slug?.[0],
-    'isViewingCurrentUser:',
-    isViewingCurrentUser
-  );
-
   // Query for current user's profile (by token)
   const {
     data: currentUserData,

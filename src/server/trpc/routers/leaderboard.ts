@@ -76,4 +76,25 @@ export const leaderboardRouter = createTRPCRouter({
         });
       }
     }),
+  getProfiles: authedProcedure.query(async () => {
+    try {
+      const profilesSnapshot = await db
+        .collection('Profiles')
+        .select('username', 'totalScore', 'photoURL', 'provider')
+        .get();
+
+      return {
+        results: profilesSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        })),
+      };
+    } catch (err) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to fetch profiles',
+        cause: err,
+      });
+    }
+  }),
 });

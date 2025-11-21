@@ -7,6 +7,7 @@ import React, {
   useState,
   useCallback,
 } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import useTypingGame, {
   CharStateType,
   PhaseType,
@@ -63,7 +64,12 @@ export default function VSCodeEditor({
   const rawCode = algo?.code?.[language] || '';
   const [isFormatting, setIsFormatting] = useState(false);
   const [fontSize, setFontSize] = useState(20);
-  const [activeTab, setActiveTab] = useState<'code' | 'info'>('code');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<'code' | 'info'>(
+    tabParam === 'info' ? 'info' : 'code'
+  );
   const [user] = useAuthState(auth);
   const [editorFocused, setEditorFocused] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
@@ -131,6 +137,13 @@ export default function VSCodeEditor({
       }, 0);
     }
   }, [activeTab]);
+
+  // Sync tab state with query param
+  useEffect(() => {
+    if (tabParam !== activeTab) {
+      setActiveTab(tabParam === 'info' ? 'info' : 'code');
+    }
+  }, [tabParam, activeTab]);
 
   useEffect(() => {
     if (cursorRef.current && editorRef.current) {
@@ -289,15 +302,22 @@ export default function VSCodeEditor({
     }
   };
 
+  const handleTabSwitch = useCallback(
+    (tab: 'code' | 'info') => {
+      router.push(`?tab=${tab}`);
+    },
+    [router]
+  );
+
   const handleReset = useCallback(() => {
     editorRef.current?.focus();
-    setActiveTab('code');
+    handleTabSwitch('code');
     resetTyping();
     hasAutoSwitchedToInfo.current = false;
     setComplete(false);
     setIsTyping(false);
     setStats({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
-  }, [resetTyping]);
+  }, [resetTyping, handleTabSwitch]);
 
   useEffect(() => {
     handleReset();
@@ -368,7 +388,7 @@ export default function VSCodeEditor({
         algo={algo}
         language={language}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabSwitch}
         handleReset={handleReset}
       />
 

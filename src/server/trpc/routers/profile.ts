@@ -22,7 +22,6 @@ export const profileRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const doc = await db.collection('Profiles').doc(input.userId).get();
       if (!doc.exists) {
-        console.log('Profile not found for userId', input.userId);
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Profile not found',
@@ -44,7 +43,6 @@ export const profileRouter = createTRPCRouter({
     .input(z.object({ userId: z.string() }))
     .query(async ({ input }) => {
       const doc = await db.collection('Profiles').doc(input.userId).get();
-      console.log('Fetched profile doc for userId', input.userId, doc.exists);
       if (!doc.exists) {
         throw new TRPCError({
           code: 'NOT_FOUND',
@@ -116,7 +114,6 @@ export const profileRouter = createTRPCRouter({
 
   createProfile: authedProcedure.mutation(async ({ ctx }) => {
     try {
-      console.log('Creating profile for user:', ctx);
       await db
         .collection('Profiles')
         .doc(ctx.user.uid)

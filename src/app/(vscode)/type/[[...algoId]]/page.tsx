@@ -1,18 +1,31 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, use } from 'react';
+import { useAlgo } from '@/contexts/AlgoContext';
 import VSCodeEditor from '~/components/VSCodeEditor';
 import PrimarySidebar from '~/components/PrimarySidebar';
 import SecondarySidebar from '~/components/SecondarySidebar';
 import StatusBar from '~/components/StatusBar';
 import { Algo, Language } from '@/server/trpc/types';
 
-interface TypePageClientProps {
-  algorithms: Algo[];
+interface TypePageProps {
+  params: Promise<{
+    algoId?: string;
+  }>;
 }
 
-export default function TypePageClient({ algorithms }: TypePageClientProps) {
-  const [selectedAlgo, setSelectedAlgo] = useState<Algo | null>(null);
+import { useRouter } from 'next/navigation';
+
+export default function TypePageClientInner({ params }: TypePageProps) {
+  const router = useRouter();
+  const { algoId } = use(params);
+  const { algorithms } = useAlgo();
+
+  const [selectedAlgo, setSelectedAlgo] = useState<Algo | null>(() => {
+    const found = algorithms.find((a: Algo) => a.id === algoId?.[0]);
+    return found || null;
+  });
+
   const [currentLanguage, setCurrentLanguage] = useState<Language>('python');
   const [stats, setStats] = useState({
     wpm: 0,
@@ -40,6 +53,14 @@ export default function TypePageClient({ algorithms }: TypePageClientProps) {
       setTimeout(() => setHackpackMode(false), 0);
     }
   }, [selectedAlgo, hackpackMode]);
+
+  // Push router on algo change
+  useEffect(() => {
+    if (selectedAlgo && selectedAlgo.id !== algoId?.[0]) {
+      router.push(`/type/${selectedAlgo.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAlgo]);
 
   // Sidebar resizing handlers (attach listeners on mousedown)
   const [dragging, setDragging] = useState<null | 'primary' | 'secondary'>(
@@ -161,9 +182,9 @@ export default function TypePageClient({ algorithms }: TypePageClientProps) {
             }}
           >
             <PrimarySidebar
-              allAlgos={algorithms}
               selectedAlgo={selectedAlgo}
               onSelectAlgo={setSelectedAlgo}
+              allAlgos={algorithms}
               hackpackMode={hackpackMode}
               onHackpackClick={() => {
                 if (hackpackMode) {

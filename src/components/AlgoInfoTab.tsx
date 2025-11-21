@@ -9,7 +9,6 @@ import { auth } from '@/server/firebase/clientApp';
 import { Algo, PlayBasic, ProfileBasic } from '@/server/trpc/types';
 import { trpc } from '@/server/trpc/client';
 import { userProfileCache, useUserProfiles } from '@/hooks/useUserProfile';
-import Loading from './Loading';
 import BlurredLeaderboard from './BlurredLeaderboard';
 import { LeaderBoard } from './AlgoLeaderboard';
 import PythonOriginal from 'devicons-react/icons/PythonOriginal';
@@ -83,12 +82,10 @@ export default function AlgoInfoTab({ algo }: AlgoInfoTabProps) {
       : [];
 
   const profileIds = leaderboard.map((play) => play.profileId);
-  console.log('Fetching profiles for IDs:', profileIds);
   const userProfiles = useUserProfiles(profileIds);
 
   // Helper function to get user info from cache/state
   const getUserInfo = (profileId: string): ProfileBasic => {
-    console.log('user', userProfiles.get(profileId));
     return (
       userProfiles.get(profileId) ||
       userProfileCache.get(profileId) || {
@@ -132,15 +129,21 @@ export default function AlgoInfoTab({ algo }: AlgoInfoTabProps) {
   const getProviderIcon = (profile: ProfileBasic) => {
     if (profile.provider === 'codeforces' && profile.username) {
       return (
-        <a
-          href={`https://codeforces.com/profile/${profile.username}`}
-          target='_blank'
-          rel='noopener noreferrer'
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(
+              `https://codeforces.com/profile/${profile.username}`,
+              '_blank',
+              'noopener,noreferrer'
+            );
+          }}
           title='View Codeforces profile'
-          className='ml-1 text-[#1f8acb] hover:text-[#005fa3] flex items-center'
+          className='ml-1 text-[#1f8acb] hover:text-[#005fa3] flex items-center cursor-pointer codeforces-icon-btn'
         >
           <SiCodeforces size={18} />
-        </a>
+        </button>
       );
     }
     return null;
@@ -222,7 +225,9 @@ export default function AlgoInfoTab({ algo }: AlgoInfoTabProps) {
               {!user ? (
                 <BlurredLeaderboard />
               ) : loading ? (
-                <Loading />
+                <div className='flex justify-center items-center h-32'>
+                  Loading...
+                </div>
               ) : leaderboard.length === 0 ? (
                 <EmptyLeaderboard />
               ) : (
