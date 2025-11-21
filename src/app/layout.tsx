@@ -10,28 +10,41 @@ const Loading = lazy(() => import('../components/Loading'));
 const _geist = Geist({ subsets: ['latin'] });
 const _geistMono = Geist_Mono({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: 'Alg0Run - Algorithm Speed Typing',
-  description: 'Type algorithms, race against peers, dominate the leaderboard',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
-};
+const baseUrl = 'https://alg0run.netlify.app/';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const title = 'Alg0Run';
+  const description =
+    'Alg0Run - type coding algorithms in a fun and competitive way!';
+
+  return {
+    metadataBase: new URL(baseUrl),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: baseUrl,
+      images: [
+        {
+          url: `/og.png`,
+          secureUrl: `/og.png`,
+          height: 1200,
+          width: 630,
+          alt: 'Preview image for Alg0Run',
+        },
+      ],
+      type: 'website',
+      siteName: 'Alg0Run',
+    },
+    icons: {
+      icon: '/favicons/favicon.ico',
+      shortcut: '/favicons/apple-touch-icon.png',
+      apple: '/favicons/apple-touch-icon.png',
+    },
+    manifest: '/favicons/site.webmanifest',
+  };
+}
 
 export default function RootLayout({
   children,
