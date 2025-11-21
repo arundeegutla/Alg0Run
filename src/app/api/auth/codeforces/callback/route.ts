@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
   const customToken = await admin.auth().createCustomToken(uid);
 
   const redirectUrl = new URL(
-    clientConfig.post_login_route,
+    clientConfig.post_login_route!,
     `${protocol}://${host}`
   );
   redirectUrl.searchParams.set('token', customToken);
