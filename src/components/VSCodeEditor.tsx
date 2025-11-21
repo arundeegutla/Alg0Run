@@ -16,10 +16,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { trpc } from '@/server/trpc/client';
 import { Algo, Language, PlayDetails } from '@/server/trpc/types';
-import {
-  formatCodeAction,
-  createPlayCompletion,
-} from '../app/(vscode)/type/actions';
+import { formatCodeAction } from '../app/(vscode)/type/actions';
 import MenuBar from './VSCodeEditor/MenuBar';
 import TabBar from './VSCodeEditor/TabBar';
 import EditorControlsBar from './VSCodeEditor/EditorControlsBar';
@@ -55,7 +52,6 @@ export default function VSCodeEditor({
     );
   }, [algo]);
 
-  // If the current language is not available, switch to the first available
   useEffect(() => {
     if (!algo || !algo.code) return;
     if (!availableLanguages.includes(language)) {
@@ -78,7 +74,6 @@ export default function VSCodeEditor({
     progress: number;
   }>({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
 
-  // Format code with Prettier (only for TypeScript/JS)
   const [targetCode, setTargetCode] = useState(() => {
     if (!rawCode) return '';
     if (language === 'cpp' || language === 'java' || language === 'python') {
@@ -100,7 +95,6 @@ export default function VSCodeEditor({
         setTargetCode(formattedCode || '');
       } catch (error) {
         console.error('Failed to format code:', error);
-        // Fallback: just clean up trailing whitespace
         const lines = rawCode.split(/\r?\n/);
         setTargetCode(lines.map((line) => line.replace(/\s+$/, '')).join('\n'));
       } finally {
@@ -130,19 +124,14 @@ export default function VSCodeEditor({
   const cursorRef = useRef<HTMLSpanElement>(null);
   const hasAutoSwitchedToInfo = useRef(false);
 
-  // Reset hook when algo or language (text) changes
-
-  // Focus editor when switching back to code tab
   useEffect(() => {
     if (activeTab === 'code') {
-      // Timeout ensures focus after render
       setTimeout(() => {
         editorRef.current?.focus();
       }, 0);
     }
   }, [activeTab]);
 
-  // Auto-scroll to keep cursor visible
   useEffect(() => {
     if (cursorRef.current && editorRef.current) {
       const cursorElement = cursorRef.current;
@@ -151,34 +140,35 @@ export default function VSCodeEditor({
       const cursorRect = cursorElement.getBoundingClientRect();
       const editorRect = editorElement.getBoundingClientRect();
 
-      // Check if cursor is below the visible area
       if (cursorRect.bottom > editorRect.bottom - 50) {
         cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      // Check if cursor is above the visible area
-      else if (cursorRect.top < editorRect.top + 50) {
+      } else if (cursorRect.top < editorRect.top + 50) {
         cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   }, [currIndex]);
+
+  const createPlayMutation = trpc.algo.createPlay.useMutation();
 
   const [complete, setComplete] = useState(false);
   const sendCompletion = useCallback(
     async (playDetails: PlayDetails) => {
       if (complete) return;
       setComplete(true);
-      if (user && algo) {
+      if (user && algo && algo.id !== 'hackpack-custom') {
         try {
-          await createPlayCompletion({
+          await createPlayMutation.mutateAsync({
             algoId: algo.id,
             playDetails,
           });
+          // Dispatch custom event to signal leaderboard update
+          window.dispatchEvent(new CustomEvent('algorun-leaderboard-update'));
         } catch (err) {
           console.error('Failed to send completion:', err);
         }
       }
     },
-    [user, algo, complete]
+    [complete, user, algo, createPlayMutation]
   );
 
   // Stats calculation

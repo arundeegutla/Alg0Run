@@ -6,8 +6,6 @@ import { admin } from '@/server/trpc/util/db';
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
-  console.log('Session in callback:', session);
-
   const openIdClientConfig = await getConfig();
   const headerList = await headers();
 
@@ -30,9 +28,6 @@ export async function GET(req: NextRequest) {
   );
 
   const claims = tokenSet.claims()!;
-
-  console.log('Codeforces Claims:', claims);
-
   const handle = claims.handle as string;
   const avatar = claims.avatar as string;
 

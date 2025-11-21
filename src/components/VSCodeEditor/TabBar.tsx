@@ -1,8 +1,9 @@
 import { Language } from '@/server/trpc/types';
 import React from 'react';
-import { FaJava } from 'react-icons/fa';
-import { SiPython, SiCplusplus } from 'react-icons/si';
 import { VscClose } from 'react-icons/vsc';
+import PythonOriginal from 'devicons-react/icons/PythonOriginal';
+import Cpp from 'devicons-react/icons/CplusplusOriginal';
+import Java from 'devicons-react/icons/JavaOriginal';
 
 interface TabBarProps {
   algo: { name?: string } | null;
@@ -19,15 +20,14 @@ export default function TabBar({
   setActiveTab,
   handleReset,
 }: TabBarProps) {
-  const getLanguageIcon = (lang: string) => {
-    const iconProps = { size: 14 };
-    switch (lang) {
+  const getLanguageIcon = (language: string) => {
+    switch (language) {
       case 'python':
-        return <SiPython {...iconProps} />;
+        return <PythonOriginal size={20} />;
       case 'cpp':
-        return <SiCplusplus {...iconProps} />;
+        return <Cpp className='text-[#00599c]' size={20} />;
       case 'java':
-        return <FaJava {...iconProps} />;
+        return <Java className='text-[#007396]' size={20} />;
       default:
         return null;
     }
@@ -58,8 +58,8 @@ export default function TabBar({
             {activeTab === 'code' && (
               <div
                 className='ml-2 hover:bg-[#505050] rounded p-0.5'
-                onClick={(e) => {
-                  e.stopPropagation();
+                onMouseDown={(e) => {
+                  e.preventDefault();
                   handleReset();
                 }}
                 title='Reset'

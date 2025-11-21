@@ -17,6 +17,7 @@ export const ProfileSchema = z.object({
   username: z.string(),
   photoURL: z.string(),
   totalScore: z.number(),
+  provider: z.enum(['google', 'codeforces']),
   friends: z.array(z.string()),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -25,7 +26,7 @@ export const ProfileBasicSchema = z.object({
   id: z.string(),
   username: z.string(),
   photoURL: z.string(),
-  totalScore: z.number(),
+  provider: z.enum(['google', 'codeforces']),
 });
 export type ProfileBasic = z.infer<typeof ProfileBasicSchema>;
 

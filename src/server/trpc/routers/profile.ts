@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db, auth } from '../util/db';
-import { ProfileSchema, PlaySchema } from '../types';
+import { ProfileSchema, PlaySchema, ProfileBasicSchema } from '../types';
 import { firestore } from 'firebase-admin';
 import { TRPCError } from '@trpc/server';
 
@@ -22,6 +22,7 @@ export const profileRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const doc = await db.collection('Profiles').doc(input.userId).get();
       if (!doc.exists) {
+        console.log('Profile not found for userId', input.userId);
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Profile not found',
@@ -29,7 +30,35 @@ export const profileRouter = createTRPCRouter({
       }
       const res = doc.data() || {};
       res.id = doc.id;
-      return { profile: ProfileSchema.parse(res) };
+      const playsSnapshot = await db
+        .collection('Plays')
+        .where('profileId', '==', res.id)
+        .get();
+      const plays = playsSnapshot.docs.map((doc) =>
+        PlaySchema.parse(doc.data())
+      );
+      return { profile: ProfileSchema.parse(res), plays };
+    }),
+
+  getBasicProfileByUserId: authedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      const doc = await db.collection('Profiles').doc(input.userId).get();
+      console.log('Fetched profile doc for userId', input.userId, doc.exists);
+      if (!doc.exists) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Profile not found',
+        });
+      }
+      const data = doc.data() || {};
+      const basicProfile = {
+        id: doc.id,
+        username: data.username,
+        photoURL: data.photoURL,
+        provider: data.provider,
+      };
+      return { profile: ProfileBasicSchema.parse(basicProfile) };
     }),
 
   getProfileByToken: authedProcedure
@@ -62,7 +91,6 @@ export const profileRouter = createTRPCRouter({
         );
         return { profile: ProfileSchema.parse(profile), plays };
       } catch (err) {
-        console.log(err);
         throw err;
       }
     }),
@@ -88,14 +116,21 @@ export const profileRouter = createTRPCRouter({
 
   createProfile: authedProcedure.mutation(async ({ ctx }) => {
     try {
-      console.log(ctx.user.uid, 'Creating profile for user:', ctx.user.name);
-      await db.collection('Profiles').doc(ctx.user.uid).set({
-        username: ctx.user.name,
-        totalScore: 0,
-        userId: ctx.user.uid,
-        photoURL: ctx.user.picture,
-        friends: [],
-      });
+      console.log('Creating profile for user:', ctx);
+      await db
+        .collection('Profiles')
+        .doc(ctx.user.uid)
+        .set({
+          username: ctx.user.name,
+          totalScore: 0,
+          userId: ctx.user.uid,
+          photoURL: ctx.user.picture,
+          provider:
+            ctx.user.firebase.sign_in_provider === 'google.com'
+              ? 'google'
+              : 'codeforces',
+          friends: [],
+        });
       return {};
     } catch (err) {
       console.error('Error creating profile:', err);

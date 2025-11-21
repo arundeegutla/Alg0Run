@@ -13,7 +13,7 @@ const Noise: React.FC<NoiseProps> = ({
   patternScaleX = 1,
   patternScaleY = 1,
   patternRefreshInterval = 2,
-  patternAlpha = 15
+  patternAlpha = 15,
 }) => {
   const grainRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -69,14 +69,20 @@ const Noise: React.FC<NoiseProps> = ({
       window.removeEventListener('resize', resize);
       window.cancelAnimationFrame(animationId);
     };
-  }, [patternSize, patternScaleX, patternScaleY, patternRefreshInterval, patternAlpha]);
+  }, [
+    patternSize,
+    patternScaleX,
+    patternScaleY,
+    patternRefreshInterval,
+    patternAlpha,
+  ]);
 
   return (
     <canvas
-      className="pointer-events-none absolute top-0 left-0 h-screen w-screen"
+      className='pointer-events-none absolute top-0 left-0 h-screen w-screen'
       ref={grainRef}
       style={{
-        imageRendering: 'pixelated'
+        imageRendering: 'pixelated',
       }}
     />
   );

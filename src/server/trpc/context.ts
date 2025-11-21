@@ -6,11 +6,6 @@ import { admin } from './util/db';
 export async function createTRPCContext(opts: { headers: Headers }) {
   const { headers } = opts;
 
-  console.log(
-    'Creating TRPC context with headers:',
-    Object.fromEntries(headers.entries())
-  );
-
   const authHeader = headers.get('authorization');
   let user: admin.auth.DecodedIdToken | null = null;
 

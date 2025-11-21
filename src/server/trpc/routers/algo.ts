@@ -38,7 +38,6 @@ export const algoRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Check if algo exists
       const algoDoc = await db.collection('Algos').doc(input.algoId).get();
       if (!algoDoc.exists) {
         throw new TRPCError({
@@ -47,7 +46,6 @@ export const algoRouter = createTRPCRouter({
         });
       }
 
-      // Check if profile exists
       const profileDoc = await db
         .collection('Profiles')
         .doc(ctx.user.uid)
@@ -61,14 +59,12 @@ export const algoRouter = createTRPCRouter({
       const profile = profileDoc.data() || {};
       profile.id = profileDoc.id;
 
-      // Get all plays for this profile
       const playsSnapshot = await db
         .collection('Plays')
         .where('profileId', '==', ctx.user.uid)
         .get();
       const plays = playsSnapshot.docs.map((doc) => doc.data());
 
-      // Create new play
       const playId = db.collection('Plays').doc().id;
       try {
         await db.collection('Plays').doc(playId).set({
@@ -84,7 +80,6 @@ export const algoRouter = createTRPCRouter({
         });
       }
 
-      // Update score if this is the highest for this algo
       const currentAlgoScores = plays
         .filter((p) => p.algoId === input.algoId)
         .map((p) => p.playDetails?.score ?? 0);
@@ -100,7 +95,6 @@ export const algoRouter = createTRPCRouter({
           .doc(ctx.user.uid)
           .update({ totalScore: Math.round(newTotalScore * 10) / 10.0 });
       }
-
       return { playId };
     }),
 });

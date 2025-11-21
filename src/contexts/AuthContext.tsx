@@ -8,7 +8,6 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { trpc } from '@/server/trpc/client';
-import { set } from 'zod';
 
 interface AuthContextType {
   googleUser: FirebaseUser | null;

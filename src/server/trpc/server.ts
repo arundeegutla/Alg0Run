@@ -8,7 +8,6 @@ import { headers } from 'next/headers';
 
 const createContext = cache(async () => {
   const heads = new Headers(await headers());
-  console.log('TRPC Headers:', Object.fromEntries(heads.entries()));
   heads.set('x-trpc-source', 'rsc');
   return createTRPCContext({
     headers: heads,
