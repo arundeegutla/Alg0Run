@@ -12,9 +12,12 @@ export default function BlurredLeaderboard() {
         </div>
       </div>
       <div className='absolute inset-0 flex flex-col items-center justify-center'>
-        <div className='text-[#cccccc] text-center font-mono text-base bg-[#252526cc] rounded px-4 py-2 border border-[#3e3e42]'>
+        <a
+          href='/auth'
+          className='text-[#cccccc] text-center font-mono text-base bg-[#252526cc] rounded px-4 py-2 border border-[#3e3e42] hover:bg-[#2d2d30] transition-colors'
+        >
           Sign in to see the standings
-        </div>
+        </a>
       </div>
     </div>
   );
