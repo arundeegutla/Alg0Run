@@ -27,11 +27,11 @@ export async function generateMetadata(): Promise<Metadata> {
       url: baseUrl,
       images: [
         {
-          url: `/og_new.png?v=2`,
-          secureUrl: `/og_new.png?v=2`,
+          url: `${baseUrl}/og_new.png?v=2`,
+          secureUrl: `${baseUrl}/og_new.png?v=2`,
           height: 1080,
           width: 1920,
-          alt: 'Preview image for Alg0Run',
+          alt: 'New preview image for Alg0Run',
         },
       ],
       type: 'website',
