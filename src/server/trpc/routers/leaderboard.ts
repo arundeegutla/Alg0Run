@@ -84,10 +84,16 @@ export const leaderboardRouter = createTRPCRouter({
         .get();
 
       return {
-        results: profilesSnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        })),
+        results: profilesSnapshot.docs
+          .map((doc) => {
+            const data = doc.data();
+            return {
+              ...data,
+              id: doc.id,
+              totalScore: data.totalScore ?? 0,
+            };
+          })
+          .filter((profile) => profile.totalScore !== 0),
       };
     } catch (err) {
       throw new TRPCError({
