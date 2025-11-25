@@ -153,7 +153,7 @@ export default function AuthPage() {
               Signing you in...
             </div>
           )}
-          <div className='mt-8 text-xs text-slate-500 text-center'>
+          {/* <div className='mt-8 text-xs text-slate-500 text-center'>
             By signing in, you agree to our{' '}
             <a
               href='https://github.com/arundeegutla/Alg0Run'
@@ -169,7 +169,7 @@ export default function AuthPage() {
               Privacy Policy
             </a>
             .
-          </div>
+          </div> */}
         </div>
       </div>
       <style jsx global>{`

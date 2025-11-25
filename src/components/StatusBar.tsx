@@ -76,7 +76,7 @@ export default function StatusBar({
         </div>
 
         {/* GitHub Link */}
-        <a
+        {/* <a
           href='https://github.com/arundeegutla/Alg0Run'
           target='_blank'
           rel='noopener noreferrer'
@@ -85,7 +85,7 @@ export default function StatusBar({
         >
           <VscGithubInverted size={14} />
           <span>GitHub</span>
-        </a>
+        </a> */}
       </div>
     </div>
   );
