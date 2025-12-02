@@ -37,7 +37,7 @@ export default function CodeEditor({
     <div className='h-full flex relative'>
       {/* Line Numbers */}
       <div
-        className='w-12 bg-[#1e1e1e] border-r border-[#3e3e42] py-4 text-right pr-2 text-[#858585] font-mono select-none overflow-hidden'
+        className='w-12 bg-[#1e1e1e] border-r border-[#3e3e42] py-4 text-right pr-2 text-[#858585] font-mono select-none'
         style={{ fontSize: `${fontSize}px` }}
       >
         {targetCode.split('\n').map((line: string, idx: number) => (
@@ -75,6 +75,7 @@ export default function CodeEditor({
                     fontSize: `${fontSize}px`,
                     lineHeight: `${fontSize * 1.5}px`,
                     fontFamily: 'monospace',
+                    overflow: 'visible',
                   }}
                   codeTagProps={{
                     style: {
