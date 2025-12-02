@@ -265,7 +265,50 @@ export default function VSCodeEditor({
       resetTyping();
       return;
     }
+
+    // VS Code-like ctrl/option+backspace behavior
     if (key === 'Backspace') {
+      const isMac =
+        typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
+      // On Mac, Option+Backspace; on others, Ctrl+Backspace
+      const wordDelete = isMac ? e.altKey : e.ctrlKey;
+      if (wordDelete) {
+        let i = currIndex;
+        if (i < 0) return;
+
+        // Step 1: Delete up to one newline
+        if (targetCode[i] === '\n') {
+          deleteTyping(false);
+          i--;
+        }
+
+        // Step 2: Delete run of whitespace (space, tab)
+        while (i >= 0 && (targetCode[i] === ' ' || targetCode[i] === '\t')) {
+          deleteTyping(false);
+          i--;
+        }
+
+        // Step 3: Delete run of symbols (non-alphanumeric, non-whitespace)
+        while (
+          i >= 0 &&
+          !/[a-zA-Z0-9_]/.test(targetCode[i]) &&
+          targetCode[i] !== ' ' &&
+          targetCode[i] !== '\t' &&
+          targetCode[i] !== '\n'
+        ) {
+          deleteTyping(false);
+          i--;
+        }
+
+        // Step 4: Delete run of alphanumerics (a-z, A-Z, 0-9, _)
+        while (i >= 0 && /[a-zA-Z0-9_]/.test(targetCode[i])) {
+          deleteTyping(false);
+          i--;
+        }
+        return;
+      }
+
+      // Default backspace: skip whitespace
       let i = currIndex;
       let skipped = false;
       while (i >= 0 && targetCode[i] && targetCode[i].trim() === '') {
