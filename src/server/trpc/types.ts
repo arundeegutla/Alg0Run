@@ -18,7 +18,6 @@ export const ProfileSchema = z.object({
   photoURL: z.string(),
   totalScore: z.number(),
   provider: z.enum(['google', 'codeforces']),
-  friends: z.array(z.string()),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
 

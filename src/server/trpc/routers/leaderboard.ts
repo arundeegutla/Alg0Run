@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { TRPCError } from '@trpc/server';
 import { db } from '../util/db';
-import { PlayBasicSchema } from '../types';
+import { PlayBasicSchema, ProfileSchema } from '../types';
 
 export const leaderboardRouter = createTRPCRouter({
   getAlgoLeaderboard: authedProcedure
@@ -76,29 +76,46 @@ export const leaderboardRouter = createTRPCRouter({
         });
       }
     }),
-  getProfiles: authedProcedure.query(async () => {
+  getLeaderboard: authedProcedure.query(async () => {
     try {
       const profilesSnapshot = await db
         .collection('Profiles')
-        .select('username', 'totalScore', 'photoURL', 'provider')
+        .select(
+          'userId',
+          'username',
+          'totalScore',
+          'photoURL',
+          'provider',
+          'friends'
+        )
         .get();
 
+      // Parse, filter, and sort profiles by totalScore descending, then take top 20
+      const profiles = profilesSnapshot.docs
+        .map((doc) => {
+          const data = doc.data() || {};
+          const profile = {
+            id: doc.id,
+            userId: data.userId ?? doc.id,
+            username: data.username ?? '',
+            photoURL: data.photoURL ?? '',
+            totalScore: data.totalScore ?? 0,
+            provider: data.provider ?? 'codeforces',
+            friends: Array.isArray(data.friends) ? data.friends : [],
+          };
+          return ProfileSchema.parse(profile);
+        })
+        .filter((profile) => profile.totalScore !== 0)
+        .sort((a, b) => b.totalScore - a.totalScore)
+        .slice(0, 10);
+
       return {
-        results: profilesSnapshot.docs
-          .map((doc) => {
-            const data = doc.data();
-            return {
-              ...data,
-              id: doc.id,
-              totalScore: data.totalScore ?? 0,
-            };
-          })
-          .filter((profile) => profile.totalScore !== 0),
+        results: profiles,
       };
     } catch (err) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to fetch profiles',
+        message: 'Failed to fetch leaderboard',
         cause: err,
       });
     }

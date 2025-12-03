@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db, auth } from '../util/db';
 import { ProfileSchema, PlaySchema, ProfileBasicSchema } from '../types';
-import { firestore } from 'firebase-admin';
 import { TRPCError } from '@trpc/server';
 
 export const profileRouter = createTRPCRouter({
@@ -126,7 +125,6 @@ export const profileRouter = createTRPCRouter({
             ctx.user.firebase.sign_in_provider === 'google.com'
               ? 'google'
               : 'codeforces',
-          friends: [],
         });
       return {};
     } catch (err) {
@@ -138,43 +136,43 @@ export const profileRouter = createTRPCRouter({
     }
   }),
 
-  addFriend: authedProcedure
-    .input(z.object({ friendId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      try {
-        await db
-          .collection('Profiles')
-          .doc(ctx.user.uid)
-          .update({
-            friends: firestore.FieldValue.arrayUnion(input.friendId),
-          });
-        return {};
-      } catch {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to add friend',
-        });
-      }
-    }),
+  // addFriend: authedProcedure
+  //   .input(z.object({ friendId: z.string() }))
+  //   .mutation(async ({ ctx, input }) => {
+  //     try {
+  //       await db
+  //         .collection('Profiles')
+  //         .doc(ctx.user.uid)
+  //         .update({
+  //           friends: firestore.FieldValue.arrayUnion(input.friendId),
+  //         });
+  //       return {};
+  //     } catch {
+  //       throw new TRPCError({
+  //         code: 'INTERNAL_SERVER_ERROR',
+  //         message: 'Failed to add friend',
+  //       });
+  //     }
+  //   }),
 
-  removeFriend: authedProcedure
-    .input(z.object({ friendId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      try {
-        await db
-          .collection('Profiles')
-          .doc(ctx.user.uid)
-          .update({
-            friends: firestore.FieldValue.arrayRemove(input.friendId),
-          });
-        return {};
-      } catch {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to remove friend',
-        });
-      }
-    }),
+  // removeFriend: authedProcedure
+  //   .input(z.object({ friendId: z.string() }))
+  //   .mutation(async ({ ctx, input }) => {
+  //     try {
+  //       await db
+  //         .collection('Profiles')
+  //         .doc(ctx.user.uid)
+  //         .update({
+  //           friends: firestore.FieldValue.arrayRemove(input.friendId),
+  //         });
+  //       return {};
+  //     } catch {
+  //       throw new TRPCError({
+  //         code: 'INTERNAL_SERVER_ERROR',
+  //         message: 'Failed to remove friend',
+  //       });
+  //     }
+  //   }),
 
   setScore: authedProcedure
     .input(z.object({ newTotalScore: z.number() }))
