@@ -34,7 +34,6 @@ export function LeaderBoard({
             return b.playDetails.accuracy - a.playDetails.accuracy;
           return 0;
         })
-        .slice(0, 10)
         .map((play, index) => (
           <Link
             key={`${play.profileId}-${index}`}

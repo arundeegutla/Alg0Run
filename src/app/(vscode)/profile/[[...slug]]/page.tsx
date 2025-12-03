@@ -19,7 +19,8 @@ import {
   VscGraphLine,
   VscCode,
 } from 'react-icons/vsc';
-import { sl } from 'zod/v4/locales';
+
+import { SiCodeforces } from 'react-icons/si';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -136,9 +137,34 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   }
 
   const { profile } = data;
+
   const avatar = profile.photoURL;
   const displayName = profile.username;
   const totalScore = profile.totalScore;
+
+  // Helper for Codeforces icon with link
+  const getProviderIcon = (profile: typeof data.profile) => {
+    if (profile.provider === 'codeforces' && profile.username) {
+      return (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(
+              `https://codeforces.com/profile/${profile.username}`,
+              '_blank',
+              'noopener,noreferrer'
+            );
+          }}
+          title='View Codeforces profile'
+          className='ml-2 text-[#1f8acb] hover:text-[#005fa3] flex items-center cursor-pointer codeforces-icon-btn'
+        >
+          <SiCodeforces size={22} />
+        </button>
+      );
+    }
+    return null;
+  };
 
   const getLanguageIcon = (language: string) => {
     switch (language) {
@@ -186,9 +212,12 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                   <span className='text-[#4ec9b0]'>$</span>
                   <span>whoami</span>
                 </div>
-                <h1 className='text-4xl font-bold mb-3 text-[#4ec9b0]'>
-                  {displayName}
-                </h1>
+                <div className='flex items-center justify-center md:justify-start gap-2 mb-3'>
+                  <h1 className='text-4xl font-bold text-[#4ec9b0]'>
+                    {displayName}
+                  </h1>
+                  {getProviderIcon(profile)}
+                </div>
                 <div className='flex flex-wrap gap-3 justify-center md:justify-start items-center'>
                   {isViewingCurrentUser && (
                     <button

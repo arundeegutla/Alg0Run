@@ -4,58 +4,65 @@ import React from 'react';
 import { trpc } from '@/server/trpc/client';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/server/firebase/clientApp';
+
 import { LeaderBoard } from '@/components/AlgoLeaderboard';
 import BlurredLeaderboard from '@/components/BlurredLeaderboard';
+import { SiCodeforces } from 'react-icons/si';
+import { Profile } from '@/server/trpc/types';
 
 export default function LeaderboardPage() {
   const [user] = useAuthState(auth);
   // Use getProfiles procedure to fetch leaderboard
-  const getProfiles = trpc.leaderboard.getProfiles.useQuery(undefined, {
+  const getProfiles = trpc.leaderboard.getLeaderboard.useQuery(undefined, {
     enabled: !!user,
     retry: false,
   });
 
   const leaderboard = getProfiles.data?.results || [];
 
-  // getUserInfo returns the profile with required fields
-  type Profile = {
-    id: string;
-    username?: string;
-    photoURL?: string;
-    totalScore?: number;
-  };
-
-  const getUserInfo = (
-    profileId: string
-  ): {
-    id: string;
-    username: string;
-    photoURL: string;
-    provider: 'codeforces';
-  } => {
+  const getUserInfo = (profileId: string): Profile => {
     const profile = leaderboard.find((p: Profile) => p.id === profileId);
+    console.log('Fetching user info for profileId:', profileId, profile);
     return profile
-      ? {
-          id: profile.id,
-          username:
-            'username' in profile && typeof profile.username === 'string'
-              ? profile.username
-              : 'Unknown',
-          photoURL:
-            'photoURL' in profile && typeof profile.photoURL === 'string'
-              ? profile.photoURL
-              : '',
-          provider: 'codeforces',
-        }
+      ? profile
       : {
-          id: profileId,
+          id: '',
+          userId: '',
           username: 'Unknown',
           photoURL: '',
+          totalScore: 0,
           provider: 'codeforces',
         };
   };
 
-  const getProviderIcon = () => null;
+  // Helper for Codeforces icon with link
+  const getProviderIcon = (profile: {
+    id: string;
+    username: string;
+    photoURL: string;
+    provider: string;
+  }) => {
+    if (profile.provider === 'codeforces' && profile.username) {
+      return (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(
+              `https://codeforces.com/profile/${profile.username}`,
+              '_blank',
+              'noopener,noreferrer'
+            );
+          }}
+          title='View Codeforces profile'
+          className='ml-2 text-[#1f8acb] hover:text-[#005fa3] flex items-center cursor-pointer codeforces-icon-btn'
+        >
+          <SiCodeforces size={22} />
+        </button>
+      );
+    }
+    return null;
+  };
   const getLanguageIcon = () => null;
 
   return (
