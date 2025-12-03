@@ -78,7 +78,7 @@ export default function LeaderboardPage() {
             Leaderboard
           </h1>
           <p className='mb-6 text-[#858585] text-sm font-mono'>
-            See the top algorithm typists and your ranking!
+            See the top algorithm typists and your ranking! (Top 10 shown below)
           </p>
           {!user ? (
             <BlurredLeaderboard />
