@@ -18,6 +18,7 @@ interface CodeEditorProps {
   language: Language;
   currIndex: number;
   charsState: (0 | 2 | 1)[];
+  typedChars: string[];
 }
 
 export default function CodeEditor({
@@ -32,6 +33,7 @@ export default function CodeEditor({
   cursorRef,
   handleKeyDown,
   getSyntaxLanguage,
+  typedChars,
 }: CodeEditorProps) {
   return (
     <div className='h-full flex relative'>
@@ -102,17 +104,21 @@ export default function CodeEditor({
                 const state = charsState[index];
                 const isIncorrect = state === CharStateType.Incorrect;
                 const isCurrent = currIndex + 1 === index;
+                const typedChar = typedChars[index] ?? '';
 
                 // Show errors with red background, cursor underline
-                // Make text transparent so syntax-highlighted code shows through
-                const bgColor = isIncorrect
-                  ? 'rgba(239, 68, 68, 0.3)'
-                  : 'transparent';
-
-                const color =
-                  state === CharStateType.Incomplete
-                    ? 'rgb(99 99 99)'
-                    : 'transparent';
+                // If incorrect, show user's input in red
+                let displayChar = char;
+                let color = 'transparent';
+                let bgColor = 'transparent';
+                if (state === CharStateType.Incomplete) {
+                  color = 'rgb(99 99 99)';
+                }
+                if (isIncorrect && typedChar) {
+                  displayChar = typedChar;
+                  color = 'rgb(255,255,255)';
+                  bgColor = 'rgba(239, 68, 68)';
+                }
                 return (
                   <span
                     key={char + index}
@@ -124,7 +130,7 @@ export default function CodeEditor({
                     }}
                   >
                     {char === '\n' ? ' ' : ''}
-                    {char}
+                    {displayChar}
                     {isCurrent && (
                       <span
                         ref={cursorRef as React.RefObject<HTMLSpanElement>}
