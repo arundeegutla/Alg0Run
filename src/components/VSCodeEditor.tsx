@@ -334,16 +334,23 @@ export default function VSCodeEditor({
     if (key === 'Tab') key = '\t';
     if (key === 'Enter') key = '\n';
     if (key.length === 1) {
-      if (
-        targetCode[currIndex + 1] === '\n' &&
-        targetCode[currIndex + 1] !== key
-      ) {
+      const nextIndex = currIndex + 1;
+      const isCorrect = targetCode[nextIndex] === key;
+      const isSpecialChar =
+        key === '\n' || key === '\t' || !/^[\x20-\x7E]$/.test(key);
+
+      if (targetCode[nextIndex] === '\n' && targetCode[nextIndex] !== key) {
         return;
       }
 
       insertTyping(key);
-      setTypedChars((prev) => [...prev, key]);
       setIsTyping(true);
+
+      if (!isCorrect && isSpecialChar) {
+        setTypedChars((prev) => [...prev, '\uFFFD']);
+      } else {
+        setTypedChars((prev) => [...prev, key]);
+      }
 
       if (key === '\n' && currIndex + 2 < length) {
         let i = currIndex + 1;
