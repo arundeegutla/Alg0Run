@@ -333,7 +333,6 @@ export default function VSCodeEditor({
       }
 
       insertTyping(key);
-      setTypedChars((prev) => [...prev, key]);
       setIsTyping(true);
 
       if (key === '\n' && currIndex + 2 < length) {
