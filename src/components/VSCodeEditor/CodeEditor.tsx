@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaMousePointer } from 'react-icons/fa';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -33,6 +33,24 @@ export default function CodeEditor({
   handleKeyDown,
   getSyntaxLanguage,
 }: CodeEditorProps) {
+  const [capsLockOn, setCapsLockOn] = useState(false);
+
+  useEffect(() => {
+    const handleKeyEvent = (e: KeyboardEvent) => {
+      if (e.getModifierState) {
+        setCapsLockOn(e.getModifierState('CapsLock'));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyEvent);
+    window.addEventListener('keyup', handleKeyEvent);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyEvent);
+      window.removeEventListener('keyup', handleKeyEvent);
+    };
+  }, []);
+
   return (
     <div className='h-full flex relative'>
       {/* Line Numbers */}
@@ -183,6 +201,13 @@ export default function CodeEditor({
           <span className='text-[#cccccc] text-base font-mono bg-[#222c] px-3 py-1 rounded shadow'>
             Hover to focus
           </span>
+        </div>
+      )}
+
+      {/* Caps Lock Indicator */}
+      {capsLockOn && (
+        <div className='absolute bottom-2 right-2 z-30 bg-[#ff6b6b] text-white text-xs font-mono px-2 py-1 rounded shadow-lg border border-[#ff8787] select-none pointer-events-none'>
+          CAPS LOCK
         </div>
       )}
     </div>
