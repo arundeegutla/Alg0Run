@@ -120,7 +120,6 @@ export default function CodeEditor({
                       backgroundColor: bgColor,
                       color,
                       position: 'relative',
-                      fontFamily: 'monospace',
                     }}
                   >
                     {char === '\n' ? ' ' : ''}
