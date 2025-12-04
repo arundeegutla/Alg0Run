@@ -101,6 +101,7 @@ export default function LeaderboardPage() {
             </div>
           ) : (
             <LeaderBoard
+              showPodium={true}
               leaderboard={leaderboard.map((profile: Profile) => ({
                 profileId: profile.id,
                 username:
