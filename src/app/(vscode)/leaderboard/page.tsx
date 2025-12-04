@@ -9,9 +9,10 @@ import { LeaderBoard } from '@/components/AlgoLeaderboard';
 import BlurredLeaderboard from '@/components/BlurredLeaderboard';
 import { SiCodeforces } from 'react-icons/si';
 import { Profile } from '@/server/trpc/types';
+import Loading from '@/components/Loading';
 
 export default function LeaderboardPage() {
-  const [user] = useAuthState(auth);
+  const [user, loading, error] = useAuthState(auth);
   // Use getProfiles procedure to fetch leaderboard
   const getProfiles = trpc.leaderboard.getLeaderboard.useQuery(undefined, {
     enabled: !!user,
@@ -87,12 +88,12 @@ export default function LeaderboardPage() {
           <p className='mb-6 text-[#858585] text-sm font-mono'>
             See the top algorithm typists and your ranking! (Top 10 shown below)
           </p>
-          {!user ? (
+          {loading ? (
+            <Loading className='bg-transparent min-h-0' />
+          ) : !user ? (
             <BlurredLeaderboard />
           ) : getProfiles.isLoading ? (
-            <div className='flex justify-center items-center h-32'>
-              <span className='text-[#569cd6] animate-pulse'>Loading...</span>
-            </div>
+            <Loading className='bg-transparent min-h-0' />
           ) : leaderboard.length === 0 ? (
             <div className='text-center text-[#858585] py-8'>
               <div className='text-4xl mb-2'>🏆</div>
