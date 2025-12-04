@@ -145,6 +145,7 @@
 
 .typing-test {
   outline: none;
+  font-family: monospace;
 }
 
 .curr-letter {

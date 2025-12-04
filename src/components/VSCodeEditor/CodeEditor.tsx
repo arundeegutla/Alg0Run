@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaMousePointer } from 'react-icons/fa';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -18,7 +18,6 @@ interface CodeEditorProps {
   language: Language;
   currIndex: number;
   charsState: (0 | 2 | 1)[];
-  typedChars: string[];
 }
 
 export default function CodeEditor({
@@ -33,8 +32,25 @@ export default function CodeEditor({
   cursorRef,
   handleKeyDown,
   getSyntaxLanguage,
-  typedChars,
 }: CodeEditorProps) {
+  const [capsLockOn, setCapsLockOn] = useState(false);
+
+  useEffect(() => {
+    const handleKeyEvent = (e: KeyboardEvent) => {
+      if (e.getModifierState) {
+        setCapsLockOn(e.getModifierState('CapsLock'));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyEvent);
+    window.addEventListener('keyup', handleKeyEvent);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyEvent);
+      window.removeEventListener('keyup', handleKeyEvent);
+    };
+  }, []);
+
   return (
     <div className='h-full flex relative'>
       {/* Line Numbers */}
@@ -104,21 +120,17 @@ export default function CodeEditor({
                 const state = charsState[index];
                 const isIncorrect = state === CharStateType.Incorrect;
                 const isCurrent = currIndex + 1 === index;
-                const typedChar = typedChars[index] ?? '';
 
                 // Show errors with red background, cursor underline
-                // If incorrect, show user's input in red
-                let displayChar = char;
-                let color = 'transparent';
-                let bgColor = 'transparent';
-                if (state === CharStateType.Incomplete) {
-                  color = 'rgb(99 99 99)';
-                }
-                if (isIncorrect && typedChar) {
-                  displayChar = typedChar;
-                  color = 'rgb(255,255,255)';
-                  bgColor = 'rgba(239, 68, 68)';
-                }
+                // Make text transparent so syntax-highlighted code shows through
+                const bgColor = isIncorrect
+                  ? 'rgba(239, 68, 68, 0.3)'
+                  : 'transparent';
+
+                const color =
+                  state === CharStateType.Incomplete
+                    ? 'rgb(99 99 99)'
+                    : 'transparent';
                 return (
                   <span
                     key={char + index}
@@ -126,11 +138,10 @@ export default function CodeEditor({
                       backgroundColor: bgColor,
                       color,
                       position: 'relative',
-                      fontFamily: 'monospace',
                     }}
                   >
                     {char === '\n' ? ' ' : ''}
-                    {displayChar}
+                    {char}
                     {isCurrent && (
                       <span
                         ref={cursorRef as React.RefObject<HTMLSpanElement>}
@@ -190,6 +201,13 @@ export default function CodeEditor({
           <span className='text-[#cccccc] text-base font-mono bg-[#222c] px-3 py-1 rounded shadow'>
             Hover to focus
           </span>
+        </div>
+      )}
+
+      {/* Caps Lock Indicator */}
+      {capsLockOn && (
+        <div className='absolute bottom-2 right-2 z-30 bg-[#ff6b6b] text-white text-xs font-mono px-2 py-1 rounded shadow-lg border border-[#ff8787] select-none pointer-events-none'>
+          CAPS LOCK
         </div>
       )}
     </div>

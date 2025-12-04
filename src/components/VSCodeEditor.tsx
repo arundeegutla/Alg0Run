@@ -79,8 +79,6 @@ export default function VSCodeEditor({
     time: number;
     progress: number;
   }>({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
-  // State to track all chars typed by the user
-  const [typedChars, setTypedChars] = useState<string[]>([]);
 
   const [targetCode, setTargetCode] = useState(() => {
     if (!rawCode) return '';
@@ -265,7 +263,6 @@ export default function VSCodeEditor({
     }
     if (key === 'Escape') {
       resetTyping();
-      setTypedChars([]);
       return;
     }
 
@@ -282,14 +279,12 @@ export default function VSCodeEditor({
         // Step 1: Delete up to one newline
         if (targetCode[i] === '\n') {
           deleteTyping(false);
-          setTypedChars((prev) => prev.slice(0, -1));
           i--;
         }
 
         // Step 2: Delete run of whitespace (space, tab)
         while (i >= 0 && (targetCode[i] === ' ' || targetCode[i] === '\t')) {
           deleteTyping(false);
-          setTypedChars((prev) => prev.slice(0, -1));
           i--;
         }
 
@@ -302,14 +297,12 @@ export default function VSCodeEditor({
           targetCode[i] !== '\n'
         ) {
           deleteTyping(false);
-          setTypedChars((prev) => prev.slice(0, -1));
           i--;
         }
 
         // Step 4: Delete run of alphanumerics (a-z, A-Z, 0-9, _)
         while (i >= 0 && /[a-zA-Z0-9_]/.test(targetCode[i])) {
           deleteTyping(false);
-          setTypedChars((prev) => prev.slice(0, -1));
           i--;
         }
         return;
@@ -320,13 +313,11 @@ export default function VSCodeEditor({
       let skipped = false;
       while (i >= 0 && targetCode[i] && targetCode[i].trim() === '') {
         deleteTyping(false);
-        setTypedChars((prev) => prev.slice(0, -1));
         i--;
         skipped = true;
       }
       if (!skipped) {
         deleteTyping(false);
-        setTypedChars((prev) => prev.slice(0, -1));
       }
       return;
     }
@@ -334,29 +325,20 @@ export default function VSCodeEditor({
     if (key === 'Tab') key = '\t';
     if (key === 'Enter') key = '\n';
     if (key.length === 1) {
-      const nextIndex = currIndex + 1;
-      const isCorrect = targetCode[nextIndex] === key;
-      const isSpecialChar =
-        key === '\n' || key === '\t' || !/^[\x20-\x7E]$/.test(key);
-
-      if (targetCode[nextIndex] === '\n' && targetCode[nextIndex] !== key) {
+      if (
+        targetCode[currIndex + 1] === '\n' &&
+        targetCode[currIndex + 1] !== key
+      ) {
         return;
       }
 
       insertTyping(key);
       setIsTyping(true);
 
-      if (!isCorrect && isSpecialChar) {
-        setTypedChars((prev) => [...prev, '\uFFFD']);
-      } else {
-        setTypedChars((prev) => [...prev, key]);
-      }
-
       if (key === '\n' && currIndex + 2 < length) {
         let i = currIndex + 1;
         while (targetCode[i + 1] && targetCode[i + 1].trim() === '') {
           insertTyping(targetCode[i + 1]);
-          setTypedChars((prev) => [...prev, targetCode[i + 1]]);
           i += 1;
         }
       }
@@ -374,7 +356,6 @@ export default function VSCodeEditor({
     editorRef.current?.focus();
     handleTabSwitch('code');
     resetTyping();
-    setTypedChars([]);
     hasAutoSwitchedToInfo.current = false;
     setComplete(false);
     setIsTyping(false);
@@ -481,7 +462,6 @@ export default function VSCodeEditor({
             )}
             {algo ? (
               <CodeEditor
-                typedChars={typedChars}
                 targetCode={targetCode}
                 fontSize={fontSize}
                 editorRef={editorRef}
