@@ -72,7 +72,10 @@ export default function CodeEditor({
   }, []);
 
   return (
-    <div className='h-full flex relative' style={{ cursor: showCursor ? 'auto' : 'none' }}>
+    <div
+      className='h-full flex relative'
+      style={{ cursor: showCursor ? 'auto' : 'none' }}
+    >
       {/* Line Numbers */}
       <div
         className='w-12 bg-[#1e1e1e] border-r border-[#3e3e42] py-4 text-right pr-2 text-[#858585] font-mono select-none'
