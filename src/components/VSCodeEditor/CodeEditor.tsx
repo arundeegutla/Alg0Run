@@ -34,6 +34,7 @@ export default function CodeEditor({
   getSyntaxLanguage,
 }: CodeEditorProps) {
   const [capsLockOn, setCapsLockOn] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
 
   useEffect(() => {
     const handleKeyEvent = (e: KeyboardEvent) => {
@@ -51,8 +52,27 @@ export default function CodeEditor({
     };
   }, []);
 
+  // Hide cursor when typing, show when mouse moves
+  useEffect(() => {
+    const handleKeyPress = () => {
+      setShowCursor(false);
+    };
+
+    const handleMouseMove = () => {
+      setShowCursor(true);
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
   return (
-    <div className='h-full flex relative'>
+    <div className='h-full flex relative' style={{ cursor: showCursor ? 'auto' : 'none' }}>
       {/* Line Numbers */}
       <div
         className='w-12 bg-[#1e1e1e] border-r border-[#3e3e42] py-4 text-right pr-2 text-[#858585] font-mono select-none'
