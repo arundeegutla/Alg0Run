@@ -63,7 +63,13 @@ export default function VSCodeEditor({
   }, [algo, language, availableLanguages, onLanguageChange]);
   const rawCode = algo?.code?.[language] || '';
   const [isFormatting, setIsFormatting] = useState(false);
-  const [fontSize, setFontSize] = useState(20);
+  const [fontSize, setFontSize] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('editor-font-size');
+      return saved ? parseInt(saved, 10) : 20;
+    }
+    return 20;
+  });
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
@@ -118,6 +124,12 @@ export default function VSCodeEditor({
   useEffect(() => {
     onStatsUpdate(stats);
   }, [stats, onStatsUpdate]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('editor-font-size', fontSize.toString());
+    }
+  }, [fontSize]);
 
   const {
     states: { charsState, length, currIndex, phase },
