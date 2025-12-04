@@ -3,15 +3,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './Loading.module.css';
 
 import { IconType } from 'react-icons';
+import { twMerge } from 'tailwind-merge';
 
 interface LoadingProps {
   text?: string;
   icon?: IconType;
+  className?: string;
 }
 
 export default function Loading({
   text = 'Loading...',
   icon: Icon,
+  className = '',
 }: LoadingProps) {
   const [typedText, setTypedText] = useState('');
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -91,7 +94,10 @@ export default function Loading({
 
   return (
     <div
-      className={`w-full bg-[#0a0a12] text-slate-200 dark:bg-[#0a0a12] dark:text-slate-200 min-h-screen flex items-center justify-center`}
+      className={twMerge(
+        `w-full bg-[#0a0a12] text-slate-200 dark:bg-[#0a0a12] dark:text-slate-200 min-h-screen flex items-center justify-center`,
+        className
+      )}
     >
       <div className={`${styles.text} flex items-center`}>
         {Icon && (
