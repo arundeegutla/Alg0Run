@@ -42,7 +42,16 @@ export default function EditorControlsBar({
           ) : (
             <VscRefresh size={14} />
           )}
-          {isFormatting ? 'Formatting...' : 'Reset'}
+          {isFormatting ? (
+            'Formatting...'
+          ) : (
+            <>
+              Reset{' '}
+              <kbd className='ml-1 px-1.5 py-0.5 text-[10px] bg-[#3C3C3C] border border-[#555555] rounded'>
+                ESC
+              </kbd>
+            </>
+          )}
         </button>
         <button
           // onClick={handleDecreaseFontSize}
