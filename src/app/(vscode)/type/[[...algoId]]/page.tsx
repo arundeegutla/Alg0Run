@@ -26,7 +26,14 @@ export default function TypePageClientInner({ params }: TypePageProps) {
     return found || null;
   });
 
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('python');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
+    if (!selectedAlgo) return 'python';
+    if (selectedAlgo.code.python) return 'python';
+    if (selectedAlgo.code.cpp) return 'cpp';
+    if (selectedAlgo.code.java) return 'java';
+    return 'python';
+  });
+
   const [stats, setStats] = useState({
     wpm: 0,
     accuracy: 0,
@@ -59,8 +66,7 @@ export default function TypePageClientInner({ params }: TypePageProps) {
     if (selectedAlgo && selectedAlgo.id !== algoId?.[0]) {
       router.push(`/type/${selectedAlgo.id}`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAlgo]);
+  }, [algoId, router, selectedAlgo]);
 
   // Sidebar resizing handlers (attach listeners on mousedown)
   const [dragging, setDragging] = useState<null | 'primary' | 'secondary'>(
