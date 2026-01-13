@@ -46,6 +46,16 @@ export default function VSCodeEditor({
   onTogglePrimarySidebar,
   onToggleSecondarySidebar,
 }: VSCodeEditorProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [user] = useAuthState(auth);
+
+  const [activeTab, setActiveTab] = useState<'code' | 'info'>(() => {
+    if (tabParam === 'info') return 'info';
+    return 'code';
+  });
+
   const availableLanguages = useMemo(() => {
     if (!algo || !algo.code) return [];
     return (['python', 'cpp', 'java'] as const).filter(
@@ -53,16 +63,8 @@ export default function VSCodeEditor({
     );
   }, [algo]);
 
-  useEffect(() => {
-    if (!algo || !algo.code) return;
-    if (!availableLanguages.includes(language)) {
-      if (availableLanguages.length > 0) {
-        onLanguageChange(availableLanguages[0]);
-      }
-    }
-  }, [algo, language, availableLanguages, onLanguageChange]);
   const rawCode = algo?.code?.[language] || '';
-  const [isFormatting, setIsFormatting] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(true);
   const [fontSize, setFontSize] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('editor-font-size');
@@ -70,13 +72,7 @@ export default function VSCodeEditor({
     }
     return 20;
   });
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState<'code' | 'info'>(
-    tabParam === 'info' ? 'info' : 'code'
-  );
-  const [user] = useAuthState(auth);
+
   const [editorFocused, setEditorFocused] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [stats, setStats] = useState<{
@@ -87,7 +83,7 @@ export default function VSCodeEditor({
   }>({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
 
   const [targetCode, setTargetCode] = useState(() => {
-    if (!rawCode) return '';
+    if (!rawCode) return 'Error: No code available for this algorithm.';
     if (language === 'cpp' || language === 'java' || language === 'python') {
       const lines = rawCode.split(/\r?\n/);
       return lines.map((line) => line.replace(/\s+$/, '')).join('\n');
@@ -95,15 +91,16 @@ export default function VSCodeEditor({
     return rawCode;
   });
 
-  const formatCode = useCallback(
-    async (rawCode: string) => {
+  useEffect(() => {
+    const formatCode = async () => {
+      if (!rawCode) return;
       setIsFormatting(true);
       try {
         const { formattedCode, error } = await formatCodeAction({
           code: rawCode,
           language,
         });
-        if (error) throw new Error(error);
+        if (error) throw error;
         setTargetCode(formattedCode || '');
       } catch (error) {
         console.error('Failed to format code:', error);
@@ -112,14 +109,9 @@ export default function VSCodeEditor({
       } finally {
         setIsFormatting(false);
       }
-    },
-    [language]
-  );
-
-  useEffect(() => {
-    if (!rawCode) return;
-    formatCode(rawCode);
-  }, [rawCode, language, formatCode]);
+    };
+    formatCode();
+  }, [language, rawCode]);
 
   useEffect(() => {
     onStatsUpdate(stats);
@@ -366,13 +358,13 @@ export default function VSCodeEditor({
 
   const handleReset = useCallback(() => {
     editorRef.current?.focus();
-    handleTabSwitch('code');
     resetTyping();
     hasAutoSwitchedToInfo.current = false;
     setComplete(false);
     setIsTyping(false);
     setStats({ wpm: 0, accuracy: 0, time: 0, progress: 0 });
-  }, [resetTyping, handleTabSwitch]);
+    // handleTabSwitch('code');
+  }, [resetTyping]);
 
   useEffect(() => {
     handleReset();
