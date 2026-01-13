@@ -39,14 +39,12 @@ import settings from '../config/settings_user_default.json';
   leftnum: layout_40_leftnum,
 */
 const starting_layout_options = [
-  // '40',
   // '60',
   '65',
   // '75',
   // '80',
   // '100',
   // '60iso',
-  // 'numpad',
   // '50ortho',
   // 'leftnum',
   // '95',
