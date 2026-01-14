@@ -3,10 +3,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import KeyManager from '@/components/keyboardUtils/three/key/KeyManager';
 import CaseManager from '@/components/keyboardUtils/three/case/CaseManager';
 import {
-  loadDefaultSettings,
   loadColorway,
   type KeyboardSettings,
 } from '@/components/keyboardUtils/config/settings';
+import initial_settings from '@/components/keyboardUtils/config/settings_user_default.json';
 
 interface Colorway {
   id: string;
@@ -39,10 +39,16 @@ export default class SceneManager {
   startResetPosition: THREE.Vector3;
   startResetTarget: THREE.Vector3;
   isDragging: boolean;
+  cameraZoom: number;
 
-  constructor(element: HTMLElement) {
+  constructor(
+    element: HTMLElement,
+    cameraZoom: number = 10,
+    customSettings?: Partial<KeyboardSettings>
+  ) {
     this.element = element;
     this.animationId = null;
+    this.cameraZoom = cameraZoom;
     this.keyManager = null;
     this.caseManager = null;
     this.isResetting = false;
@@ -51,8 +57,12 @@ export default class SceneManager {
     this.startResetTarget = new THREE.Vector3();
     this.isDragging = false;
 
-    // Load settings from default config
-    this.settings = loadDefaultSettings();
+    // Load settings from initial_settings and merge with custom settings
+    // Note: initial_settings includes randomized colorway and layout
+    this.settings = customSettings
+      ? (customSettings as KeyboardSettings)
+      : (initial_settings as KeyboardSettings);
+
     this.colorway = null;
 
     // Scene
@@ -63,7 +73,7 @@ export default class SceneManager {
     const aspect = element.clientWidth / element.clientHeight;
     this.camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 1000);
     // Start at a rotated position for initial animation
-    this.camera.position.set(-5, 10, 8);
+    this.camera.position.set(-5, cameraZoom, 8);
     this.camera.lookAt(0, 1, 2.5); // Look at keyboard center
 
     // Renderer
@@ -98,7 +108,11 @@ export default class SceneManager {
 
     // Store initial camera position and controls target for reset
     // (this is the final/original position, not the starting position)
-    this.initialCameraPosition = new THREE.Vector3(0, 8, 10);
+    this.initialCameraPosition = new THREE.Vector3(
+      0,
+      cameraZoom * 0.8,
+      cameraZoom
+    );
     this.initialControlsTarget = new THREE.Vector3(0, 1, 2.5);
 
     // Track dragging state
@@ -121,9 +135,22 @@ export default class SceneManager {
     window.addEventListener('resize', this.handleResize.bind(this));
   }
 
+  mergeSettings(
+    defaults: KeyboardSettings,
+    custom: Partial<KeyboardSettings>
+  ): KeyboardSettings {
+    return {
+      settings: { ...defaults.settings, ...(custom.settings || {}) },
+      case: { ...defaults.case, ...(custom.case || {}) },
+      keys: { ...defaults.keys, ...(custom.keys || {}) },
+      switches: { ...defaults.switches, ...(custom.switches || {}) },
+      colorways: { ...defaults.colorways, ...(custom.colorways || {}) },
+    };
+  }
+
   async initializeKeyboard() {
     // Load colorway based on settings
-    this.colorway = await loadColorway(this.settings.colorways.active);
+    this.colorway = await loadColorway('port');
 
     // Create keyboard components with settings
     this.caseManager = new CaseManager(this.scene, this.settings);
@@ -273,11 +300,51 @@ export default class SceneManager {
     }
   }
 
+  async updateSettings(newSettings: KeyboardSettings) {
+    const previousColorway = this.settings.colorways.active;
+    this.settings = newSettings;
+
+    // Load new colorway if changed
+    if (newSettings.colorways.active !== previousColorway || !this.colorway) {
+      this.colorway = await loadColorway(newSettings.colorways.active);
+    }
+
+    // Dispose of old keyboard components
+    if (this.keyManager) {
+      this.keyManager.dispose();
+      this.keyManager = null;
+    }
+    if (this.caseManager) {
+      this.caseManager.dispose();
+      this.caseManager = null;
+    }
+
+    // Recreate keyboard components with new settings
+    this.caseManager = new CaseManager(this.scene, this.settings);
+
+    if (this.colorway) {
+      this.keyManager = new KeyManager(
+        this.scene,
+        this.settings,
+        this.colorway
+      );
+    }
+  }
+
   destroy() {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
     }
     window.removeEventListener('resize', this.handleResize.bind(this));
+
+    // Dispose of keyboard components
+    if (this.keyManager) {
+      this.keyManager.dispose();
+    }
+    if (this.caseManager) {
+      this.caseManager.dispose();
+    }
+
     this.renderer.dispose();
     this.element.removeChild(this.renderer.domElement);
   }

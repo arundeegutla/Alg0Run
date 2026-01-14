@@ -6,7 +6,7 @@ import switchesReducer from './slices/switches';
 import colorwaysReducer from './slices/colorways';
 import caseReducer from './slices/case';
 import keysReducer from './slices/keys';
-import { initial_settings } from './startup';
+import { initial_settings } from '../config/settings_user_default.json';
 
 const ENABLE_LOCAL_STORAGE = true;
 

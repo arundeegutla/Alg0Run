@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 import SceneManager from '@/components/keyboardUtils/three/SceneManager';
+import type { KeyboardSettings } from '@/components/keyboardUtils/config/settings';
 
 // Preload fonts before rendering
 const preloadFonts = async () => {
@@ -19,48 +20,85 @@ export interface Keyboard3DHandle {
   triggerKeyPress: (keyCode: string) => void;
 }
 
-const Keyboard3D = forwardRef<Keyboard3DHandle>((props, ref) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const sceneManagerRef = useRef<SceneManager | null>(null);
+interface Keyboard3DProps {
+  cameraZoom?: number;
+  keyboardOptions?: Partial<KeyboardSettings>;
+}
 
-  useImperativeHandle(ref, () => ({
-    triggerKeyPress: (keyCode: string) => {
-      if (sceneManagerRef.current) {
-        sceneManagerRef.current.triggerKeyPress(keyCode);
+const Keyboard3D = forwardRef<Keyboard3DHandle, Keyboard3DProps>(
+  ({ cameraZoom = 10, keyboardOptions }, ref) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const sceneManagerRef = useRef<SceneManager | null>(null);
+    const isInitializedRef = useRef(false);
+    const previousSettingsRef = useRef<string>('');
+
+    useImperativeHandle(ref, () => ({
+      triggerKeyPress: (keyCode: string) => {
+        if (sceneManagerRef.current) {
+          sceneManagerRef.current.triggerKeyPress(keyCode);
+        }
+      },
+    }));
+
+    // Initialize scene once
+    useEffect(() => {
+      if (!containerRef.current || isInitializedRef.current) return;
+
+      let mounted = true;
+
+      // Initialize scene after fonts are loaded
+      preloadFonts().then(() => {
+        if (!mounted || !containerRef.current) return;
+
+        // Create and initialize scene
+        sceneManagerRef.current = new SceneManager(
+          containerRef.current,
+          cameraZoom,
+          keyboardOptions
+        );
+        sceneManagerRef.current.tick();
+        isInitializedRef.current = true;
+        
+        // Store initial settings
+        if (keyboardOptions) {
+          previousSettingsRef.current = JSON.stringify(keyboardOptions);
+        }
+      });
+
+      // Cleanup on unmount
+      return () => {
+        mounted = false;
+        isInitializedRef.current = false;
+        if (sceneManagerRef.current) {
+          sceneManagerRef.current.destroy();
+        }
+      };
+    }, [cameraZoom, keyboardOptions]);
+
+    // Update settings when they change
+    useEffect(() => {
+      if (!sceneManagerRef.current || !keyboardOptions || !isInitializedRef.current) {
+        return;
       }
-    },
-  }));
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    let mounted = true;
-
-    // Initialize scene after fonts are loaded
-    preloadFonts().then(() => {
-      if (!mounted || !containerRef.current) return;
-
-      // Create and initialize scene
-      sceneManagerRef.current = new SceneManager(containerRef.current);
-      sceneManagerRef.current.tick();
-    });
-
-    // Cleanup on unmount
-    return () => {
-      mounted = false;
-      if (sceneManagerRef.current) {
-        sceneManagerRef.current.destroy();
+      const newSettingsStr = JSON.stringify(keyboardOptions);
+      
+      // Only update if settings actually changed
+      if (newSettingsStr !== previousSettingsRef.current) {
+        console.log('Settings changed, updating keyboard...');
+        previousSettingsRef.current = newSettingsStr;
+        sceneManagerRef.current.updateSettings(keyboardOptions as KeyboardSettings);
       }
-    };
-  }, []);
+    }, [keyboardOptions]);
 
-  return (
-    <div
-      ref={containerRef}
-      className='w-full h-full overflow-visible mx-auto'
-    />
-  );
-});
+    return (
+      <div
+        ref={containerRef}
+        className='w-full h-full overflow-visible mx-auto'
+      />
+    );
+  }
+);
 
 Keyboard3D.displayName = 'Keyboard3D';
 

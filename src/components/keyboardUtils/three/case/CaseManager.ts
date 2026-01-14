@@ -372,4 +372,66 @@ export default class CaseManager {
     materials.push(materialPrimary, materialSecondary);
     this.caseMesh.material = materials;
   }
+
+  dispose() {
+    // Remove all meshes from the group
+    if (this.caseMesh) {
+      this.group.remove(this.caseMesh);
+      if (this.caseMesh.geometry) this.caseMesh.geometry.dispose();
+      if (this.caseMesh.material) {
+        if (Array.isArray(this.caseMesh.material)) {
+          this.caseMesh.material.forEach((mat) => mat.dispose());
+        } else {
+          this.caseMesh.material.dispose();
+        }
+      }
+    }
+
+    if (this.plate) {
+      this.group.remove(this.plate);
+      if (this.plate.geometry) this.plate.geometry.dispose();
+      if (this.plate.material) {
+        if (Array.isArray(this.plate.material)) {
+          this.plate.material.forEach((mat) => mat.dispose());
+        } else {
+          this.plate.material.dispose();
+        }
+      }
+    }
+
+    if (this.badgeMesh) {
+      this.group.remove(this.badgeMesh);
+      if (this.badgeMesh.geometry) this.badgeMesh.geometry.dispose();
+      if (this.badgeMesh.material) {
+        if (Array.isArray(this.badgeMesh.material)) {
+          this.badgeMesh.material.forEach((mat) => mat.dispose());
+        } else {
+          this.badgeMesh.material.dispose();
+        }
+      }
+    }
+
+    if (this.shadow) {
+      this.scene.remove(this.shadow);
+      if (this.shadow.geometry) this.shadow.geometry.dispose();
+      if (this.shadow.material) {
+        if (Array.isArray(this.shadow.material)) {
+          this.shadow.material.forEach((mat) => mat.dispose());
+        } else {
+          this.shadow.material.dispose();
+        }
+      }
+    }
+
+    // Remove group from scene
+    if (this.group) {
+      this.scene.remove(this.group);
+    }
+
+    // Dispose textures
+    if (this.lightTexture) this.lightTexture.dispose();
+    if (this.aoShadowTexture) this.aoShadowTexture.dispose();
+    if (this.roughnessMap) this.roughnessMap.dispose();
+    if (this.albedoMap) this.albedoMap.dispose();
+  }
 }

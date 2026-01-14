@@ -1,6 +1,6 @@
+'use client';
 import * as THREE from 'three';
 import { keyTexture } from './texture';
-import { initial_settings } from '../../store/startup';
 import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
 import ambiantOcclusionPath from '@/assets/dist/shadow-key-noise.png';
 import lightMapPath from '@/assets/materials/white.png';
@@ -90,8 +90,8 @@ const getMaterialSet = (opts, offset) => {
 
 export const keyMaterials = (opts) => {
   let base = getMaterialSet(opts);
-  opts.color = initial_settings.keys.activeColor;
-  opts.background = initial_settings.keys.activeBackground;
+  opts.color = opts.activeColor;
+  opts.background = opts.activeBackground;
   let active = getMaterialSet(opts);
   let materials = [...active, ...base];
   return materials;
@@ -105,8 +105,8 @@ export const updateMaterials = (mesh, opts) => {
 };
 
 export const updateActiveMaterials = (mesh, opts) => {
-  opts.color = initial_settings.keys.activeColor;
-  opts.background = initial_settings.keys.activeBackground;
+  opts.color = opts.activeColor;
+  opts.background = opts.activeBackground;
   let active = getMaterialSet(opts);
   mesh.material[0] = active[0];
   mesh.material[1] = active[1];

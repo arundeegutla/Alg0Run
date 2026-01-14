@@ -5,7 +5,6 @@ import ColorUtil from '../../util/color';
 import KEYMAPS from '../../config/keymaps/keymaps';
 import LAYOUTS from '../../config/layouts/layouts';
 import { subscribe } from 'redux-subscriber';
-import { initial_settings } from '../../store/startup';
 import { Key, KEYSTATES } from './Key';
 import Collection from '../collection';
 
@@ -24,6 +23,7 @@ export default class KeyManager extends Collection {
     this.group.name = 'KEYS';
     this.editing = false;
     this.paintWithKeys = false;
+    this.unsubscribers = [];
     this.getLayout();
     this.getKeymap();
     this.createKeys();
@@ -32,18 +32,18 @@ export default class KeyManager extends Collection {
     this.position();
     this.scene.add(this.group);
 
-    subscribe('case.layout', (state) => {
+    this.unsubscribers.push(subscribe('case.layout', (state) => {
       this.getLayout(state.case.layout);
       this.getKeymap(state.case.layout);
       this.createKeys();
       this.position();
-    });
-    subscribe('colorways.editing', (state) => {
+    }));
+    this.unsubscribers.push(subscribe('colorways.editing', (state) => {
       this.editing = state.colorways.editing;
-    });
-    subscribe('settings.paintWithKeys', (state) => {
+    }));
+    this.unsubscribers.push(subscribe('settings.paintWithKeys', (state) => {
       this.paintWithKeys = state.settings.paintWithKeys;
-    });
+    }));
   }
 
   get width() {
@@ -62,17 +62,17 @@ export default class KeyManager extends Collection {
     this.group.position.y = this.angleOffset + this.height;
   }
 
-  getKeymap(id = initial_settings.case.layout) {
+  getKeymap(id = this.settings.case.layout) {
     this.keymap = KEYMAPS[id].layers[0];
   }
 
-  getLayout(id = initial_settings.case.layout) {
+  getLayout(id = this.settings.case.layout) {
     this.layoutFull = LAYOUTS[id];
     this.layout = LAYOUTS[id].layouts['LAYOUT'].layout;
   }
 
   bindPressedEvents() {
-    document.addEventListener('keydown', (e) => {
+    this.onKeyDown = (e) => {
       let code = KeyUtil.getKeyCode(e.code);
       let key = this.getKey(code);
       if (!key) return;
@@ -80,19 +80,23 @@ export default class KeyManager extends Collection {
         this.paintKey(code);
       }
       key.setState(KEYSTATES.MOVING_DOWN);
-    });
-    document.addEventListener('keyup', (e) => {
+    };
+    this.onKeyUp = (e) => {
       let code = KeyUtil.getKeyCode(e.code);
       let key = this.getKey(code);
       if (!key) return;
       key.setState(KEYSTATES.MOVING_UP);
-    });
+    };
+
+    document.addEventListener('keydown', this.onKeyDown);
+    document.addEventListener('keyup', this.onKeyUp);
   }
 
   bindPaintEvent() {
-    document.addEventListener('key_painted', (e) => {
+    this.onKeyPainted = (e) => {
       this.paintKey(e.detail);
-    });
+    };
+    document.addEventListener('key_painted', this.onKeyPainted);
   }
 
   paintKey(code) {
@@ -154,5 +158,24 @@ export default class KeyManager extends Collection {
     let hmatch = (k.options.dimensions?.h || 1) === (dimensions?.h || 1);
     let wmatch = (k.options.dimensions?.w || 1) === (dimensions?.w || 1);
     return hmatch && wmatch;
+  }
+
+  dispose() {
+    this.scene.remove(this.group);
+    
+    if (this.onKeyDown) document.removeEventListener('keydown', this.onKeyDown);
+    if (this.onKeyUp) document.removeEventListener('keyup', this.onKeyUp);
+    if (this.onKeyPainted) document.removeEventListener('key_painted', this.onKeyPainted);
+    
+    if (this.unsubscribers) {
+      this.unsubscribers.forEach(unsub => unsub());
+    }
+
+    if (this.components) {
+        this.components.forEach(key => {
+            if (key.destroy) key.destroy();
+        });
+    }
+    this.components = [];
   }
 }

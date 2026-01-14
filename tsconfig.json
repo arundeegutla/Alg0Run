@@ -30,7 +30,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "src/components/keyboardUtils/three/key/geometry.js",
+    "src/components/keyboardUtils/three/key/texture.js"
   ],
   "exclude": ["node_modules", "src/keyboardUtils"]
 }

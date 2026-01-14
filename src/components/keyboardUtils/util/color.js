@@ -1,5 +1,4 @@
 import COLORWAYS from '../config/colorways/colorways';
-import initial_settings from '../config/settings_user_default.json';
 import { updateCustomColorway } from '../store/slices/colorways';
 import colorConvert from 'color-convert';
 import colorwayTemplate from '../config/colorways/colorway_template.json';

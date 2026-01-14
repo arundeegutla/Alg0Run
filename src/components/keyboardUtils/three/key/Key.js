@@ -3,7 +3,6 @@ import KeyUtil from '../../util/keyboard';
 import ColorUtil from '../../util/color';
 import store from '../../store/store';
 import { subscribe } from 'redux-subscriber';
-import { initial_settings } from '../../store/startup';
 import {
   keyMaterials,
   setKeyMaterialState,
@@ -37,7 +36,7 @@ export class Key {
     this.press_velocity = 0.1; // speed of press, smaller = smoother slower motion
     this.legend = currentState.keys.legendPrimaryStyle || 'cherry';
     this.sub = currentState.keys.legendSecondaryStyle || '';
-    this.testing = initial_settings.settings.testing || false;
+    this.testing = currentState.settings.testing || false;
     this.setup();
   }
 
