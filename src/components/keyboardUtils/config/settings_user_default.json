@@ -15,7 +15,7 @@
     "primaryColor": "#eeeeee",
     "colorSecondary": "#eeeeee",
     "style": "CASE_1",
-    "bezel": 12,
+    "bezel": 6,
     "layout": "65",
     "profile": "high",
     "material": "matte"

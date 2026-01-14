@@ -6,7 +6,35 @@ import {
   loadColorway,
   type KeyboardSettings,
 } from '@/components/keyboardUtils/config/settings';
-import initial_settings from '@/components/keyboardUtils/config/settings_user_default.json';
+import store from '@/components/keyboardUtils/store/store';
+// @ts-expect-error - redux-subscriber doesn't have types
+import { subscribe } from 'redux-subscriber';
+import { setColorway } from '@/components/keyboardUtils/store/slices/colorways';
+import {
+  setPrimaryColor,
+  setSecondaryColor,
+  setStyle,
+  setBezel,
+  setLayout,
+  setProfile as setCaseProfile,
+  setMaterial,
+  setAutoColor,
+} from '@/components/keyboardUtils/store/slices/case';
+import {
+  setProfile as setKeyProfile,
+  setLegendPrimaryStyle,
+  setLegendSecondaryStyle,
+  toggleVisible,
+} from '@/components/keyboardUtils/store/slices/keys';
+
+// Define Redux state type based on store structure
+interface ReduxState {
+  settings: KeyboardSettings['settings'];
+  case: KeyboardSettings['case'];
+  keys: KeyboardSettings['keys'];
+  switches: KeyboardSettings['switches'];
+  colorways: KeyboardSettings['colorways'];
+}
 
 interface Colorway {
   id: string;
@@ -40,6 +68,7 @@ export default class SceneManager {
   startResetTarget: THREE.Vector3;
   isDragging: boolean;
   cameraZoom: number;
+  unsubscribeStore: (() => void) | null;
 
   constructor(
     element: HTMLElement,
@@ -56,12 +85,24 @@ export default class SceneManager {
     this.startResetPosition = new THREE.Vector3();
     this.startResetTarget = new THREE.Vector3();
     this.isDragging = false;
+    this.unsubscribeStore = null;
 
-    // Load settings from initial_settings and merge with custom settings
-    // Note: initial_settings includes randomized colorway and layout
+    // Get settings from Redux store or use custom settings
+    const reduxState = store.getState();
     this.settings = customSettings
       ? (customSettings as KeyboardSettings)
-      : (initial_settings as KeyboardSettings);
+      : {
+          settings: reduxState.settings,
+          case: reduxState.case,
+          keys: reduxState.keys,
+          switches: reduxState.switches,
+          colorways: reduxState.colorways,
+        };
+
+    // If custom settings provided, dispatch them to Redux store
+    if (customSettings) {
+      this.dispatchInitialSettings(customSettings);
+    }
 
     this.colorway = null;
 
@@ -131,6 +172,9 @@ export default class SceneManager {
     // Initialize keyboard components (async)
     this.initializeKeyboard();
 
+    // Subscribe to Redux store changes
+    this.setupStoreSubscription();
+
     // Handle resize
     window.addEventListener('resize', this.handleResize.bind(this));
   }
@@ -148,9 +192,131 @@ export default class SceneManager {
     };
   }
 
+  setupStoreSubscription() {
+    // Subscribe to all relevant state changes
+    this.unsubscribeStore = subscribe(
+      'colorways.active',
+      (state: ReduxState) => {
+        const newColorway = state.colorways.active;
+        if (newColorway !== this.settings.colorways.active) {
+          this.handleColorwayChange(newColorway);
+        }
+      }
+    );
+
+    // Subscribe to case changes
+    const caseUnsubscribe = subscribe('case', (state: ReduxState) => {
+      this.settings.case = state.case;
+      this.handleCaseChange();
+    });
+
+    // Subscribe to keys changes
+    const keysUnsubscribe = subscribe('keys', (state: ReduxState) => {
+      this.settings.keys = state.keys;
+      this.handleKeysChange();
+    });
+
+    // Combine all unsubscribe functions
+    const originalUnsubscribe = this.unsubscribeStore;
+    this.unsubscribeStore = () => {
+      if (originalUnsubscribe) originalUnsubscribe();
+      caseUnsubscribe();
+      keysUnsubscribe();
+    };
+  }
+
+  dispatchInitialSettings(settings: Partial<KeyboardSettings>) {
+    // Dispatch all initial settings to Redux store
+    if (settings.colorways?.active) {
+      store.dispatch(setColorway(settings.colorways.active));
+    }
+
+    if (settings.case) {
+      if (settings.case.primaryColor) {
+        store.dispatch(setPrimaryColor(settings.case.primaryColor));
+      }
+      if (settings.case.colorSecondary) {
+        store.dispatch(setSecondaryColor(settings.case.colorSecondary));
+      }
+      if (settings.case.style) {
+        store.dispatch(setStyle(settings.case.style));
+      }
+      if (settings.case.bezel !== undefined) {
+        store.dispatch(setBezel(settings.case.bezel));
+      }
+      if (settings.case.layout) {
+        store.dispatch(setLayout(settings.case.layout));
+      }
+      if (settings.case.profile) {
+        store.dispatch(setCaseProfile(settings.case.profile));
+      }
+      if (settings.case.material) {
+        store.dispatch(setMaterial(settings.case.material));
+      }
+      if (settings.case.autoColor !== undefined) {
+        store.dispatch(setAutoColor(settings.case.autoColor));
+      }
+    }
+
+    if (settings.keys) {
+      if (settings.keys.profile) {
+        store.dispatch(setKeyProfile(settings.keys.profile));
+      }
+      if (settings.keys.legendPrimaryStyle) {
+        store.dispatch(setLegendPrimaryStyle(settings.keys.legendPrimaryStyle));
+      }
+      if (settings.keys.legendSecondaryStyle) {
+        store.dispatch(setLegendSecondaryStyle(settings.keys.legendSecondaryStyle));
+      }
+    }
+  }
+
+  async handleColorwayChange(newColorwayId: string) {
+    this.settings.colorways.active = newColorwayId;
+    this.colorway = await loadColorway(newColorwayId);
+
+    // Recreate key manager with new colorway
+    if (this.keyManager) {
+      this.keyManager.dispose();
+      this.keyManager = null;
+    }
+
+    if (this.colorway) {
+      this.keyManager = new KeyManager(
+        this.scene,
+        this.settings,
+        this.colorway
+      );
+    }
+  }
+
+  handleCaseChange() {
+    // Recreate case manager
+    if (this.caseManager) {
+      this.caseManager.dispose();
+      this.caseManager = null;
+    }
+
+    this.caseManager = new CaseManager(this.scene, this.settings);
+  }
+
+  handleKeysChange() {
+    // Recreate key manager with updated settings
+    if (this.keyManager && this.colorway) {
+      this.keyManager.dispose();
+      this.keyManager = null;
+
+      this.keyManager = new KeyManager(
+        this.scene,
+        this.settings,
+        this.colorway
+      );
+    }
+  }
+
   async initializeKeyboard() {
     // Load colorway based on settings
-    this.colorway = await loadColorway('port');
+    this.colorway = await loadColorway(this.settings.colorways.active);
 
     // Create keyboard components with settings
     this.caseManager = new CaseManager(this.scene, this.settings);
@@ -301,40 +467,90 @@ export default class SceneManager {
   }
 
   async updateSettings(newSettings: KeyboardSettings) {
-    const previousColorway = this.settings.colorways.active;
-    this.settings = newSettings;
+    // Update settings via Redux store dispatch
+    // The store subscriptions will handle recreating components automatically
 
-    // Load new colorway if changed
-    if (newSettings.colorways.active !== previousColorway || !this.colorway) {
-      this.colorway = await loadColorway(newSettings.colorways.active);
+    // Update colorway if changed
+    if (
+      newSettings.colorways?.active &&
+      newSettings.colorways.active !== this.settings.colorways.active
+    ) {
+      store.dispatch(setColorway(newSettings.colorways.active));
     }
 
-    // Dispose of old keyboard components
-    if (this.keyManager) {
-      this.keyManager.dispose();
-      this.keyManager = null;
-    }
-    if (this.caseManager) {
-      this.caseManager.dispose();
-      this.caseManager = null;
+    // Update case settings
+    if (newSettings.case) {
+      if (newSettings.case.primaryColor !== this.settings.case.primaryColor) {
+        store.dispatch(setPrimaryColor(newSettings.case.primaryColor));
+      }
+      if (
+        newSettings.case.colorSecondary !== this.settings.case.colorSecondary
+      ) {
+        store.dispatch(setSecondaryColor(newSettings.case.colorSecondary));
+      }
+      if (newSettings.case.style !== this.settings.case.style) {
+        store.dispatch(setStyle(newSettings.case.style));
+      }
+      if (newSettings.case.bezel !== this.settings.case.bezel) {
+        store.dispatch(setBezel(newSettings.case.bezel));
+      }
+      if (newSettings.case.layout !== this.settings.case.layout) {
+        store.dispatch(setLayout(newSettings.case.layout));
+      }
+      if (newSettings.case.profile !== this.settings.case.profile) {
+        store.dispatch(setCaseProfile(newSettings.case.profile));
+      }
+      if (newSettings.case.material !== this.settings.case.material) {
+        store.dispatch(setMaterial(newSettings.case.material));
+      }
+      if (newSettings.case.autoColor !== this.settings.case.autoColor) {
+        store.dispatch(setAutoColor(newSettings.case.autoColor));
+      }
     }
 
-    // Recreate keyboard components with new settings
-    this.caseManager = new CaseManager(this.scene, this.settings);
-
-    if (this.colorway) {
-      this.keyManager = new KeyManager(
-        this.scene,
-        this.settings,
-        this.colorway
-      );
+    // Update keys settings
+    if (newSettings.keys) {
+      if (newSettings.keys.profile !== this.settings.keys.profile) {
+        store.dispatch(setKeyProfile(newSettings.keys.profile));
+      }
+      if (
+        newSettings.keys.legendPrimaryStyle !==
+        this.settings.keys.legendPrimaryStyle
+      ) {
+        store.dispatch(
+          setLegendPrimaryStyle(newSettings.keys.legendPrimaryStyle)
+        );
+      }
+      if (
+        newSettings.keys.legendSecondaryStyle !==
+        this.settings.keys.legendSecondaryStyle
+      ) {
+        store.dispatch(
+          setLegendSecondaryStyle(newSettings.keys.legendSecondaryStyle)
+        );
+      }
+      if (
+        newSettings.keys.visible !== this.settings.keys.visible &&
+        newSettings.keys.visible !== undefined
+      ) {
+        store.dispatch(toggleVisible());
+      }
     }
+
+    // The Redux subscriptions will handle updating the scene automatically
   }
 
   destroy() {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
     }
+
+    // Unsubscribe from Redux store
+    if (this.unsubscribeStore) {
+      this.unsubscribeStore();
+      this.unsubscribeStore = null;
+    }
+
     window.removeEventListener('resize', this.handleResize.bind(this));
 
     // Dispose of keyboard components

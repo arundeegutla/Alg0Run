@@ -1,12 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { saveState } from './localStorage';
-import initSubscriber from 'redux-subscriber';
-import settingsReducer from './slices/settings';
-import switchesReducer from './slices/switches';
-import colorwaysReducer from './slices/colorways';
-import caseReducer from './slices/case';
-import keysReducer from './slices/keys';
-import { initial_settings } from '../config/settings_user_default.json';
+import { configureStore } from "@reduxjs/toolkit";
+import { saveState } from "./localStorage";
+import initSubscriber from "redux-subscriber";
+import settingsReducer from "./slices/settings";
+import switchesReducer from "./slices/switches";
+import colorwaysReducer from "./slices/colorways";
+import caseReducer from "./slices/case";
+import keysReducer from "./slices/keys";
+import { initial_settings } from "./startup";
 
 const ENABLE_LOCAL_STORAGE = true;
 

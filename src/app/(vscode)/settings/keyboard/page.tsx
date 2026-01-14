@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Keyboard3D, { Keyboard3DHandle } from '@/components/Keyboard3D';
 import {
-  loadDefaultSettings,
+  getSettings,
   type KeyboardSettings,
 } from '@/components/keyboardUtils/config/settings';
 import { colorwayOptions } from '@/components/keyboardUtils/config/colorways/colorways';
@@ -62,8 +62,8 @@ export default function KeyboardSettingsPage() {
         primaryColor: '#eeeeee',
         colorSecondary: '#eeeeee',
         style: 'CASE_2',
-        bezel: 12,
-        layout: '65',
+        bezel: 0,
+        layout: '100',
         profile: 'high',
         material: 'matte',
       },
@@ -83,7 +83,7 @@ export default function KeyboardSettingsPage() {
       colorways: {
         editing: false,
         activeSwatch: 'accent',
-        active: 'handarbeit',
+        active: 'mizu',
         custom: [],
       },
     };
@@ -131,7 +131,7 @@ export default function KeyboardSettingsPage() {
   };
 
   const resetToDefaults = () => {
-    setSettings(loadDefaultSettings());
+    setSettings(getSettings());
   };
 
   return (

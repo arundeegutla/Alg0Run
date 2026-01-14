@@ -32,7 +32,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "src/components/keyboardUtils/three/key/geometry.js",
-    "src/components/keyboardUtils/three/key/texture.js"
+    "src/components/keyboardUtils/three/key/texture.js",
+    "src/components/keyboardUtils/three/case/case_1.js",
+    "src/components/keyboardUtils/three/case/badge.js",
+    "src/components/keyboardUtils/three/SceneManager.ts",
+    "src/components/keyboardUtils/three/SceneManager.ts",
+    "src/components/keyboardUtils/three/case/CaseManager.js"
   ],
   "exclude": ["node_modules", "src/keyboardUtils"]
 }

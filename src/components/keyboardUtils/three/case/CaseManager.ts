@@ -33,6 +33,19 @@ import brushedAlbedo from '@/assets/dist/brushed-metal_albedo-512.png';
 import brushedAo from '@/assets/dist/brushed-metal_ao-512.png';
 
 import shadow_path_65 from '@/assets/shadows/65.png';
+import shadow_path_100 from '@/assets/shadows/100.png';
+import shadow_path_40 from '@/assets/shadows/40.png';
+import shadow_path_60 from '@/assets/shadows/60.png';
+import shadow_path_60hhkb from '@/assets/shadows/60hhkb.png';
+import shadow_path_60iso from '@/assets/shadows/60iso.png';
+import shadow_path_60wkl from '@/assets/shadows/60wkl.png';
+import shadow_path_75 from '@/assets/shadows/75.png';
+import shadow_path_80 from '@/assets/shadows/80.png';
+import shadow_path_95 from '@/assets/shadows/95.png';
+import shadow_path_leftnum from '@/assets/shadows/leftnum.png';
+import shadow_path_numpad from '@/assets/shadows/numpad.png';
+import shadow_path_40ortho from '@/assets/shadows/40ortho.png';
+import shadow_path_50ortho from '@/assets/shadows/50ortho.png';
 
 // Helper to get image src from StaticImageData
 const getImageSrc = (img: StaticImageData | string): string => {
@@ -40,7 +53,20 @@ const getImageSrc = (img: StaticImageData | string): string => {
 };
 
 const shadow_paths: Record<string, string> = {
+  shadow_path_100: getImageSrc(shadow_path_100),
+  shadow_path_40: getImageSrc(shadow_path_40),
+  shadow_path_60: getImageSrc(shadow_path_60),
+  shadow_path_60hhkb: getImageSrc(shadow_path_60hhkb),
+  shadow_path_60iso: getImageSrc(shadow_path_60iso),
+  shadow_path_60wkl: getImageSrc(shadow_path_60wkl),
   shadow_path_65: getImageSrc(shadow_path_65),
+  shadow_path_75: getImageSrc(shadow_path_75),
+  shadow_path_80: getImageSrc(shadow_path_80),
+  shadow_path_95: getImageSrc(shadow_path_95),
+  shadow_path_leftnum: getImageSrc(shadow_path_leftnum),
+  shadow_path_numpad: getImageSrc(shadow_path_numpad),
+  shadow_path_40ortho: getImageSrc(shadow_path_40ortho),
+  shadow_path_50ortho: getImageSrc(shadow_path_50ortho),
 };
 
 interface MaterialOptions {
@@ -126,7 +152,7 @@ export default class CaseManager {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.layout = (LAYOUTS as any)[this.layoutName] || LAYOUT_65;
     this.texScale = 0.1;
-    this.bezel = 0.5;
+    this.bezel = settings.case.bezel / 10 || 0;
     this.height = 1;
     this.angle = 6;
     this.r = 0.5;

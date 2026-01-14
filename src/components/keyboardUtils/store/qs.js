@@ -1,8 +1,9 @@
+import store from './store';
 import { encodeColorway, decodeColorway } from './encoder';
-import qs from 'query-string';
+const qs = require('query-string');
 
 export const get_qs_values = () => {
-  if (!document.location.search) return;
+  if (typeof window === 'undefined' || !document.location.search) return;
   const parsed = qs.parse(document.location.search);
   if (parsed.colorway && parsed.colorway.includes('cw_')) {
     parsed.colorway = decodeColorway(parsed.colorway);
@@ -17,9 +18,8 @@ const getColorwayString = (state) => {
   return encodeColorway(cw);
 };
 
-export const getPermalink = async () => {
-  // Lazy-load store to avoid circular dependency
-  const { default: store } = await import('./store');
+export const getPermalink = () => {
+  if (typeof window === 'undefined') return '';
   let link = window.location.href;
   link = link.includes('?') ? link.split('?')[0] : link;
   let state = store.getState();

@@ -1,4 +1,45 @@
-import defaultSettings from './settings_user_default.json';
+const defaultSettings = {
+  settings: {
+    mute: true,
+    debug: false,
+    testing: false,
+    mode: 'sidebar',
+    sceneAutoColor: true,
+    sceneColor: '#cccccc',
+    glowColor: '#ffffff',
+    highContrast: false,
+    paintWithKeys: false,
+  },
+  case: {
+    autoColor: true,
+    primaryColor: '#eeeeee',
+    colorSecondary: '#eeeeee',
+    style: 'CASE_2',
+    bezel: 12,
+    layout: '100',
+    profile: 'high',
+    material: 'matte',
+  },
+  keys: {
+    visible: true,
+    profile: 'mx',
+    legendPrimaryStyle: 'cherry',
+    legendSecondaryStyle: '',
+    activeBackground: '#51cf59',
+    activeColor: '#ffffff',
+  },
+  switches: {
+    stemColor: 'red',
+    bodyColor: 'blue',
+    soundProfile: 'default',
+  },
+  colorways: {
+    editing: false,
+    activeSwatch: 'accent',
+    active: 'nord',
+    custom: [],
+  },
+};
 
 export interface KeyboardSettings {
   settings: {

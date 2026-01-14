@@ -5,14 +5,25 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
 import ambiantOcclusionPath from '@/assets/dist/shadow-key-noise.png';
 import lightMapPath from '@/assets/materials/white.png';
 
-const loader = new TextureLoader();
-const ambiantOcclusionMap = loader.load(ambiantOcclusionPath);
-ambiantOcclusionMap.wrapS = THREE.RepeatWrapping;
-ambiantOcclusionMap.wrapT = THREE.RepeatWrapping;
+let loader = null;
+let ambiantOcclusionMap = null;
+let lightMap = null;
 
-const lightMap = loader.load(lightMapPath);
-lightMap.wrapS = THREE.RepeatWrapping;
-lightMap.wrapT = THREE.RepeatWrapping;
+const initTextures = () => {
+  if (typeof window === 'undefined') return;
+  
+  if (!loader) {
+    loader = new TextureLoader();
+    
+    ambiantOcclusionMap = loader.load(ambiantOcclusionPath);
+    ambiantOcclusionMap.wrapS = THREE.RepeatWrapping;
+    ambiantOcclusionMap.wrapT = THREE.RepeatWrapping;
+
+    lightMap = loader.load(lightMapPath);
+    lightMap.wrapS = THREE.RepeatWrapping;
+    lightMap.wrapT = THREE.RepeatWrapping;
+  }
+};
 
 var computed_materials = {};
 
@@ -60,6 +71,8 @@ const setMaterialIndexes = (mesh, side, top, isoent) => {
 
 //generate top and side materials for a single color set
 const getMaterialSet = (opts, offset) => {
+  initTextures();
+  
   let key = `mat${opts.background}`;
 
   let legendTexture = keyTexture(opts);

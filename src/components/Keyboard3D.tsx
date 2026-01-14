@@ -58,7 +58,7 @@ const Keyboard3D = forwardRef<Keyboard3DHandle, Keyboard3DProps>(
         );
         sceneManagerRef.current.tick();
         isInitializedRef.current = true;
-        
+
         // Store initial settings
         if (keyboardOptions) {
           previousSettingsRef.current = JSON.stringify(keyboardOptions);
@@ -73,21 +73,23 @@ const Keyboard3D = forwardRef<Keyboard3DHandle, Keyboard3DProps>(
           sceneManagerRef.current.destroy();
         }
       };
-    }, [cameraZoom, keyboardOptions]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cameraZoom]); // Only recreate if cameraZoom changes, not keyboardOptions
 
     // Update settings when they change
     useEffect(() => {
-      if (!sceneManagerRef.current || !keyboardOptions || !isInitializedRef.current) {
+      if (!sceneManagerRef.current || !keyboardOptions) {
         return;
       }
 
       const newSettingsStr = JSON.stringify(keyboardOptions);
-      
+
       // Only update if settings actually changed
       if (newSettingsStr !== previousSettingsRef.current) {
-        console.log('Settings changed, updating keyboard...');
         previousSettingsRef.current = newSettingsStr;
-        sceneManagerRef.current.updateSettings(keyboardOptions as KeyboardSettings);
+        sceneManagerRef.current.updateSettings(
+          keyboardOptions as KeyboardSettings
+        );
       }
     }, [keyboardOptions]);
 

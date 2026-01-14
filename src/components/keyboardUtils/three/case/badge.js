@@ -3,18 +3,19 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
 import roughnessMapPath from '@/assets/dist/lightgold_roughness-512.png';
 import albedoMapPath from '@/assets/dist/lightgold_albedo-512.png';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createBadge = (w: number, cm: any) => {
-  const cornerRadius = 0.02;
-  const bevel = 0.04;
-  const height = 0.2;
-  const width = w || 4;
-  const depth = 1;
-  const loader = new TextureLoader();
-  const ratio = depth / width;
+export default (w, cm) => {
+  let cornerRadius = 0.02;
+  let bevel = 0.04;
+  let height = 0.2;
+  let width = w || 4;
+  let depth = 1;
+  let geometry;
+  let mesh;
+  let loader = new TextureLoader();
+  let ratio = depth / width;
 
   //create geometry
-  const shape = new THREE.Shape();
+  let shape = new THREE.Shape();
 
   //basic outline
   shape.moveTo(0, cornerRadius);
@@ -27,7 +28,7 @@ const createBadge = (w: number, cm: any) => {
   shape.quadraticCurveTo(0, depth, 0, depth - cornerRadius);
   shape.lineTo(0, cornerRadius);
 
-  const extrudeOptions = {
+  let extrudeOptions = {
     depth: height,
     steps: 1,
     bevelSegments: 1,
@@ -36,49 +37,49 @@ const createBadge = (w: number, cm: any) => {
     bevelThickness: bevel,
   };
 
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeOptions);
+  geometry = new THREE.ExtrudeGeometry(shape, extrudeOptions);
 
-  const roughnessMap = loader.load(
-    typeof roughnessMapPath === 'string'
-      ? roughnessMapPath
-      : roughnessMapPath.src
-  );
+  // Set uv2 for AO if needed (BufferGeometry equivalent of duplicating UVs)
+  if (geometry.attributes.uv) {
+    geometry.setAttribute(
+      'uv2',
+      new THREE.BufferAttribute(geometry.attributes.uv.array, 2)
+    );
+  }
+
+  let roughnessMap = loader.load(roughnessMapPath);
   roughnessMap.wrapS = THREE.RepeatWrapping;
   roughnessMap.wrapT = THREE.RepeatWrapping;
   roughnessMap.repeat.x = ratio;
   roughnessMap.repeat.y = -ratio;
 
-  const albedoMap = loader.load(
-    typeof albedoMapPath === 'string' ? albedoMapPath : albedoMapPath.src
-  );
+  let albedoMap = loader.load(albedoMapPath);
   albedoMap.wrapS = THREE.RepeatWrapping;
   albedoMap.wrapT = THREE.RepeatWrapping;
   albedoMap.repeat.x = ratio;
   albedoMap.repeat.y = -ratio;
 
-  const material = new THREE.MeshStandardMaterial({
+  let material = new THREE.MeshStandardMaterial({
     envMap: cm,
     roughness: 0.05,
     metalness: 0.9,
     map: albedoMap,
   });
   //top face
-  const material2 = new THREE.MeshStandardMaterial({
+  let material2 = new THREE.MeshStandardMaterial({
     envMap: cm,
     map: albedoMap,
     metalness: 0.9,
     roughnessMap: roughnessMap,
   });
-  const materials = [];
+  let materials = [];
 
   materials.push(material2, material);
 
   //create mesh
-  const mesh = new THREE.Mesh(geometry, materials);
+  mesh = new THREE.Mesh(geometry, materials);
   mesh.name = 'badge';
   mesh.rotation.x = Math.PI / 2;
   mesh.position.set(0, 0.15, 0);
   return mesh;
 };
-
-export default createBadge;

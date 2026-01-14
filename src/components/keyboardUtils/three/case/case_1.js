@@ -2,23 +2,20 @@ import * as THREE from 'three';
 import store from '../../store/store';
 import holes from './holes';
 
-interface Layout {
-  width: number;
-  height: number;
-}
-
-const createCase = (layout: Layout, color?: string) => {
-  const finalColor = color || '#cccccc';
-  const cornerRadius = 0.5;
-  const bevel = 0.05;
-  const bezel = 0.5;
-  const height = 1;
-  const width = layout.width + bezel * 2;
-  const depth = layout.height + bezel * 2;
-  const size = store.getState().case.layout;
+export default (layout, color) => {
+  color = color || '#cccccc';
+  let cornerRadius = 0.5;
+  let bevel = 0.05;
+  let bezel = store.getState().case.bezel / 10 || 0.5;
+  let height = 1;
+  let width = layout.width + bezel * 2;
+  let depth = layout.height + bezel * 2;
+  let size = store.getState().case.layout;
+  let geometry;
+  let mesh;
 
   //create geometry
-  const shape = new THREE.Shape();
+  let shape = new THREE.Shape();
 
   //basic outline
   shape.moveTo(0, cornerRadius);
@@ -33,7 +30,7 @@ const createCase = (layout: Layout, color?: string) => {
 
   shape.holes = holes(size, layout, bezel);
 
-  const extrudeOptions = {
+  let extrudeOptions = {
     depth: height,
     steps: 1,
     bevelSegments: 1,
@@ -42,16 +39,22 @@ const createCase = (layout: Layout, color?: string) => {
     bevelThickness: bevel,
   };
 
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeOptions);
+  geometry = new THREE.ExtrudeGeometry(shape, extrudeOptions);
 
-  // Note: faceVertexUvs and faces are deprecated in newer Three.js versions
-  // This code may need updating for the current Three.js geometry system
-  // which uses BufferGeometry and does not have faces property
+  // Set uv2 for AO if needed (BufferGeometry equivalent of duplicating UVs)
+  if (geometry.attributes.uv) {
+    geometry.setAttribute(
+      'uv2',
+      new THREE.BufferAttribute(geometry.attributes.uv.array, 2)
+    );
+  }
+
+  geometry.computeVertexNormals();
 
   //create mesh
-  const mesh = new THREE.Mesh(
+  mesh = new THREE.Mesh(
     geometry,
-    new THREE.MeshBasicMaterial({ color: finalColor })
+    new THREE.MeshBasicMaterial({ color: color })
   );
   mesh.name = 'CASE';
   mesh.rotation.x = Math.PI / 2;
@@ -59,5 +62,3 @@ const createCase = (layout: Layout, color?: string) => {
 
   return mesh;
 };
-
-export default createCase;
