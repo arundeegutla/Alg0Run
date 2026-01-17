@@ -83,6 +83,7 @@ interface MaterialOptions {
   map?: THREE.Texture;
   aoMap?: THREE.Texture;
   color?: string | number;
+  secondaryColor?: string | number;
 }
 
 const MATERIAL_OPTIONS: Record<string, MaterialOptions> = {
@@ -118,6 +119,7 @@ export default class CaseManager {
   layoutName: string;
   style: string;
   color: string;
+  secondaryColor: string;
   finish: string;
   bezel: number;
   height: number;
@@ -148,6 +150,7 @@ export default class CaseManager {
     this.layoutName = settings.case.layout || '65';
     this.style = settings.case.style || 'CASE_1';
     this.color = settings.case.primaryColor;
+    this.secondaryColor = settings.case.colorSecondary;
     this.finish = settings.case.material || 'matte';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.layout = (LAYOUTS as any)[this.layoutName] || LAYOUT_65;
@@ -188,12 +191,21 @@ export default class CaseManager {
     subscribe('case.primaryColor', (state: any) => {
       this.color = state.case.primaryColor;
       this.updateCaseMaterial();
+      this.createCaseShadow();
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subscribe('case.colorSecondary', (state: any) => {
+      this.secondaryColor = state.case.colorSecondary;
+      this.updateCaseMaterial();
+      this.createCaseShadow();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     subscribe('case.material', (state: any) => {
       this.finish = state.case.material;
       this.updateCaseMaterial();
+      this.createCaseShadow();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -202,6 +214,7 @@ export default class CaseManager {
       this.layout = (LAYOUTS as any)[state.case.layout];
       this.style = state.case.style;
       this.updateCaseGeometry();
+      this.createCaseShadow();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -269,7 +282,7 @@ export default class CaseManager {
       this.depth - this.bezel * 2
     );
     const material = new THREE.MeshLambertMaterial({
-      color: 'black',
+      color: this.secondaryColor,
     });
 
     this.plate = new THREE.Mesh(geometry, material);
@@ -304,32 +317,37 @@ export default class CaseManager {
   }
 
   createCaseShadow() {
-    if (this.shadow) this.scene.remove(this.shadow);
-
-    const sh_w = this.style === 'CASE_1' ? 32.7 : 32;
-    const sh_h = this.style === 'CASE_1' ? 33 : 31.5;
-    const sh_o = this.style === 'CASE_1' ? 0 : -0.05;
-
-    const shadowTex = this.loader.load(
-      shadow_paths[`shadow_path_${this.layoutName}`]
-    );
-    const shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTex,
-      transparent: true,
-    });
-
-    this.shadow = new THREE.Mesh(
-      new THREE.PlaneGeometry(sh_w, sh_h),
-      shadowMat
-    );
-    this.shadow.position.z = this.depth / 2 - this.bezel + sh_o;
-    this.shadow.position.y = 0.01;
-    if (this.shadow.material instanceof THREE.Material) {
-      this.shadow.material.side = THREE.DoubleSide;
+    if (this.shadow) {
+      console.log('Removing existing case shadow');
+      this.scene.remove(this.shadow);
     }
-    this.shadow.rotation.x = -Math.PI / 2;
 
-    this.scene.add(this.shadow);
+    // console.log('Creating case shadow for layout:', this.layoutName);
+    // const sh_w = this.style === 'CASE_1' ? 32.7 : 32;
+    // const sh_h = this.style === 'CASE_1' ? 33 : 31.5;
+    // const sh_o = this.style === 'CASE_1' ? 0 : -0.05;
+
+    // const shadowTex = this.loader.load(
+    //   shadow_paths[`shadow_path_${this.layoutName}`]
+    // );
+
+    // const shadowMat = new THREE.MeshBasicMaterial({
+    //   map: shadowTex,
+    //   transparent: true,
+    // });
+
+    // this.shadow = new THREE.Mesh(
+    //   new THREE.PlaneGeometry(sh_w, sh_h),
+    //   shadowMat
+    // );
+    // this.shadow.position.z = this.depth / 2 - this.bezel + sh_o;
+    // this.shadow.position.y = 0.01;
+    // // if (this.shadow.material instanceof THREE.Material) {
+    // //   this.shadow.material.side = THREE.DoubleSide;
+    // // }
+    // this.shadow.rotation.x = -Math.PI / 2;
+
+    // this.scene.add(this.shadow);
   }
 
   getCaseMesh(layout = this.layout, style = this.style) {
@@ -382,7 +400,7 @@ export default class CaseManager {
     // Primary material
     const materialPrimary = new THREE.MeshPhysicalMaterial({
       ...options,
-      color: color,
+      color: this.color,
     });
 
     // Side material

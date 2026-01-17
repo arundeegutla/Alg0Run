@@ -64,7 +64,7 @@ export default function VSCodeEditor({
   }, [algo]);
 
   const rawCode = algo?.code?.[language] || '';
-  const [isFormatting, setIsFormatting] = useState(true);
+  const [isFormatting, setIsFormatting] = useState(false);
   const [fontSize, setFontSize] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('editor-font-size');

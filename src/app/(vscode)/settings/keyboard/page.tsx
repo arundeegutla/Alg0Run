@@ -1,22 +1,35 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { trpc } from '@/server/trpc/client';
 import Keyboard3D, { Keyboard3DHandle } from '@/components/Keyboard3D';
+import Loading from '@/components/Loading';
 import {
   getSettings,
   type KeyboardSettings,
 } from '@/components/keyboardUtils/config/settings';
-import { colorwayOptions } from '@/components/keyboardUtils/config/colorways/colorways';
+import COLORWAYS, {
+  colorwayOptions,
+} from '@/components/keyboardUtils/config/colorways/colorways';
 import { layoutOptions } from '@/components/keyboardUtils/config/layouts/layouts';
+import toast from 'react-hot-toast';
 
 // Transform colorway keys to display format
-const colorwayDisplayOptions = colorwayOptions.map((id) => ({
-  id,
-  label: id
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' '),
-}));
+const colorwayDisplayOptions = colorwayOptions.map((id) => {
+  const colors = COLORWAYS[id as keyof typeof COLORWAYS];
+  return {
+    id,
+    label: id
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' '),
+    colors: [
+      colors.swatches.base.background,
+      colors.swatches.mods.background,
+      colors.swatches.accent.background,
+    ],
+  };
+});
 
 // Transform layout keys to display format
 const layoutDisplayOptions = layoutOptions.map((id) => ({
@@ -30,12 +43,6 @@ const layoutDisplayOptions = layoutOptions.map((id) => ({
         : id.toUpperCase(),
 }));
 
-const profileOptions = [
-  { id: 'mx', label: 'Cherry MX' },
-  { id: 'sa', label: 'SA Profile' },
-  { id: 'dsa', label: 'DSA Profile' },
-];
-
 const materialOptions = [
   { id: 'matte', label: 'Matte' },
   { id: 'glossy', label: 'Glossy' },
@@ -44,66 +51,46 @@ const materialOptions = [
 
 export default function KeyboardSettingsPage() {
   const keyboardRef = useRef<Keyboard3DHandle>(null);
-  const [settings, setSettings] = useState<KeyboardSettings>(() => {
-    return {
-      settings: {
-        mute: true,
-        debug: false,
-        testing: false,
-        mode: 'sidebar',
-        sceneAutoColor: true,
-        sceneColor: '#cccccc',
-        glowColor: '#ffffff',
-        highContrast: false,
-        paintWithKeys: false,
-      },
-      case: {
-        autoColor: true,
-        primaryColor: '#eeeeee',
-        colorSecondary: '#eeeeee',
-        style: 'CASE_2',
-        bezel: 0,
-        layout: '100',
-        profile: 'high',
-        material: 'matte',
-      },
-      keys: {
-        visible: true,
-        profile: 'mx',
-        legendPrimaryStyle: 'cherry',
-        legendSecondaryStyle: '',
-        activeBackground: '#51cf59',
-        activeColor: '#ffffff',
-      },
-      switches: {
-        stemColor: 'red',
-        bodyColor: 'blue',
-        soundProfile: 'default',
-      },
-      colorways: {
-        editing: false,
-        activeSwatch: 'accent',
-        active: 'mizu',
-        custom: [],
-      },
-    };
+  const [settings, setSettings] = useState<KeyboardSettings | null>(null);
+
+  const { data: profileData } = trpc.profile.getProfile.useQuery(undefined, {
+    refetchOnWindowFocus: false,
   });
-  const [activeTab, setActiveTab] = useState<
-    'appearance' | 'layout' | 'advanced'
-  >('appearance');
+  const updateKeyboardSettingsMutation =
+    trpc.profile.updateKeyboardSettings.useMutation();
+
+  const handleSaveSettings = () => {
+    updateKeyboardSettingsMutation.mutate({
+      keyboardSettings: settings!,
+    });
+    toast.success('Keyboard settings saved');
+  };
+
+  useEffect(() => {
+    if (profileData?.profile.keyboardSettings) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSettings(profileData.profile.keyboardSettings);
+    } else if (profileData?.profile) {
+      setSettings(getSettings());
+    }
+  }, [profileData]);
 
   useEffect(() => {
     console.log('Current Settings:', settings);
   }, [settings]);
 
   const updateSettings = (updates: Partial<KeyboardSettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      ...updates,
-    }));
+    setSettings((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        ...updates,
+      };
+    });
   };
 
   const updateColorway = (colorwayId: string) => {
+    if (!settings) return;
     updateSettings({
       colorways: {
         ...settings.colorways,
@@ -113,6 +100,7 @@ export default function KeyboardSettingsPage() {
   };
 
   const updateCaseSetting = (key: string, value: string | number | boolean) => {
+    if (!settings) return;
     updateSettings({
       case: {
         ...settings.case,
@@ -121,334 +109,190 @@ export default function KeyboardSettingsPage() {
     });
   };
 
-  const updateKeysSetting = (key: string, value: string | boolean) => {
-    updateSettings({
-      keys: {
-        ...settings.keys,
-        [key]: value,
-      },
-    });
+  const resetToDefaults = () => {
+    updateSettings(getSettings());
   };
 
-  const resetToDefaults = () => {
-    setSettings(getSettings());
-  };
+  if (!settings) return <Loading />;
 
   return (
     <div className='flex flex-col h-screen w-full bg-[#1e1e1e] text-[#cccccc]'>
       {/* Header */}
       <div className='border-b border-[#3c3c3c] px-6 py-4'>
-        <h1 className='text-2xl font-semibold text-white'>
+        <h1 className='text-2xl font-semibold text-white font-mono'>
           Keyboard Customization
         </h1>
-        <p className='text-sm text-[#858585] mt-1'>
-          Personalize your typing experience
-        </p>
       </div>
 
       <div className='flex flex-1 overflow-hidden'>
         {/* Left Panel - Settings */}
         <div className='w-96 border-r border-[#3c3c3c] flex flex-col'>
-          {/* Tabs */}
-          <div className='flex border-b border-[#3c3c3c]'>
-            <button
-              onClick={() => setActiveTab('appearance')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'appearance'
-                  ? 'bg-[#2d2d2d] text-white border-b-2 border-[#007acc]'
-                  : 'text-[#858585] hover:text-white hover:bg-[#2a2a2a]'
-              }`}
-            >
-              Appearance
-            </button>
-            <button
-              onClick={() => setActiveTab('layout')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'layout'
-                  ? 'bg-[#2d2d2d] text-white border-b-2 border-[#007acc]'
-                  : 'text-[#858585] hover:text-white hover:bg-[#2a2a2a]'
-              }`}
-            >
-              Layout
-            </button>
-            <button
-              onClick={() => setActiveTab('advanced')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'advanced'
-                  ? 'bg-[#2d2d2d] text-white border-b-2 border-[#007acc]'
-                  : 'text-[#858585] hover:text-white hover:bg-[#2a2a2a]'
-              }`}
-            >
-              Advanced
-            </button>
-          </div>
-
           {/* Settings Content */}
           <div className='flex-1 overflow-y-auto p-6 space-y-6'>
-            {activeTab === 'appearance' && (
-              <>
-                {/* Colorway Selection */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Keycap Colorway
-                  </label>
-                  <div className='grid grid-cols-2 gap-2 max-h-96 overflow-y-auto'>
-                    {colorwayDisplayOptions.map((colorway) => (
-                      <button
-                        key={colorway.id}
-                        onClick={() => updateColorway(colorway.id)}
-                        className={`px-3 py-2 text-xs rounded border transition-all ${
-                          settings.colorways.active === colorway.id
-                            ? 'bg-[#007acc] border-[#007acc] text-white'
-                            : 'bg-[#2d2d2d] border-[#3c3c3c] text-[#cccccc] hover:border-[#007acc]'
-                        }`}
-                      >
+            {/* Colorway Selection */}
+            <div>
+              <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                Keycap Colorway
+              </label>
+              <div className='grid grid-cols-2 gap-3 max-h-96 overflow-y-auto p-2 custom-scrollbar'>
+                {colorwayDisplayOptions.map((colorway) => (
+                  <button
+                    key={colorway.id}
+                    onClick={() => updateColorway(colorway.id)}
+                    className={`group relative h-14 rounded-lg overflow-hidden transition-all duration-200 ${
+                      settings.colorways.active === colorway.id
+                        ? 'ring-2 ring-[#007acc] ring-offset-2 ring-offset-[#1e1e1e] scale-[1.02]'
+                        : 'hover:opacity-90'
+                    }`}
+                  >
+                    <div
+                      className='absolute inset-0'
+                      style={{
+                        background: `linear-gradient(135deg, ${colorway.colors[0]} 0%, ${colorway.colors[1]} 50%, ${colorway.colors[2]} 100%)`,
+                      }}
+                    />
+                    <div className='absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors' />
+                    <div className='absolute inset-x-0 bottom-0 p-2 bg-linear-to-t from-black/90 to-transparent'>
+                      <span className='text-xs font-medium text-white [text-shadow:0_1px_2px_rgb(0_0_0/80%)] block truncate text-left pl-1'>
                         {colorway.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Case Color */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Case Color
-                  </label>
-                  <div className='space-y-3'>
-                    <div className='flex items-center gap-3'>
-                      <input
-                        type='checkbox'
-                        id='autoColor'
-                        checked={settings.case.autoColor}
-                        onChange={(e) =>
-                          updateCaseSetting('autoColor', e.target.checked)
-                        }
-                        className='w-4 h-4 accent-[#007acc]'
-                      />
-                      <label
-                        htmlFor='autoColor'
-                        className='text-sm text-[#cccccc]'
-                      >
-                        Auto-match with keycaps
-                      </label>
+                      </span>
                     </div>
-                    {!settings.case.autoColor && (
-                      <div className='flex items-center gap-3'>
-                        <input
-                          type='color'
-                          value={settings.case.primaryColor}
-                          onChange={(e) =>
-                            updateCaseSetting('primaryColor', e.target.value)
-                          }
-                          className='w-10 h-10 rounded border border-[#3c3c3c] bg-transparent cursor-pointer'
-                        />
-                        <span className='text-sm text-[#858585] font-mono'>
-                          {settings.case.primaryColor}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                {/* Material */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Case Material
-                  </label>
-                  <div className='grid grid-cols-3 gap-2'>
-                    {materialOptions.map((material) => (
-                      <button
-                        key={material.id}
-                        onClick={() =>
-                          updateCaseSetting('material', material.id)
-                        }
-                        className={`px-3 py-2 text-xs rounded border transition-all ${
-                          settings.case.material === material.id
-                            ? 'bg-[#007acc] border-[#007acc] text-white'
-                            : 'bg-[#2d2d2d] border-[#3c3c3c] text-[#cccccc] hover:border-[#007acc]'
-                        }`}
-                      >
-                        {material.label}
-                      </button>
-                    ))}
+            {/* Case Color */}
+            <div className='flex flex-row gap-6 w-full'>
+              <div className='flex-1'>
+                <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                  Primary Color
+                </label>
+                <div className='flex items-center gap-3 bg-[#2d2d2d] p-2 rounded-lg border border-[#3c3c3c]'>
+                  <div className='relative w-8 h-8 rounded-full shadow-inner overflow-hidden ring-1 ring-[#3c3c3c]'>
+                    <input
+                      type='color'
+                      value={settings.case.primaryColor}
+                      onChange={(e) =>
+                        updateCaseSetting('primaryColor', e.target.value)
+                      }
+                      className='absolute inset-[-50%] w-[200%] h-[200%] cursor-pointer p-0 border-0'
+                    />
                   </div>
+                  <span className='text-xs text-[#858585] font-mono uppercase'>
+                    {settings.case.primaryColor}
+                  </span>
                 </div>
+              </div>
 
-                {/* Key Profile */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Keycap Profile
-                  </label>
-                  <div className='grid grid-cols-3 gap-2'>
-                    {profileOptions.map((profile) => (
-                      <button
-                        key={profile.id}
-                        onClick={() => updateKeysSetting('profile', profile.id)}
-                        className={`px-3 py-2 text-xs rounded border transition-all ${
-                          settings.keys.profile === profile.id
-                            ? 'bg-[#007acc] border-[#007acc] text-white'
-                            : 'bg-[#2d2d2d] border-[#3c3c3c] text-[#cccccc] hover:border-[#007acc]'
-                        }`}
-                      >
-                        {profile.label}
-                      </button>
-                    ))}
+              {/* Secondary Case Color */}
+              <div className='flex-1'>
+                <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                  Secondary Color
+                </label>
+                <div className='flex items-center gap-3 bg-[#2d2d2d] p-2 rounded-lg border border-[#3c3c3c]'>
+                  <div className='relative w-8 h-8 rounded-full shadow-inner overflow-hidden ring-1 ring-[#3c3c3c]'>
+                    <input
+                      type='color'
+                      value={settings.case.colorSecondary}
+                      onChange={(e) =>
+                        updateCaseSetting('colorSecondary', e.target.value)
+                      }
+                      className='absolute inset-[-50%] w-[200%] h-[200%] cursor-pointer p-0 border-0'
+                    />
                   </div>
+                  <span className='text-xs text-[#858585] font-mono uppercase'>
+                    {settings.case.colorSecondary}
+                  </span>
                 </div>
-              </>
-            )}
+              </div>
+            </div>
 
-            {activeTab === 'layout' && (
-              <>
-                {/* Keyboard Layout */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Keyboard Layout
-                  </label>
-                  <div className='grid grid-cols-3 gap-2'>
-                    {layoutDisplayOptions.map((layout) => (
-                      <button
-                        key={layout.id}
-                        onClick={() => updateCaseSetting('layout', layout.id)}
-                        className={`px-3 py-2 text-xs rounded border transition-all ${
-                          settings.case.layout === layout.id
-                            ? 'bg-[#007acc] border-[#007acc] text-white'
-                            : 'bg-[#2d2d2d] border-[#3c3c3c] text-[#cccccc] hover:border-[#007acc]'
-                        }`}
-                      >
-                        {layout.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+            {/* Material */}
+            <div>
+              <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                Case Material
+              </label>
+              <div className='bg-[#252526] p-1 rounded-lg border border-[#3c3c3c] flex gap-1'>
+                {materialOptions.map((material) => (
+                  <button
+                    key={material.id}
+                    onClick={() => updateCaseSetting('material', material.id)}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                      settings.case.material === material.id
+                        ? 'bg-[#3c3c3c] text-white shadow-sm'
+                        : 'text-[#858585] hover:text-[#cccccc] hover:bg-[#2d2d2d]'
+                    }`}
+                  >
+                    {material.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-                {/* Case Style */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Case Style
-                  </label>
+            {/* Keyboard Layout */}
+            <div>
+              <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                Keyboard Layout
+              </label>
+              <div className='grid grid-cols-4 gap-2'>
+                {layoutDisplayOptions.map((layout) => (
+                  <button
+                    key={layout.id}
+                    onClick={() => updateCaseSetting('layout', layout.id)}
+                    className={`px-2 py-2 text-xs font-medium rounded border transition-all duration-200 ${
+                      settings.case.layout === layout.id
+                        ? 'bg-[#007acc] border-[#007acc] text-white shadow-md'
+                        : 'bg-[#2d2d2d] border-[#3c3c3c] text-[#cccccc] hover:border-[#505050]'
+                    }`}
+                  >
+                    {layout.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Case Style */}
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                  Case Style
+                </label>
+                <div className='relative'>
                   <select
                     value={settings.case.style}
                     onChange={(e) => updateCaseSetting('style', e.target.value)}
-                    className='w-full px-3 py-2 bg-[#2d2d2d] border border-[#3c3c3c] rounded text-sm text-[#cccccc] focus:outline-none focus:border-[#007acc]'
+                    className='w-full appearance-none px-3 py-2 bg-[#2d2d2d] border border-[#3c3c3c] rounded text-sm text-[#cccccc] focus:outline-none focus:border-[#007acc] cursor-pointer'
                   >
                     <option value='CASE_1'>Standard</option>
                     <option value='CASE_2'>High Profile</option>
-                    <option value='CASE_3'>Low Profile</option>
                   </select>
+                  <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#cccccc] text-xs'>
+                    ▼
+                  </div>
                 </div>
+              </div>
 
-                {/* Bezel Size */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Bezel Size: {settings.case.bezel}mm
-                  </label>
+              {/* Bezel Size */}
+              <div>
+                <label className='block text-xs font-medium text-[#cccccc] uppercase tracking-wider mb-3'>
+                  Bezel Size:{' '}
+                  <span className='text-white'>{settings.case.bezel}mm</span>
+                </label>
+                <div className='h-[38px] flex items-center px-1'>
                   <input
                     type='range'
-                    min='0'
-                    max='20'
+                    min='1'
+                    max='10'
                     value={settings.case.bezel}
                     onChange={(e) =>
                       updateCaseSetting('bezel', parseInt(e.target.value))
                     }
-                    className='w-full accent-[#007acc]'
+                    className='w-full h-1.5 bg-[#3c3c3c] rounded-lg appearance-none cursor-pointer accent-[#007acc]'
                   />
                 </div>
-              </>
-            )}
-
-            {activeTab === 'advanced' && (
-              <>
-                {/* Active Key Highlight */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Active Key Highlight
-                  </label>
-                  <div className='space-y-3'>
-                    <div className='flex items-center gap-3'>
-                      <label className='text-xs text-[#858585] w-24'>
-                        Background
-                      </label>
-                      <input
-                        type='color'
-                        value={settings.keys.activeBackground}
-                        onChange={(e) =>
-                          updateKeysSetting('activeBackground', e.target.value)
-                        }
-                        className='w-10 h-10 rounded border border-[#3c3c3c] bg-transparent cursor-pointer'
-                      />
-                      <span className='text-sm text-[#858585] font-mono'>
-                        {settings.keys.activeBackground}
-                      </span>
-                    </div>
-                    <div className='flex items-center gap-3'>
-                      <label className='text-xs text-[#858585] w-24'>
-                        Text
-                      </label>
-                      <input
-                        type='color'
-                        value={settings.keys.activeColor}
-                        onChange={(e) =>
-                          updateKeysSetting('activeColor', e.target.value)
-                        }
-                        className='w-10 h-10 rounded border border-[#3c3c3c] bg-transparent cursor-pointer'
-                      />
-                      <span className='text-sm text-[#858585] font-mono'>
-                        {settings.keys.activeColor}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* High Contrast Mode */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Display Options
-                  </label>
-                  <div className='flex items-center gap-3'>
-                    <input
-                      type='checkbox'
-                      id='highContrast'
-                      checked={settings.settings.highContrast}
-                      onChange={(e) =>
-                        updateSettings({
-                          settings: {
-                            ...settings.settings,
-                            highContrast: e.target.checked,
-                          },
-                        })
-                      }
-                      className='w-4 h-4 accent-[#007acc]'
-                    />
-                    <label
-                      htmlFor='highContrast'
-                      className='text-sm text-[#cccccc]'
-                    >
-                      High Contrast Mode
-                    </label>
-                  </div>
-                </div>
-
-                {/* Legend Styles */}
-                <div>
-                  <label className='block text-sm font-medium text-white mb-3'>
-                    Legend Style
-                  </label>
-                  <select
-                    value={settings.keys.legendPrimaryStyle}
-                    onChange={(e) =>
-                      updateKeysSetting('legendPrimaryStyle', e.target.value)
-                    }
-                    className='w-full px-3 py-2 bg-[#2d2d2d] border border-[#3c3c3c] rounded text-sm text-[#cccccc] focus:outline-none focus:border-[#007acc]'
-                  >
-                    <option value='cherry'>Cherry</option>
-                    <option value='gmk'>GMK</option>
-                    <option value='modern'>Modern</option>
-                    <option value='retro'>Retro</option>
-                  </select>
-                </div>
-              </>
-            )}
+              </div>
+            </div>
           </div>
 
           {/* Footer Actions */}
@@ -461,11 +305,7 @@ export default function KeyboardSettingsPage() {
             </button>
             <button
               onClick={() => {
-                // Save settings to localStorage or API
-                localStorage.setItem(
-                  'keyboardSettings',
-                  JSON.stringify(settings)
-                );
+                handleSaveSettings();
               }}
               className='flex-1 px-4 py-2 bg-[#007acc] rounded text-sm text-white hover:bg-[#005a9e] transition-colors'
             >
@@ -476,16 +316,9 @@ export default function KeyboardSettingsPage() {
 
         {/* Right Panel - Preview */}
         <div className='flex-1 flex flex-col bg-[#252526]'>
-          <div className='border-b border-[#3c3c3c] px-6 py-3'>
-            <h2 className='text-sm font-medium text-[#cccccc]'>Live Preview</h2>
-          </div>
           <div className='flex-1 flex items-center justify-center '>
             <div className='w-full h-full'>
-              <Keyboard3D
-                ref={keyboardRef}
-                cameraZoom={16}
-                keyboardOptions={settings}
-              />
+              <Keyboard3D ref={keyboardRef} keyboardOptions={settings} />
             </div>
           </div>
           <div className='border-t border-[#3c3c3c] px-6 py-3 bg-[#1e1e1e]'>

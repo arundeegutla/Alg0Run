@@ -12,7 +12,7 @@ import { subscribe } from 'redux-subscriber';
 import { setColorway } from '@/components/keyboardUtils/store/slices/colorways';
 import {
   setPrimaryColor,
-  setSecondaryColor,
+  setColorSecondary,
   setStyle,
   setBezel,
   setLayout,
@@ -67,17 +67,14 @@ export default class SceneManager {
   startResetPosition: THREE.Vector3;
   startResetTarget: THREE.Vector3;
   isDragging: boolean;
-  cameraZoom: number;
   unsubscribeStore: (() => void) | null;
 
   constructor(
     element: HTMLElement,
-    cameraZoom: number = 10,
     customSettings?: Partial<KeyboardSettings>
   ) {
     this.element = element;
     this.animationId = null;
-    this.cameraZoom = cameraZoom;
     this.keyManager = null;
     this.caseManager = null;
     this.isResetting = false;
@@ -113,8 +110,8 @@ export default class SceneManager {
     // Camera
     const aspect = element.clientWidth / element.clientHeight;
     this.camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 1000);
-    // Start at a rotated position for initial animation
-    this.camera.position.set(-5, cameraZoom, 8);
+    // Start at a default position (will be updated by fitCameraToKeyboard)
+    this.camera.position.set(-5, 10, 8);
     this.camera.lookAt(0, 1, 2.5); // Look at keyboard center
 
     // Renderer
@@ -148,13 +145,8 @@ export default class SceneManager {
     };
 
     // Store initial camera position and controls target for reset
-    // (this is the final/original position, not the starting position)
-    this.initialCameraPosition = new THREE.Vector3(
-      0,
-      cameraZoom * 0.8,
-      cameraZoom
-    );
-    this.initialControlsTarget = new THREE.Vector3(0, 1, 2.5);
+    this.initialCameraPosition = new THREE.Vector3();
+    this.initialControlsTarget = new THREE.Vector3();
 
     // Track dragging state
     this.controls.addEventListener('start', () => {
@@ -190,6 +182,61 @@ export default class SceneManager {
       switches: { ...defaults.switches, ...(custom.switches || {}) },
       colorways: { ...defaults.colorways, ...(custom.colorways || {}) },
     };
+  }
+  fitCameraToKeyboard() {
+    // Calculate bounding box of the keyboard (and everything in scene)
+    const box = new THREE.Box3();
+    box.setFromObject(this.scene);
+
+    if (box.isEmpty()) return;
+
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+
+    // 1. Center the controls target
+    this.controls.target.copy(center);
+    this.initialControlsTarget.copy(center);
+
+    // 2. Adjust camera position to fit the object
+    // We want to maintain a fixed "top-down angled" direction
+    // Direction vector roughly (0, 0.8, 1) to match previous aesthetic
+    const direction = new THREE.Vector3(0, 1, 1).normalize();
+
+    // Use box dimensions for a tighter rectangular fit
+    // This allows zooming in more on rectangular objects compared to a bounding sphere
+    const vFov = this.camera.fov * (Math.PI / 180);
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect);
+
+    // Calculate vertical distance (fitting depth)
+    // We use size.z as a safe approximation of projected height.
+    // Since the camera is angled, the visible height is actually less than size.z (foreshortening),
+    // so this is a conservative fitting that ensures the whole depth is visible.
+    const distV = size.z / 2 / Math.tan(vFov / 2);
+
+    // Calculate horizontal distance (fitting width)
+    // Add extra buffer to x-axis (e.g. 15%) to ensure side padding
+    const distH = (size.x * 1.15) / 2 / Math.tan(hFov / 2);
+
+    // Use the larger distance to ensure both width and height fit
+    const distance = Math.max(distV, distH);
+
+    // Add minimal global padding (mostly for Y axis)
+    const padding = 1.1;
+    const finalDistance = distance * padding;
+
+    // Set new camera position
+    this.camera.position
+      .copy(center)
+      .add(direction.multiplyScalar(finalDistance));
+
+    // Update initial position reference
+    this.initialCameraPosition.copy(this.camera.position);
+
+    // Ensure camera is looking at the target
+    this.camera.lookAt(center);
+    this.controls.update();
   }
 
   setupStoreSubscription() {
@@ -236,7 +283,7 @@ export default class SceneManager {
         store.dispatch(setPrimaryColor(settings.case.primaryColor));
       }
       if (settings.case.colorSecondary) {
-        store.dispatch(setSecondaryColor(settings.case.colorSecondary));
+        store.dispatch(setColorSecondary(settings.case.colorSecondary));
       }
       if (settings.case.style) {
         store.dispatch(setStyle(settings.case.style));
@@ -266,7 +313,9 @@ export default class SceneManager {
         store.dispatch(setLegendPrimaryStyle(settings.keys.legendPrimaryStyle));
       }
       if (settings.keys.legendSecondaryStyle) {
-        store.dispatch(setLegendSecondaryStyle(settings.keys.legendSecondaryStyle));
+        store.dispatch(
+          setLegendSecondaryStyle(settings.keys.legendSecondaryStyle)
+        );
       }
     }
   }
@@ -298,6 +347,12 @@ export default class SceneManager {
     }
 
     this.caseManager = new CaseManager(this.scene, this.settings);
+
+    // Update fit after case and potentially keys are updated
+    // Small delay ensures keys/layout updates are processed
+    setTimeout(() => {
+      this.fitCameraToKeyboard();
+    }, 50);
   }
 
   handleKeysChange() {
@@ -329,6 +384,9 @@ export default class SceneManager {
         this.colorway
       );
     }
+
+    // Fit camera to the newly initialized keyboard
+    this.fitCameraToKeyboard();
   }
 
   setupLighting() {
@@ -363,6 +421,9 @@ export default class SceneManager {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(width, height);
+
+    // Recalculate component fit on resize
+    this.fitCameraToKeyboard();
   }
 
   resetKeyboardOrientation() {
@@ -486,7 +547,7 @@ export default class SceneManager {
       if (
         newSettings.case.colorSecondary !== this.settings.case.colorSecondary
       ) {
-        store.dispatch(setSecondaryColor(newSettings.case.colorSecondary));
+        store.dispatch(setColorSecondary(newSettings.case.colorSecondary));
       }
       if (newSettings.case.style !== this.settings.case.style) {
         store.dispatch(setStyle(newSettings.case.style));

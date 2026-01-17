@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { VscChromeClose, VscGraphLine } from 'react-icons/vsc';
-import dynamic from 'next/dynamic';
-import { Algo } from '@/server/trpc/types';
-const Keyboard3D = dynamic(() => import('@/components/Keyboard3D'), {
-  ssr: false,
-});
+import { Algo, KeyboardSettings } from '@/server/trpc/types';
+import { trpc } from '@/server/trpc/client';
+import Keyboard3D, { Keyboard3DHandle } from '@/components/Keyboard3D';
 
 interface Stats {
   wpm: number;
@@ -26,11 +24,25 @@ export default function SecondarySidebar({
   stats,
   onClose,
 }: SecondarySidebarProps) {
+  const keyboardRef = useRef<Keyboard3DHandle>(null);
+
+  const [settings, setSettings] = useState<KeyboardSettings | null>(null);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  const { data: profileData } = trpc.profile.getProfile.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (profileData?.profile.keyboardSettings) {
+      setSettings(profileData.profile.keyboardSettings);
+    }
+  }, [profileData]);
 
   return (
     <div className='w-full bg-[#252526] border-l border-[#3e3e42] flex flex-col h-full overflow-hidden font-mono'>
@@ -51,7 +63,11 @@ export default function SecondarySidebar({
 
       {/* Keyboard 3D */}
       <div className='flex justify-center items-center w-full h-24'>
-        <Keyboard3D />
+        {settings ? (
+          <Keyboard3D ref={keyboardRef} keyboardOptions={settings} />
+        ) : (
+          <Keyboard3D ref={keyboardRef} cameraZoom={16} />
+        )}
       </div>
 
       {/* Content */}

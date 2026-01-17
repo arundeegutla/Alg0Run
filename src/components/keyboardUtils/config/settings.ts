@@ -14,9 +14,9 @@ const defaultSettings = {
     autoColor: true,
     primaryColor: '#eeeeee',
     colorSecondary: '#eeeeee',
-    style: 'CASE_2',
-    bezel: 12,
-    layout: '100',
+    style: 'CASE_1',
+    bezel: 5,
+    layout: '65',
     profile: 'high',
     material: 'matte',
   },
@@ -36,7 +36,7 @@ const defaultSettings = {
   colorways: {
     editing: false,
     activeSwatch: 'accent',
-    active: 'nord',
+    active: 'taro',
     custom: [],
   },
 };

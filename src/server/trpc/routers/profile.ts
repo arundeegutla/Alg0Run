@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { createTRPCRouter, authedProcedure } from '../context';
 import { db, auth } from '../util/db';
-import { ProfileSchema, PlaySchema, ProfileBasicSchema } from '../types';
+import {
+  ProfileSchema,
+  PlaySchema,
+  ProfileBasicSchema,
+  KeyboardSettingsSchema,
+} from '../types';
 import { TRPCError } from '@trpc/server';
 
 export const profileRouter = createTRPCRouter({
@@ -187,6 +192,23 @@ export const profileRouter = createTRPCRouter({
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to set score',
+        });
+      }
+    }),
+
+  updateKeyboardSettings: authedProcedure
+    .input(z.object({ keyboardSettings: KeyboardSettingsSchema }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await db
+          .collection('Profiles')
+          .doc(ctx.user.uid)
+          .update({ keyboardSettings: input.keyboardSettings });
+        return { success: true };
+      } catch {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update keyboard settings',
         });
       }
     }),

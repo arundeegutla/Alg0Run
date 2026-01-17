@@ -1,6 +1,7 @@
 'use client';
 
 import React, { use, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Loading from '@/components/Loading';
@@ -9,6 +10,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/server/firebase/clientApp';
 import { trpc } from '@/server/trpc/client';
 import { useAlgos } from '@/hooks/useAlgos';
+import Keyboard3D from '@/components/Keyboard3D';
 import PythonOriginal from 'devicons-react/icons/PythonOriginal';
 import Cpp from 'devicons-react/icons/CplusplusOriginal';
 import Java from 'devicons-react/icons/JavaOriginal';
@@ -19,6 +21,7 @@ import {
   VscGraphLine,
   VscCode,
 } from 'react-icons/vsc';
+import { FaKeyboard } from 'react-icons/fa';
 
 import { SiCodeforces } from 'react-icons/si';
 
@@ -201,7 +204,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                 <Image
                   src={avatar}
                   alt='Avatar'
-                  className='w-28 h-28 rounded-full  object-center bg-[#232323]'
+                  className='w-28 h-28 rounded-full object-center bg-[#232323]'
                   width={112}
                   height={112}
                   priority
@@ -220,17 +223,31 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                 </div>
                 <div className='flex flex-wrap gap-3 justify-center md:justify-start items-center'>
                   {isViewingCurrentUser && (
-                    <button
-                      onClick={async () => {
-                        await signOut(auth);
-                      }}
-                      className='flex items-center gap-2 px-4 py-1.5 bg-[#f44747] hover:bg-[#ff6b6b] text-white rounded text-sm font-semibold transition-all duration-200'
-                    >
-                      <VscSignOut size={16} /> logout
-                    </button>
+                    <>
+                      <Link
+                        href='/settings/keyboard'
+                        className='flex items-center gap-2 px-4 py-1.5 bg-[#3e3e42] hover:bg-[#4e4e52] text-white rounded text-sm font-semibold transition-all duration-200'
+                      >
+                        <FaKeyboard size={16} /> keyboard settings
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await signOut(auth);
+                        }}
+                        className='flex items-center gap-2 px-4 py-1.5 bg-[#f44747] hover:bg-[#ff6b6b] text-white rounded text-sm font-semibold transition-all duration-200'
+                      >
+                        <VscSignOut size={16} /> logout
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
+
+              {profile.keyboardSettings && (
+                <div className='w-[800px] h-40 relative cursor-move'>
+                  <Keyboard3D keyboardOptions={profile.keyboardSettings} />
+                </div>
+              )}
             </div>
           </div>
         </div>

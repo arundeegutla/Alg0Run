@@ -21,12 +21,11 @@ export interface Keyboard3DHandle {
 }
 
 interface Keyboard3DProps {
-  cameraZoom?: number;
   keyboardOptions?: Partial<KeyboardSettings>;
 }
 
 const Keyboard3D = forwardRef<Keyboard3DHandle, Keyboard3DProps>(
-  ({ cameraZoom = 10, keyboardOptions }, ref) => {
+  ({ keyboardOptions }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneManagerRef = useRef<SceneManager | null>(null);
     const isInitializedRef = useRef(false);
@@ -53,7 +52,6 @@ const Keyboard3D = forwardRef<Keyboard3DHandle, Keyboard3DProps>(
         // Create and initialize scene
         sceneManagerRef.current = new SceneManager(
           containerRef.current,
-          cameraZoom,
           keyboardOptions
         );
         sceneManagerRef.current.tick();
@@ -74,7 +72,7 @@ const Keyboard3D = forwardRef<Keyboard3DHandle, Keyboard3DProps>(
         }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cameraZoom]); // Only recreate if cameraZoom changes, not keyboardOptions
+    }, []); // Only run once on mount
 
     // Update settings when they change
     useEffect(() => {

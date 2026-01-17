@@ -141,7 +141,6 @@ const COLORWAYS = {
   honeywell: colorway_honeywell,
   demonic: colorway_demonic,
   nuclear_data: colorway_nuclear_data,
-  gregory: colorway_gregory,
   pluto: colorway_pluto,
 };
 

@@ -14,8 +14,8 @@ export const caseSlice = createSlice({
     setPrimaryColor: (state, action) => {
       state.primaryColor = action.payload;
     },
-    setSecondaryColor: (state, action) => {
-      state.secondaryColor = action.payload;
+    setColorSecondary: (state, action) => {
+      state.colorSecondary = action.payload;
     },
     setStyle: (state, action) => {
       state.style = action.payload;
@@ -39,7 +39,7 @@ export const caseSlice = createSlice({
 export const {
   toggleAutoColor,
   setPrimaryColor,
-  setSecondaryColor,
+  setColorSecondary,
   setStyle,
   setBezel,
   setLayout,
@@ -51,7 +51,7 @@ export const {
 //case
 export const selectAutoColor = (state) => state.case.autoColor;
 export const selectPrimaryColor = (state) => state.case.primaryColor;
-export const selectSecondaryColor = (state) => state.case.secondaryColor;
+export const selectColorSecondary = (state) => state.case.colorSecondary;
 export const selectStyle = (state) => state.case.style;
 export const selectBezel = (state) => state.case.bezel;
 export const selectLayout = (state) => state.case.layout;
