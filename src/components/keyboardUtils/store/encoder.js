@@ -31,10 +31,10 @@ decoded example:
 
 const decodeSwatches = (arr, sw_keys) => {
   let items = arr.map((x) => {
-    let o = x.split('.');
+    let o = x.split(".");
     return {
-      background: '#' + o[0],
-      color: '#' + o[1],
+      background: "#" + o[0],
+      color: "#" + o[1],
     };
   });
   let sw = {};
@@ -47,8 +47,8 @@ const decodeSwatches = (arr, sw_keys) => {
 const decodeOverride = (arr, sw_keys) => {
   let override = {};
   arr.forEach((x) => {
-    let o = x.split('.');
-    let key = 'KC_' + o[0];
+    let o = x.split(".");
+    let key = "KC_" + o[0];
     override[key] = sw_keys[o[1]];
   });
   return override;
@@ -58,41 +58,41 @@ const decodeOverride = (arr, sw_keys) => {
 export const decodeColorway = (value) => {
   if (!value) return;
   let cw = {};
-  value = value.split('_');
-  let sw_list = value[1].split('-');
-  let sw_keys = ['base', 'mods', 'accent'];
+  value = value.split("_");
+  let sw_list = value[1].split("-");
+  let sw_keys = ["base", "mods", "accent"];
   if (sw_list.length > 3) {
     for (let i = 3; i < sw_list.length; i++) {
-      sw_keys.push('swatch-' + Math.floor(Math.random() * Math.floor(100000)));
+      sw_keys.push("swatch-" + Math.floor(Math.random() * Math.floor(100000)));
     }
   }
-  cw['swatches'] = decodeSwatches(sw_list, sw_keys);
-  cw['override'] = decodeOverride(value[2].split('-'), sw_keys);
-  cw.id = value[3].replace('-', '_');
+  cw["swatches"] = decodeSwatches(sw_list, sw_keys);
+  cw["override"] = decodeOverride(value[2].split("-"), sw_keys);
+  cw.id = value[3].replace("-", "_");
   cw.label = decodeURIComponent(value[4]);
   return cw;
 };
 
 export const encodeColorway = (value) => {
   let swatchlist = Object.keys(value.swatches);
-  if (swatchlist.legnth < 1) return '';
+  if (swatchlist.legnth < 1) return "";
   let swatches = swatchlist
     .map((s) => {
       let x = value.swatches[s];
       let colors = Object.keys(x);
-      return colors.map((c) => x[c]).join('.');
+      return colors.map((c) => x[c]).join(".");
     })
-    .join('-');
+    .join("-");
   let override = Object.keys(value.override)
     .map((o) => {
       let x = value.override[o];
-      return `${o.replace('KC_', '')}.${swatchlist.indexOf(x)}`;
+      return `${o.replace("KC_", "")}.${swatchlist.indexOf(x)}`;
     })
-    .join('-');
-  let id = value.id.replace('_', '-');
+    .join("-");
+  let id = value.id.replace("_", "-");
   let label = encodeURIComponent(value.label);
-  let encoded = `cw_${swatches}_${override}_${id}_${label}`.replace(/#/gi, '');
-  return swatches ? encoded : '';
+  let encoded = `cw_${swatches}_${override}_${id}_${label}`.replace(/#/gi, "");
+  return swatches ? encoded : "";
 };
 
 export const validateColorway = (cw_str) => {

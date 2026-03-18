@@ -5,6 +5,8 @@ import './globals.css';
 import './fonts.css';
 import { TRPCProvider } from '~/server/trpc/client';
 import { AuthProvider } from '@/contexts/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
+
 const Loading = lazy(() => import('../components/Loading'));
 
 const _geist = Geist({ subsets: ['latin'] });
@@ -55,6 +57,7 @@ export default function RootLayout({
       <body className={`font-sans antialiased`}>
         <TRPCProvider>
           <AuthProvider>
+            <Toaster />
             <Suspense fallback={<Loading />}>{children}</Suspense>
           </AuthProvider>
         </TRPCProvider>

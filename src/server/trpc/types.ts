@@ -3,6 +3,50 @@ import { z } from 'zod';
 export const LanguageSchema = z.enum(['python', 'cpp', 'java']);
 export type Language = z.infer<typeof LanguageSchema>;
 
+export const KeyboardSettingsSchema = z.object({
+  settings: z.object({
+    mute: z.boolean(),
+    debug: z.boolean(),
+    testing: z.boolean(),
+    mode: z.string(),
+    sceneAutoColor: z.boolean(),
+    sceneColor: z.string(),
+    glowColor: z.string(),
+    highContrast: z.boolean(),
+    paintWithKeys: z.boolean(),
+  }),
+  case: z.object({
+    autoColor: z.boolean(),
+    primaryColor: z.string(),
+    colorSecondary: z.string(),
+    style: z.string(),
+    bezel: z.number(),
+    layout: z.string(),
+    profile: z.string(),
+    material: z.string(),
+  }),
+  keys: z.object({
+    visible: z.boolean(),
+    profile: z.string(),
+    legendPrimaryStyle: z.string(),
+    legendSecondaryStyle: z.string(),
+    activeBackground: z.string(),
+    activeColor: z.string(),
+  }),
+  switches: z.object({
+    stemColor: z.string(),
+    bodyColor: z.string(),
+    soundProfile: z.string(),
+  }),
+  colorways: z.object({
+    editing: z.boolean(),
+    activeSwatch: z.string(),
+    active: z.string(),
+    custom: z.array(z.unknown()),
+  }),
+});
+export type KeyboardSettings = z.infer<typeof KeyboardSettingsSchema>;
+
 export const CodeForcesOAuthSessionSchema = z.object({
   code_verifier: z.string().optional(),
   state: z.string().optional(),
@@ -18,6 +62,7 @@ export const ProfileSchema = z.object({
   photoURL: z.string(),
   totalScore: z.number(),
   provider: z.enum(['google', 'codeforces']),
+  keyboardSettings: KeyboardSettingsSchema.optional(),
 });
 export type Profile = z.infer<typeof ProfileSchema>;
 

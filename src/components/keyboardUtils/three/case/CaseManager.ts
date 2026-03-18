@@ -33,6 +33,19 @@ import brushedAlbedo from '@/assets/dist/brushed-metal_albedo-512.png';
 import brushedAo from '@/assets/dist/brushed-metal_ao-512.png';
 
 import shadow_path_65 from '@/assets/shadows/65.png';
+import shadow_path_100 from '@/assets/shadows/100.png';
+import shadow_path_40 from '@/assets/shadows/40.png';
+import shadow_path_60 from '@/assets/shadows/60.png';
+import shadow_path_60hhkb from '@/assets/shadows/60hhkb.png';
+import shadow_path_60iso from '@/assets/shadows/60iso.png';
+import shadow_path_60wkl from '@/assets/shadows/60wkl.png';
+import shadow_path_75 from '@/assets/shadows/75.png';
+import shadow_path_80 from '@/assets/shadows/80.png';
+import shadow_path_95 from '@/assets/shadows/95.png';
+import shadow_path_leftnum from '@/assets/shadows/leftnum.png';
+import shadow_path_numpad from '@/assets/shadows/numpad.png';
+import shadow_path_40ortho from '@/assets/shadows/40ortho.png';
+import shadow_path_50ortho from '@/assets/shadows/50ortho.png';
 
 // Helper to get image src from StaticImageData
 const getImageSrc = (img: StaticImageData | string): string => {
@@ -40,7 +53,20 @@ const getImageSrc = (img: StaticImageData | string): string => {
 };
 
 const shadow_paths: Record<string, string> = {
+  shadow_path_100: getImageSrc(shadow_path_100),
+  shadow_path_40: getImageSrc(shadow_path_40),
+  shadow_path_60: getImageSrc(shadow_path_60),
+  shadow_path_60hhkb: getImageSrc(shadow_path_60hhkb),
+  shadow_path_60iso: getImageSrc(shadow_path_60iso),
+  shadow_path_60wkl: getImageSrc(shadow_path_60wkl),
   shadow_path_65: getImageSrc(shadow_path_65),
+  shadow_path_75: getImageSrc(shadow_path_75),
+  shadow_path_80: getImageSrc(shadow_path_80),
+  shadow_path_95: getImageSrc(shadow_path_95),
+  shadow_path_leftnum: getImageSrc(shadow_path_leftnum),
+  shadow_path_numpad: getImageSrc(shadow_path_numpad),
+  shadow_path_40ortho: getImageSrc(shadow_path_40ortho),
+  shadow_path_50ortho: getImageSrc(shadow_path_50ortho),
 };
 
 interface MaterialOptions {
@@ -57,6 +83,7 @@ interface MaterialOptions {
   map?: THREE.Texture;
   aoMap?: THREE.Texture;
   color?: string | number;
+  secondaryColor?: string | number;
 }
 
 const MATERIAL_OPTIONS: Record<string, MaterialOptions> = {
@@ -92,6 +119,7 @@ export default class CaseManager {
   layoutName: string;
   style: string;
   color: string;
+  secondaryColor: string;
   finish: string;
   bezel: number;
   height: number;
@@ -122,11 +150,12 @@ export default class CaseManager {
     this.layoutName = settings.case.layout || '65';
     this.style = settings.case.style || 'CASE_1';
     this.color = settings.case.primaryColor;
+    this.secondaryColor = settings.case.colorSecondary;
     this.finish = settings.case.material || 'matte';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.layout = (LAYOUTS as any)[this.layoutName] || LAYOUT_65;
     this.texScale = 0.1;
-    this.bezel = 0.5;
+    this.bezel = settings.case.bezel / 10 || 0;
     this.height = 1;
     this.angle = 6;
     this.r = 0.5;
@@ -162,12 +191,21 @@ export default class CaseManager {
     subscribe('case.primaryColor', (state: any) => {
       this.color = state.case.primaryColor;
       this.updateCaseMaterial();
+      this.createCaseShadow();
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subscribe('case.colorSecondary', (state: any) => {
+      this.secondaryColor = state.case.colorSecondary;
+      this.updateCaseMaterial();
+      this.createCaseShadow();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     subscribe('case.material', (state: any) => {
       this.finish = state.case.material;
       this.updateCaseMaterial();
+      this.createCaseShadow();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,6 +214,7 @@ export default class CaseManager {
       this.layout = (LAYOUTS as any)[state.case.layout];
       this.style = state.case.style;
       this.updateCaseGeometry();
+      this.createCaseShadow();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -243,7 +282,7 @@ export default class CaseManager {
       this.depth - this.bezel * 2
     );
     const material = new THREE.MeshLambertMaterial({
-      color: 'black',
+      color: this.secondaryColor,
     });
 
     this.plate = new THREE.Mesh(geometry, material);
@@ -278,32 +317,37 @@ export default class CaseManager {
   }
 
   createCaseShadow() {
-    if (this.shadow) this.scene.remove(this.shadow);
-
-    const sh_w = this.style === 'CASE_1' ? 32.7 : 32;
-    const sh_h = this.style === 'CASE_1' ? 33 : 31.5;
-    const sh_o = this.style === 'CASE_1' ? 0 : -0.05;
-
-    const shadowTex = this.loader.load(
-      shadow_paths[`shadow_path_${this.layoutName}`]
-    );
-    const shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTex,
-      transparent: true,
-    });
-
-    this.shadow = new THREE.Mesh(
-      new THREE.PlaneGeometry(sh_w, sh_h),
-      shadowMat
-    );
-    this.shadow.position.z = this.depth / 2 - this.bezel + sh_o;
-    this.shadow.position.y = 0.01;
-    if (this.shadow.material instanceof THREE.Material) {
-      this.shadow.material.side = THREE.DoubleSide;
+    if (this.shadow) {
+      console.log('Removing existing case shadow');
+      this.scene.remove(this.shadow);
     }
-    this.shadow.rotation.x = -Math.PI / 2;
 
-    this.scene.add(this.shadow);
+    // console.log('Creating case shadow for layout:', this.layoutName);
+    // const sh_w = this.style === 'CASE_1' ? 32.7 : 32;
+    // const sh_h = this.style === 'CASE_1' ? 33 : 31.5;
+    // const sh_o = this.style === 'CASE_1' ? 0 : -0.05;
+
+    // const shadowTex = this.loader.load(
+    //   shadow_paths[`shadow_path_${this.layoutName}`]
+    // );
+
+    // const shadowMat = new THREE.MeshBasicMaterial({
+    //   map: shadowTex,
+    //   transparent: true,
+    // });
+
+    // this.shadow = new THREE.Mesh(
+    //   new THREE.PlaneGeometry(sh_w, sh_h),
+    //   shadowMat
+    // );
+    // this.shadow.position.z = this.depth / 2 - this.bezel + sh_o;
+    // this.shadow.position.y = 0.01;
+    // // if (this.shadow.material instanceof THREE.Material) {
+    // //   this.shadow.material.side = THREE.DoubleSide;
+    // // }
+    // this.shadow.rotation.x = -Math.PI / 2;
+
+    // this.scene.add(this.shadow);
   }
 
   getCaseMesh(layout = this.layout, style = this.style) {
@@ -356,7 +400,7 @@ export default class CaseManager {
     // Primary material
     const materialPrimary = new THREE.MeshPhysicalMaterial({
       ...options,
-      color: color,
+      color: this.color,
     });
 
     // Side material
@@ -371,5 +415,67 @@ export default class CaseManager {
 
     materials.push(materialPrimary, materialSecondary);
     this.caseMesh.material = materials;
+  }
+
+  dispose() {
+    // Remove all meshes from the group
+    if (this.caseMesh) {
+      this.group.remove(this.caseMesh);
+      if (this.caseMesh.geometry) this.caseMesh.geometry.dispose();
+      if (this.caseMesh.material) {
+        if (Array.isArray(this.caseMesh.material)) {
+          this.caseMesh.material.forEach((mat) => mat.dispose());
+        } else {
+          this.caseMesh.material.dispose();
+        }
+      }
+    }
+
+    if (this.plate) {
+      this.group.remove(this.plate);
+      if (this.plate.geometry) this.plate.geometry.dispose();
+      if (this.plate.material) {
+        if (Array.isArray(this.plate.material)) {
+          this.plate.material.forEach((mat) => mat.dispose());
+        } else {
+          this.plate.material.dispose();
+        }
+      }
+    }
+
+    if (this.badgeMesh) {
+      this.group.remove(this.badgeMesh);
+      if (this.badgeMesh.geometry) this.badgeMesh.geometry.dispose();
+      if (this.badgeMesh.material) {
+        if (Array.isArray(this.badgeMesh.material)) {
+          this.badgeMesh.material.forEach((mat) => mat.dispose());
+        } else {
+          this.badgeMesh.material.dispose();
+        }
+      }
+    }
+
+    if (this.shadow) {
+      this.scene.remove(this.shadow);
+      if (this.shadow.geometry) this.shadow.geometry.dispose();
+      if (this.shadow.material) {
+        if (Array.isArray(this.shadow.material)) {
+          this.shadow.material.forEach((mat) => mat.dispose());
+        } else {
+          this.shadow.material.dispose();
+        }
+      }
+    }
+
+    // Remove group from scene
+    if (this.group) {
+      this.scene.remove(this.group);
+    }
+
+    // Dispose textures
+    if (this.lightTexture) this.lightTexture.dispose();
+    if (this.aoShadowTexture) this.aoShadowTexture.dispose();
+    if (this.roughnessMap) this.roughnessMap.dispose();
+    if (this.albedoMap) this.albedoMap.dispose();
   }
 }

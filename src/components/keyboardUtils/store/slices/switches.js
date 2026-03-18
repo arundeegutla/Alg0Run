@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import initial_settings from '../../config/settings_user_default.json';
+import { getSettings } from '../../config/settings';
 
 export const switchesSlice = createSlice({
   name: 'switches',
-  initialState: initial_settings.switches,
+  initialState: getSettings().switches,
   reducers: {
     setBodyColor: (state, action) => {
       state.bodyColor = action.payload;

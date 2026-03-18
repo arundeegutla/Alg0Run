@@ -252,7 +252,7 @@ export default function Home() {
       </main>
 
       {/* 3D Keyboard - Fixed to Bottom */}
-      <div className='relative z-20 shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px]'>
+      <div className='relative z-20 shrink-0 w-full h-[45vh] min-h-[300px] max-h-[550px] pb-1'>
         <Keyboard3D ref={keyboardRef} />
       </div>
     </div>
